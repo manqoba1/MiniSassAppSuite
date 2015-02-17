@@ -4,7 +4,6 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ResponseDTO;
-import com.sifiso.codetribe.minisasslibrary.toolbox.WebSocketUtil;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

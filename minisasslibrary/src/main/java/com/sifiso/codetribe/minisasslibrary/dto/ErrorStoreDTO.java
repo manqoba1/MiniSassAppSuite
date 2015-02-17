@@ -5,7 +5,10 @@
 package com.sifiso.codetribe.minisasslibrary.dto;
 
 
+
+
 /**
+ *
  * @author aubreyM
  */
 public class ErrorStoreDTO {
@@ -14,6 +17,7 @@ public class ErrorStoreDTO {
     private int statusCode;
     private String message, origin;
     private long dateOccured;
+
 
 
     public int getErrorStoreID() {

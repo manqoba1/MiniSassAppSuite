@@ -2,8 +2,6 @@ package com.sifiso.codetribe.minisasslibrary.util;
 
 import android.util.Log;
 
-import com.sifiso.codetribe.minisasslibrary.toolbox.WebSocketUtil;
-
 import java.util.Timer;
 import java.util.TimerTask;
 

@@ -3,26 +3,27 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.sifiso.codetribe.minisasslibrary.dto;
 
-
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author aubreyM
  */
 public class InsectDTO implements Serializable {
+
     private static final long serialVersionUID = 1L;
     private Integer insectID;
     private String groupName;
     private int sensitivityScore;
-    private List<InsectImageDTO> insectImageList;
-    private List<EvaluationInsectDTO> evaluationInsectList;
+    private List<InsectImageDTO> insectImageList = new ArrayList<>();
+    private List<EvaluationInsectDTO> evaluationInsectList = new ArrayList<>();
 
     public InsectDTO() {
     }
+
 
     public Integer getInsectID() {
         return insectID;

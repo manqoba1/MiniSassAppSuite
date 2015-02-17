@@ -10,7 +10,6 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- *
  * @author aubreyM
  */
 public class CommentDTO implements Serializable {
@@ -22,7 +21,6 @@ public class CommentDTO implements Serializable {
 
     public CommentDTO() {
     }
-
 
 
     public List<EvaluationCommentDTO> getEvaluationcommentList() {

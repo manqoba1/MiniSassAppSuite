@@ -5,9 +5,7 @@
  */
 package com.sifiso.codetribe.minisasslibrary.dto;
 
-
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 
 /**

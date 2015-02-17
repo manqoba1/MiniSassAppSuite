@@ -5,6 +5,7 @@
  */
 package com.sifiso.codetribe.minisasslibrary.dto;
 
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -22,7 +23,6 @@ public class CategoryDTO implements Serializable {
 
     public CategoryDTO() {
     }
-
 
 
     public Integer getCategoryID() {

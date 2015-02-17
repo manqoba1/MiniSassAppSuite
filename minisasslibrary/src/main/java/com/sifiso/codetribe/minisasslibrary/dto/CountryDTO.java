@@ -3,21 +3,24 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.sifiso.codetribe.minisasslibrary.dto;
+
 
 import java.io.Serializable;
 import java.util.List;
 
 /**
+ *
  * @author aubreyM
  */
 public class CountryDTO implements Serializable {
+
     private static final long serialVersionUID = 1L;
     private Integer countryID;
     private String countryName;
     private Double latitude;
     private Double longitude;
+    private String countryCode;
     private List<ProvinceDTO> provinceList;
     private List<RiverDTO> originRiverList;
     private List<RiverDTO> endRiverList;
@@ -29,6 +32,15 @@ public class CountryDTO implements Serializable {
         this.countryID = countryID;
     }
 
+
+
+    public String getCountryCode() {
+        return countryCode;
+    }
+
+    public void setCountryCode(String countryCode) {
+        this.countryCode = countryCode;
+    }
 
     public Integer getCountryID() {
         return countryID;
@@ -85,7 +97,6 @@ public class CountryDTO implements Serializable {
     public void setEndRiverList(List<RiverDTO> endRiverList) {
         this.endRiverList = endRiverList;
     }
-
 
     @Override
     public int hashCode() {

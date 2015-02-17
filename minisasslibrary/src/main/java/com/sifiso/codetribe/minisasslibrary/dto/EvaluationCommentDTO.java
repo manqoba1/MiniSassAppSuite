@@ -9,6 +9,7 @@ package com.sifiso.codetribe.minisasslibrary.dto;
 import java.io.Serializable;
 
 /**
+ *
  * @author aubreyM
  */
 public class EvaluationCommentDTO implements Serializable {
@@ -20,6 +21,7 @@ public class EvaluationCommentDTO implements Serializable {
 
     public EvaluationCommentDTO() {
     }
+
 
 
     public Integer getEvaluationCommentID() {

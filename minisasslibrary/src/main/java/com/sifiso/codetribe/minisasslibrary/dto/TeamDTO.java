@@ -7,9 +7,11 @@ package com.sifiso.codetribe.minisasslibrary.dto;
 
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
+ *
  * @author aubreyM
  */
 public class TeamDTO implements Serializable {
@@ -21,10 +23,12 @@ public class TeamDTO implements Serializable {
     private String townName;
     private String teamImage;
     private List<GcmDeviceDTO> gcmdeviceList;
-    private List<TeamMemberDTO> teamMemberList;
+    private List<TeamMemberDTO> teamMemberList = new ArrayList<>();
 
     public TeamDTO() {
     }
+
+
 
     public Integer getTownID() {
         return townID;

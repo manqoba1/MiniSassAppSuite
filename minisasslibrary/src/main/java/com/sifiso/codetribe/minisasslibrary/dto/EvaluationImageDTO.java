@@ -10,7 +10,6 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- *
  * @author aubreyM
  */
 public class EvaluationImageDTO implements Serializable {
@@ -23,7 +22,6 @@ public class EvaluationImageDTO implements Serializable {
 
     public EvaluationImageDTO() {
     }
-
 
 
     public Integer getEvaluationID() {

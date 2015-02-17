@@ -22,6 +22,9 @@ public class GcmDeviceDTO {
     private TeamMemberDTO teamMember;
     private TeamDTO team;
 
+    public GcmDeviceDTO() {
+    }
+
 
     public TeamMemberDTO getTeamMember() {
         return teamMember;

@@ -7,6 +7,7 @@ package com.sifiso.codetribe.minisasslibrary.dto;
 
 import java.io.Serializable;
 
+
 /**
  * @author aubreyM
  */

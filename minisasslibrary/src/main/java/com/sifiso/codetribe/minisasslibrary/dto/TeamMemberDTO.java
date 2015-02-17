@@ -5,7 +5,6 @@
  */
 package com.sifiso.codetribe.minisasslibrary.dto;
 
-
 import java.io.Serializable;
 import java.util.List;
 
@@ -30,7 +29,6 @@ public class TeamMemberDTO implements Serializable {
 
     public TeamMemberDTO() {
     }
-
 
     public String getTeamMemberImage() {
         return teamMemberImage;

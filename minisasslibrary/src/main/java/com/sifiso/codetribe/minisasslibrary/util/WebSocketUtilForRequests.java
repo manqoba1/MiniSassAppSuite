@@ -1,16 +1,14 @@
-package com.sifiso.codetribe.minisasslibrary.toolbox;
+package com.sifiso.codetribe.minisasslibrary.util;
 
 import android.content.Context;
 import android.util.Log;
 
+
 import com.google.gson.Gson;
 import com.sifiso.codetribe.minisasslibrary.R;
-import com.sifiso.codetribe.minisasslibrary.dto.tranfer.RequestDTO;
+import com.sifiso.codetribe.minisasslibrary.dto.tranfer.RequestList;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ResponseDTO;
-import com.sifiso.codetribe.minisasslibrary.util.Statics;
-import com.sifiso.codetribe.minisasslibrary.util.TimerUtil;
-import com.sifiso.codetribe.minisasslibrary.util.Util;
-import com.sifiso.codetribe.minisasslibrary.util.ZipUtil;
+import com.sifiso.codetribe.minisasslibrary.toolbox.BaseVolley;
 
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.exceptions.WebsocketNotConnectedException;
@@ -25,7 +23,7 @@ import java.nio.ByteBuffer;
  * Utility class to manage web socket communications for the application
  * Created by aubreyM on 2014/08/10.
  */
-public class WebSocketUtil {
+public class WebSocketUtilForRequests {
     public interface WebSocketListener {
         public void onMessage(ResponseDTO response);
 
@@ -36,7 +34,7 @@ public class WebSocketUtil {
     }
 
     static WebSocketListener webSocketListener;
-    static RequestDTO request;
+    static RequestList requestList;
     static Context ctx;
     static long start, end;
 
@@ -47,20 +45,20 @@ public class WebSocketUtil {
         }
     }
 
-    public static void sendRequest(Context c, final String suffix, RequestDTO req, WebSocketListener listener) {
+    public static void sendRequest(Context c, RequestList req, WebSocketListener listener) {
         if (!BaseVolley.checkNetworkOnDevice(c)) {
-            listener.onError("Network connections unavailable");
+            listener.onError(c.getString(R.string.no_networks));
             return;
         }
 
         webSocketListener = listener;
-        request = req;
+        requestList = req;
         ctx = c;
         TimerUtil.startTimer(new TimerUtil.TimerListener() {
             @Override
             public void onSessionDisconnected() {
                 try {
-                    connectWebSocket(suffix);
+                    connectWebSocket();
                     return;
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
@@ -69,29 +67,32 @@ public class WebSocketUtil {
         });
         try {
             if (mWebSocketClient == null) {
-                connectWebSocket(suffix);
+                connectWebSocket();
             } else {
-                String json = gson.toJson(req);
+                String json = gson.toJson(requestList);
                 start = System.currentTimeMillis();
                 mWebSocketClient.send(json);
-                URI uri = new URI(Statics.WEBSOCKET_URL + suffix);
-                Log.i(LOG, "## sent request, uri: " + uri.toString() + "web socket message sent\n"
-                         + json);
+                Log.d(LOG, "## web socket message sent\n" + json);
             }
 
 
         } catch (WebsocketNotConnectedException e) {
+            try {
+                Log.e(LOG, "WebsocketNotConnectedException. Problems with web socket", e);
+                connectWebSocket();
+            } catch (URISyntaxException e1) {
                 Log.e(LOG, "Problems with web socket", e);
-                //webSocketListener.onError("Problem starting server socket communications\n");
-
+                webSocketListener.onError("Problem starting server socket communications\n" + e1.getMessage());
+            }
         } catch (URISyntaxException e) {
             Log.e(LOG, "Problems with web socket", e);
             webSocketListener.onError("Problem starting server socket communications");
         }
     }
 
-    private static void connectWebSocket(String socketSuffix) throws URISyntaxException {
-        URI uri = new URI(Statics.WEBSOCKET_URL + socketSuffix);
+
+    private static void connectWebSocket() throws URISyntaxException {
+        URI uri = new URI(Statics.WEBSOCKET_URL + Statics.REQUEST_ENDPOINT);
         Log.i(LOG, "## connectWebSocket uri: " + uri.toString());
         start = System.currentTimeMillis();
         mWebSocketClient = new WebSocketClient(uri) {
@@ -104,14 +105,14 @@ public class WebSocketUtil {
             public void onMessage(String response) {
                 TimerUtil.killTimer();
                 end = System.currentTimeMillis();
-                Log.i(LOG, "### onMessage returning websocket sessionID, length: " + response.length() + " elapsed: " + Util.getElapsed(start, end) + " seconds"
+                Log.i(LOG, "### onMessage returning socket sessionID, length: " + response.length() + " elapsed: " + Util.getElapsed(start, end) + " seconds"
                         + "\n" + response);
                 try {
                     ResponseDTO r = gson.fromJson(response, ResponseDTO.class);
-                    if (r.getStatusCode() == 0) {
+                    if (r.getStatusCode() == null || r.getStatusCode() == 0) {
                         if (r.getSessionID() != null) {
-                           // SharedUtil.saveSessionID(ctx, r.getSessionID());
-                            String json = gson.toJson(request);
+                            //SharedUtil.saveSessionID(ctx, r.getSessionID());
+                            String json = gson.toJson(requestList);
                             mWebSocketClient.send(json);
                             Log.i(LOG, "### web socket request sent after onOpen\n" + json);
 
@@ -164,7 +165,6 @@ public class WebSocketUtil {
         try {
             try {
                 content = new String(bb.array());
-                end = System.currentTimeMillis();
                 ResponseDTO response = gson.fromJson(content, ResponseDTO.class);
                 if (response.getStatusCode() == 0) {
                     webSocketListener.onMessage(response);
@@ -180,7 +180,7 @@ public class WebSocketUtil {
             if (content != null) {
                 ResponseDTO response = gson.fromJson(content, ResponseDTO.class);
                 if (response.getStatusCode() == 0) {
-                    Log.w(LOG, "### response status code is 0 - OK");
+                    Log.w(LOG, "### response status code is 0 -  OK");
                     webSocketListener.onMessage(response);
                 } else {
                     Log.e(LOG, "## response status code is > 0 - server found ERROR");
@@ -190,7 +190,8 @@ public class WebSocketUtil {
                 Log.e(LOG, "-- Content from server failed. Response content is null");
                 webSocketListener.onError("Content from server failed. Response is null");
             }
-
+            end = System.currentTimeMillis();
+            Log.d(LOG, "### parseData finished, elapsed: " + Util.getElapsed(start, end) + " seconds");
         } catch (Exception e) {
             Log.e(LOG, "parseData Failed", e);
             webSocketListener.onError("Failed to unpack server response");
@@ -198,7 +199,7 @@ public class WebSocketUtil {
     }
 
     static WebSocketClient mWebSocketClient;
-    static final String LOG = WebSocketUtil.class.getSimpleName();
+    static final String LOG = WebSocketUtilForRequests.class.getSimpleName();
     static final Gson gson = new Gson();
 
     public static String getElapsed() {

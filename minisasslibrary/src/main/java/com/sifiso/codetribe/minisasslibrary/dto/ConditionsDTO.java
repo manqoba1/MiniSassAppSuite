@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
+ *
  * @author CodeTribe1
  */
 public class ConditionsDTO implements Serializable {
@@ -26,6 +27,7 @@ public class ConditionsDTO implements Serializable {
     public ConditionsDTO() {
 
     }
+
 
 
     public Integer getCategoryID() {
