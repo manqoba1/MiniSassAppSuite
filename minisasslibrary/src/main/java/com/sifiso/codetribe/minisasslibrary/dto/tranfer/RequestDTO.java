@@ -24,15 +24,14 @@ import com.sifiso.codetribe.minisasslibrary.dto.TownDTO;
 import java.util.List;
 
 /**
- *
  * @author aubreyM
  */
 public class RequestDTO {
 
     private int requestType;
     private String email, password;
-    private Integer countryID, categoryID, commentID, conditionsID, evaluationID,  evaluationInsectID,
-            evaluationCommentID, evaluationSiteID, insectID, provinceID, riverID, teamID, townID, teamMemberID, 
+    private Integer countryID, categoryID, commentID, conditionsID, evaluationID, evaluationInsectID,
+            evaluationCommentID, evaluationSiteID, insectID, provinceID, riverID, teamID, townID, teamMemberID,
             evaluationImageID;
 
     public static final int REGISTER_TEAM = 1,
@@ -41,10 +40,9 @@ public class RequestDTO {
             REGISTER_TEAM_MEMBER = 2,
             SIGN_IN_MEMBER = 3,
             IMPORT_MEMBERS = 4;
-    
-    
 
-    public static final int 
+
+    public static final int
             ADD_RIVER = 10,
             ADD_RIVER_TOWN = 11,
             ADD_EVALUATION_SITE = 12,
@@ -52,29 +50,29 @@ public class RequestDTO {
             ADD_INSECT_IMAGE = 14,
             ADD_EVALUATION = 15,
             ADD_COMMENT = 16,
-            
-            ADD_EVALUATION_INSECT = 17;
-                    
-                    
+
+    ADD_EVALUATION_INSECT = 17;
+
+
     public static final int ADD_COUNTRY = 21,
             ADD_PROVINCE = 22,
             ADD_TOWN = 23;
 
-    public static final int 
+    public static final int
             UPDATE_RIVER = 30,
             UPDATE_RIVER_TOWN = 31,
             UPDATE_EVALUATION_SITE = 32,
             UPDATE_INSECT = 33,
             UPDATE_INSECT_IMAGE = 34,
-            
-            UPDATE_TOWN = 35,
+
+    UPDATE_TOWN = 35,
             UPDATE_TEAM = 36,
             UPDATE_TEAM_MEMBER = 37,
             UPDATE_COMMENT = 38,
             UPDATE_CATEGORY = 39,
             UPDATE_CONDITIONS = 55,
             UPDATE_EVALUATION_IMAGE = 56;
-                    
+
     public static final int
             LIST_RIVERS_IN_COUNTRY = 40,
             LIST_RIVER_TOWNS = 41,
@@ -84,8 +82,8 @@ public class RequestDTO {
             LIST_EVALUATION_SITE_BY_RIVER = 45,
             LIST_PROVINCE_BY_COUNTRY = 46,
             LIST_ALL_PROVINCES = 50,
-            
-            LIST_EVALUATION_BY_TEAM_MEMBER = 60,
+
+    LIST_EVALUATION_BY_TEAM_MEMBER = 60,
             LIST_EVALUATION_BY_CONDITIONS = 61,
             LIST_EVALUATION_SITE_BY_CATEGORY = 62,
             LIST_EVALUATION_INSECT_BY_EVALUATION = 63,
@@ -96,9 +94,10 @@ public class RequestDTO {
             LIST_COMMENTS = 68,
             LIST_COUNTRYS = 69,
             LIST_EVALUATIONS = 70,
-            LIST_RIVERS = 71;
-                    
-                    
+            LIST_RIVERS = 71,
+            GET_DATA = 72;
+
+
     private EvaluationDTO evaluation;
     private ImagesDTO images;
     private CategoryDTO category;
@@ -119,8 +118,8 @@ public class RequestDTO {
     private CountryDTO country;
     private TownDTO town;
     private ProvinceDTO province;
-    
-    
+
+
     public static final String SAMPLE_DIR = "company";
 
     private List<TeamMemberDTO> members;
@@ -440,6 +439,6 @@ public class RequestDTO {
 
     public void setEvaluationImageID(Integer evaluationImageID) {
         this.evaluationImageID = evaluationImageID;
-    }      
+    }
 
 }

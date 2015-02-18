@@ -1,7 +1,12 @@
 package com.sifiso.codetribe.minisasslibrary.util;
 
+import android.app.Activity;
 import android.content.Context;
+import android.os.Build;
+import android.util.Log;
 
+import com.sifiso.codetribe.minisasslibrary.dto.EvaluationDTO;
+import com.sifiso.codetribe.minisasslibrary.dto.GcmDeviceDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.TeamDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.TeamMemberDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.RequestDTO;
@@ -15,7 +20,7 @@ import java.util.List;
  */
 public class DataUtil {
     private static List<TeamMemberDTO> teamMembers;
-    private DataUtilInterface listener;
+    static DataUtilInterface dataUtilInterface;
 
     public interface DataUtilInterface {
         public void onResponse(ResponseDTO r);
@@ -37,7 +42,7 @@ public class DataUtil {
 
 
     public static void registerTeamMember(Context ctx, String sufix, TeamDTO team, final DataUtilInterface listener) {
-
+        dataUtilInterface = listener;
         RequestDTO req = new RequestDTO();
         req.setTeam(team);
         req.setRequestType(RequestDTO.REGISTER_TEAM);
@@ -47,7 +52,7 @@ public class DataUtil {
                 @Override
                 public void onMessage(final ResponseDTO response) {
 
-                    listener.onResponse(response);
+                    dataUtilInterface.onResponse(response);
 
                 }
 
@@ -58,7 +63,7 @@ public class DataUtil {
 
                 @Override
                 public void onError(String message) {
-                    listener.onError(message);
+                    dataUtilInterface.onError(message);
                 }
             });
         } catch (Exception e) {
@@ -67,9 +72,13 @@ public class DataUtil {
 
     }
 
-    public static void login(Context ctx, String sufix, TeamMemberDTO teamMember, final DataUtilInterface listener) {
+    public static void login(Context ctx, String sufix, String email, String pin, GcmDeviceDTO dto, DataUtilInterface listener) {
+
+        dataUtilInterface = listener;
         RequestDTO req = new RequestDTO();
-        req.setTeamMember(teamMember);
+        req.setEmail(email);
+        req.setPassword(pin);
+        req.setGcmDevice(dto);
         req.setRequestType(RequestDTO.SIGN_IN_MEMBER);
 
         try {
@@ -77,7 +86,7 @@ public class DataUtil {
                 @Override
                 public void onMessage(final ResponseDTO response) {
 
-                    listener.onResponse(response);
+                    dataUtilInterface.onResponse(response);
 
                 }
 
@@ -88,24 +97,52 @@ public class DataUtil {
 
                 @Override
                 public void onError(String message) {
-                    listener.onError(message);
+                    dataUtilInterface.onError(message);
                 }
             });
         } catch (Exception e) {
 
         }
     }
-    public static void getData(Context ctx, String sufix, TeamMemberDTO teamMember, final DataUtilInterface listener) {
+
+    private static String LOG = DataUtil.class.getSimpleName();
+    static GCMRegisteredListener gcmRegisteredListener;
+
+    public interface GCMRegisteredListener {
+        public void onDeviceRegistered(String c);
+    }
+
+    public void registerGCMDevice(Context ctx, Activity act, GCMRegisteredListener registeredListener) {
+        gcmRegisteredListener = registeredListener;
+        GCMUtil.checkPlayServices(ctx, act);
+
+        GCMUtil.startGCMRegistration(ctx, new GCMUtil.GCMUtilListener() {
+            @Override
+            public void onGCMError() {
+                Log.e(LOG, "Error registering device for gcm");
+            }
+
+            @Override
+            public void onDeviceRegistered(String regID) {
+                gcmRegisteredListener.onDeviceRegistered(regID);
+            }
+        });
+
+
+    }
+
+
+    public static void getData(Context ctx, String sufix, DataUtilInterface listener) {
+        dataUtilInterface = listener;
         RequestDTO req = new RequestDTO();
-        req.setTeamMember(teamMember);
-        req.setRequestType(RequestDTO.SIGN_IN_MEMBER);
+        req.setRequestType(RequestDTO.GET_DATA);
 
         try {
             WebSocketUtil.sendRequest(ctx, sufix, req, new WebSocketUtil.WebSocketListener() {
                 @Override
                 public void onMessage(final ResponseDTO response) {
 
-                    listener.onResponse(response);
+                    dataUtilInterface.onResponse(response);
 
                 }
 
@@ -116,7 +153,7 @@ public class DataUtil {
 
                 @Override
                 public void onError(String message) {
-                    listener.onError(message);
+                    dataUtilInterface.onError(message);
                 }
             });
         } catch (Exception e) {
@@ -124,5 +161,32 @@ public class DataUtil {
         }
     }
 
+    public static void createEvaluation(Context ctx, String sufix, EvaluationDTO dto, DataUtilInterface listener) {
+        dataUtilInterface = listener;
+        RequestDTO req = new RequestDTO();
+        req.setEvaluation(dto);
+        try {
+            WebSocketUtil.sendRequest(ctx, sufix, req, new WebSocketUtil.WebSocketListener() {
+                @Override
+                public void onMessage(final ResponseDTO response) {
+
+                    dataUtilInterface.onResponse(response);
+
+                }
+
+                @Override
+                public void onClose() {
+
+                }
+
+                @Override
+                public void onError(String message) {
+                    dataUtilInterface.onError(message);
+                }
+            });
+        } catch (Exception e) {
+
+        }
+    }
 
 }
