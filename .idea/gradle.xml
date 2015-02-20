@@ -8,9 +8,6 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/minisasslibrary" />
-            <option value="$PROJECT_DIR$/officialsapp" />
-            <option value="$PROJECT_DIR$/riverteamapp" />
           </set>
         </option>
       </GradleProjectSettings>
