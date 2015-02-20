@@ -1,19 +1,54 @@
 package com.sifiso.codetribe.minisasslibrary.activities;
 
+import android.content.Context;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.sifiso.codetribe.minisasslibrary.R;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 
 public class SplashActivity extends ActionBarActivity {
+    ImageView imageView;
+    TextView imageText;
+    Timer timer;
+    Context ctx;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+        getSupportActionBar().hide();
+        ctx = getApplicationContext();
+        imageView = (ImageView) findViewById(R.id.imgBackground);
+        imageText = (TextView) findViewById(R.id.imageText);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                timer = new Timer();
+
+
+                timer.scheduleAtFixedRate(new TimerTask() {
+                    @Override
+                    public void run() {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                RandomPics.getImage(ctx, imageView, imageText);
+                            }
+                        });
+
+                    }
+                }, 1000, 5000);
+
+            }
+        });
     }
 
 
