@@ -13,7 +13,7 @@ import com.sifiso.codetribe.minisasslibrary.R;
 import java.util.Timer;
 import java.util.TimerTask;
 /*
-* Sasa
+* Sasa 2015-02-20
  */
 
 public class SplashActivity extends ActionBarActivity {
