@@ -12,7 +12,9 @@ import com.sifiso.codetribe.minisasslibrary.R;
 
 import java.util.Timer;
 import java.util.TimerTask;
-
+/*
+* Sasa
+ */
 
 public class SplashActivity extends ActionBarActivity {
     ImageView imageView;
