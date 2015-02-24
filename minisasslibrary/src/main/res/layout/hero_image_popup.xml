@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:background="@color/white"
+
+    android:layout_height="wrap_content">
+
+
+
+    <ImageView
+        android:id="@+id/HERO_image"
+        android:src="@drawable/olofants6"
+        android:scaleType="fitXY"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"/>
+
+    <TextView
+        android:id="@+id/HERO_caption"
+        android:text="River Team"
+        android:textColor="@color/material_blue_grey_800"
+        android:padding="@dimen/mon_padding"
+        android:layout_below="@id/HERO_image"
+        style="@style/TextStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    </RelativeLayout>
+

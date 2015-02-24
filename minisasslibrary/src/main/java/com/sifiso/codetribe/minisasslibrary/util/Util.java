@@ -41,6 +41,8 @@ import android.widget.Toast;
 
 
 import com.sifiso.codetribe.minisasslibrary.R;
+import com.sifiso.codetribe.minisasslibrary.adapters.PopupListAdapter;
+import com.sifiso.codetribe.minisasslibrary.dto.TownDTO;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -364,6 +366,41 @@ public class Util {
         });
         view.startAnimation(a);
     }
+    public static void showPopupBasicWithHeroImage(Context ctx, Activity act,
+                                                   List<TownDTO> list,
+                                                   View anchorView, String caption, final UtilPopupListener listener) {
+        final ListPopupWindow pop = new ListPopupWindow(act);
+        LayoutInflater inf = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View v = inf.inflate(R.layout.hero_image_popup, null);
+        TextView txt = (TextView) v.findViewById(R.id.HERO_caption);
+        if (caption != null) {
+            txt.setText(caption);
+        } else {
+            txt.setVisibility(View.GONE);
+        }
+        ImageView img = (ImageView) v.findViewById(R.id.HERO_image);
+        img.setImageDrawable(getRandomHeroImage(ctx));
+
+        pop.setPromptView(v);
+        pop.setPromptPosition(ListPopupWindow.POSITION_PROMPT_ABOVE);
+        pop.setAdapter(new PopupListAdapter(ctx, R.layout.xxsimple_spinner_item,
+                list, false));
+        pop.setAnchorView(anchorView);
+        pop.setHorizontalOffset(getPopupHorizontalOffset(act));
+        pop.setModal(true);
+        pop.setWidth(getPopupWidth(act));
+        pop.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                pop.dismiss();
+                if (listener != null) {
+                    listener.onItemSelected(position);
+                }
+            }
+        });
+        pop.show();
+    }
+
 
     public static void flashOnce(View view, long duration, final UtilAnimationListener listener) {
         ObjectAnimator an = ObjectAnimator.ofFloat(view, "alpha", 0, 1);

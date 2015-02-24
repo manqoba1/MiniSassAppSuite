@@ -26,6 +26,7 @@ import com.sifiso.codetribe.minisasslibrary.dto.TeamMemberDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.TownDTO;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -35,6 +36,7 @@ public class ResponseDTO {
 
     private Integer statusCode;
     private String message;
+    private Date lastCacheDate, startDate, endDate;
     private Integer statusCountInPeriod, goodCount, badCount;
     private String sessionID, GCMRegistrationID, fileString;
     private double elapsedRequestTimeInSeconds;
@@ -85,6 +87,30 @@ public class ResponseDTO {
 
     public void setEvaluationImageList(List<EvaluationImageDTO> evaluationImageList) {
         this.evaluationImageList = evaluationImageList;
+    }
+
+    public Date getLastCacheDate() {
+        return lastCacheDate;
+    }
+
+    public void setLastCacheDate(Date lastCacheDate) {
+        this.lastCacheDate = lastCacheDate;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
     }
 
     public List<GcmDeviceDTO> getGcmDeviceList() {

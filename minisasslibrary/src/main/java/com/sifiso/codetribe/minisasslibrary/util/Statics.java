@@ -10,31 +10,13 @@ import com.sifiso.codetribe.minisasslibrary.R;
 
 public class Statics {
 
-    /*
-     * REMOTE URL - bohamaker back end - production
-     */
-    //
-    // public static final String WEBSOCKET_URL = "ws://bohamaker.com:51490/mwp/";
-    //public static final String URL = "http://bohamaker.com:51490/mwp/";
-    //public static final String IMAGE_URL = "http://bohamaker.com:51490/";
-    //public static final String PDF_URL = "http://bohamaker.com:51490/monitor_documents/";
 
-    //google cloud http://mggolf-303.appspot.com/golf?JSON={requestType:38,golfGroupID:21}
-    //public static final String URL = "http://mggolf-303.appspot.com/";
+    public static final String WEBSOCKET_URL = "ws://192.168.1.116:8080/ms/";
+    public static final String URL = "http://192.168.1.116:8080/ms/";
+    public static final String IMAGE_URL = "http://192.168.1.116:8080/";
 
-    public static final String WEBSOCKET_URL = "ws://10.50.75.35:8080/ms/";
-    public static final String URL = "http://10.50.75.35:8080/ms/";
-    public static final String IMAGE_URL = "http://10.50.75.35:8080/";
-    public static final String PDF_URL = "http://10.50.75.35:8080/minisass_documents/";
-
-    public static final String INVITE_DESTINATION = "https://play.google.com/store/apps/details?id=";
-    public static final String INVITE_EXEC = INVITE_DESTINATION + "com.boha.monitor.exec";
-    public static final String INVITE_OPERATIONS_MGR = INVITE_DESTINATION + "com.boha.monitor.operations";
-    public static final String INVITE_PROJECT_MGR = INVITE_DESTINATION + "com.boha.monitor.pmanager";
-    public static final String INVITE_SITE_MGR = INVITE_DESTINATION + "com.boha.monitor.site";
 
     public static final String UPLOAD_URL_REQUEST = "uploadUrl?";
-    //public static final String UPLOAD_BLOB = "uploadBlob?";
     public static final String CRASH_REPORTS_URL = URL + "crash?";
 
     public static final String

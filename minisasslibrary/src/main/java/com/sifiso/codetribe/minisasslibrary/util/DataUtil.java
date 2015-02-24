@@ -2,8 +2,15 @@ package com.sifiso.codetribe.minisasslibrary.util;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.GcmDeviceDTO;
@@ -11,6 +18,8 @@ import com.sifiso.codetribe.minisasslibrary.dto.TeamDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.TeamMemberDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.RequestDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ResponseDTO;
+import com.sifiso.codetribe.minisasslibrary.toolbox.WebCheck;
+import com.sifiso.codetribe.minisasslibrary.toolbox.WebCheckResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,36 +49,72 @@ public class DataUtil {
         return teamMembers;
     }
 
+    static ProgressBar progressBar;
+    static Context ctx;
 
-    public static void registerTeamMember(Context ctx, String sufix, TeamDTO team, final DataUtilInterface listener) {
+    public static void registerTeamMember(TeamDTO team, final DataUtilInterface listener) {
         dataUtilInterface = listener;
+
         RequestDTO req = new RequestDTO();
         req.setTeam(team);
         req.setRequestType(RequestDTO.REGISTER_TEAM);
+        progressBar.setVisibility(View.VISIBLE);
+        WebSocketUtil.sendRequest(ctx, Statics.MINI_SASS_ENDPOINT, req, new WebSocketUtil.WebSocketListener() {
+            @Override
+            public void onMessage(final ResponseDTO r) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressBar.setVisibility(View.GONE);
+                        Log.e(LOG, "## getCompanyData responded...statusCode: " + r.getStatusCode());
+                        if (!ErrorUtil.checkServerError(ctx, r)) {
+                            return;
+                        }
 
-        try {
-            WebSocketUtil.sendRequest(ctx, sufix, req, new WebSocketUtil.WebSocketListener() {
-                @Override
-                public void onMessage(final ResponseDTO response) {
+                        CacheUtil.cacheData(ctx, r, CacheUtil.CACHE_DATA, new CacheUtil.CacheUtilListener() {
+                            @Override
+                            public void onFileDataDeserialized(ResponseDTO response) {
 
-                    dataUtilInterface.onResponse(response);
+                            }
 
-                }
+                            @Override
+                            public void onDataCached() {
 
-                @Override
-                public void onClose() {
+                            }
 
-                }
+                            @Override
+                            public void onError() {
 
-                @Override
-                public void onError(String message) {
-                    dataUtilInterface.onError(message);
-                }
-            });
-        } catch (Exception e) {
+                            }
+                        });
 
-        }
 
+                    }
+                });
+
+            }
+
+            @Override
+            public void onClose() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressBar.setVisibility(View.GONE);
+                    }
+                });
+            }
+
+            @Override
+            public void onError(final String message) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressBar.setVisibility(View.GONE);
+                        Util.showErrorToast(ctx, message);
+                    }
+                });
+            }
+        });
     }
 
     public static void login(Context ctx, String sufix, String email, String pin, GcmDeviceDTO dto, DataUtilInterface listener) {
@@ -132,28 +177,66 @@ public class DataUtil {
     }
 
 
-    public static void getData(Context ctx, String sufix, DataUtilInterface listener) {
-        dataUtilInterface = listener;
+    public static void getData() {
         RequestDTO req = new RequestDTO();
         req.setRequestType(RequestDTO.GET_DATA);
 
         try {
-            WebSocketUtil.sendRequest(ctx, sufix, req, new WebSocketUtil.WebSocketListener() {
+            progressBar.setVisibility(View.VISIBLE);
+            WebSocketUtil.sendRequest(ctx, Statics.MINI_SASS_ENDPOINT, req, new WebSocketUtil.WebSocketListener() {
                 @Override
-                public void onMessage(final ResponseDTO response) {
+                public void onMessage(final ResponseDTO r) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            progressBar.setVisibility(View.GONE);
+                            Log.e(LOG, "## getStarterData responded...statusCode: " + r.getStatusCode());
+                            if (!ErrorUtil.checkServerError(ctx, r)) {
+                                return;
+                            }
 
-                    dataUtilInterface.onResponse(response);
+                            CacheUtil.cacheData(ctx, r, CacheUtil.CACHE_DATA, new CacheUtil.CacheUtilListener() {
+                                @Override
+                                public void onFileDataDeserialized(ResponseDTO response) {
+
+                                }
+
+                                @Override
+                                public void onDataCached() {
+
+                                }
+
+                                @Override
+                                public void onError() {
+
+                                }
+                            });
+
+
+                        }
+                    });
 
                 }
 
                 @Override
                 public void onClose() {
-
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            progressBar.setVisibility(View.GONE);
+                        }
+                    });
                 }
 
                 @Override
-                public void onError(String message) {
-                    dataUtilInterface.onError(message);
+                public void onError(final String message) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            progressBar.setVisibility(View.GONE);
+                            Util.showErrorToast(ctx, message);
+                        }
+                    });
                 }
             });
         } catch (Exception e) {
@@ -188,5 +271,10 @@ public class DataUtil {
 
         }
     }
+
+    static void runOnUiThread(Runnable runnable) {
+
+    }
+
 
 }

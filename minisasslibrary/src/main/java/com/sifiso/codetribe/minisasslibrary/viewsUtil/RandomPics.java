@@ -1,4 +1,4 @@
-package com.sifiso.codetribe.minisasslibrary.activities;
+package com.sifiso.codetribe.minisasslibrary.viewsUtil;
 
 import android.content.Context;
 import android.util.Log;
@@ -7,6 +7,7 @@ import android.widget.TextView;
 
 import com.sifiso.codetribe.minisasslibrary.R;
 
+import java.util.Random;
 import java.util.Timer;
 
 /**
@@ -15,17 +16,25 @@ import java.util.Timer;
 public class RandomPics {
 
     static Timer timer;
-    static int index = 0;
 
+    public interface RandomPicsListener {
+        public void onCompleteFlash();
+    }
 
-    public static void getImage(Context ctx,ImageView v, TextView txt) {
+    static RandomPicsListener mListener;
+    static int count = 0;
 
-        Log.i("Random","starting switch");
+    public static void getImage(Context ctx, ImageView v, TextView txt, RandomPicsListener listener) {
+        mListener = listener;
+        Random random = new Random(System.currentTimeMillis());
+        Log.i("Random", "starting switch");
+        int index = random.nextInt(14);
         try {
             switch (index) {
 
                 case 0:
                     v.setImageDrawable(ctx.getResources().getDrawable(R.drawable.bergriver));
+
                     txt.setText("Berg River");
                     break;
                 case 1:
@@ -85,12 +94,13 @@ public class RandomPics {
                     txt.setText("Vaal River");
                     break;
             }
-            index++;
-            if (index > 14) {
-                index = 0;
+            count++;
+            if (count > 5) {
+                count = 0;
+                listener.onCompleteFlash();
             }
-        }catch (Exception e){
-            Log.d("RandomPics",e.toString());
+        } catch (Exception e) {
+            Log.d("RandomPics", e.toString());
         }
     }
 
