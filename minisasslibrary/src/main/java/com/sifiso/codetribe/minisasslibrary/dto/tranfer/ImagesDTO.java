@@ -18,7 +18,10 @@ public class ImagesDTO implements Serializable {
     private Integer teamMemberID, teamID, evaluationID, thumbFlag, pictureType;
     private boolean isFullPicture;
     private List<String> tags;
-
+    private String imageFilePath;
+    private double latitude, longitude;
+    private long time;
+    private String thumbFilePath;
     public ImagesDTO() {
     }
 
