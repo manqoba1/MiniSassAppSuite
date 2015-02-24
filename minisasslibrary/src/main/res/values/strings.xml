@@ -1,6 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">MinisassLibrary</string>
 
+    <string name="app_name">MinisassLibrary</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="done_label">Done</string>
@@ -27,13 +28,21 @@
     <string name="crash_dialog_text">An unexpected error occurred forcing the
     application to stop. Please help us fix this by sending us error data,
     all you have to do is click OK.</string>
+    <string name="yes">YES</string>
+    <string name="action_camera">Camera</string>
+    <string name="camera_error">Unable to fet picture from camera, try again</string>
+    <string name="no">NO</string>
+    <string name="welcome">Welcome</string>
+    <string name="refresh">Refresh</string>
+    <string name="gps_complete">GPS Co-ordinates done, Begin by tapping camera</string>
+    <string name="file_error">unable to createImageFile</string>
     <string name="crash_dialog_comment_prompt">You might add your comments about the problem below:</string>
     <string name="crash_dialog_ok_toast">Thank you !</string>
     <string name="server_comms_failed">Server communications failed. Please try again</string>
     <string name="no_networks">Network connections unavailable</string>
     <string name="day_of_week_label_typeface" translatable="false">sans-serif</string>
-
     <string name="error_email">Problem sending email</string>
+    <string name="photo_error">Unable to cache photo, insert SD card</string>
     <string name="choose_photo">Select Profile Photo</string>
     <string name="error_date">Enter end date equal or later than start date</string>
     <string name="error_database">Database error. Contact The CourseMaker support on the web site</string>
@@ -43,4 +52,9 @@
     <string name="error_encoding">Error encoding request. Contact support</string>
     <string name="error_server_comms">Problem communicating with the server. Please try again or contact mgGolf support</string>
     <string name="error_duplicate">Attempting to put duplicate data in database, ignored</string>
+    <string name="title_activity_picture">PictureActivity</string>
+    <string name="take_pic">Take Picture</string>
+    <string name="gallery">Gallery</string>
+    <string name="finding_gps">Finding GPS</string>
+    <string name="start_pic_rep">Start Pic Rep</string>
 </resources>

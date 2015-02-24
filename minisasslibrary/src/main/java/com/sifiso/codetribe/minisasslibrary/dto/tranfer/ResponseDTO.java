@@ -36,10 +36,10 @@ public class ResponseDTO {
 
     private Integer statusCode;
     private String message;
-    private Date lastCacheDate, startDate, endDate;
     private Integer statusCountInPeriod, goodCount, badCount;
     private String sessionID, GCMRegistrationID, fileString;
     private double elapsedRequestTimeInSeconds;
+    private Date lastCacheDate, startdate, endDate, dateTaken;
 
     private TeamDTO team;
     private TeamMemberDTO teamMember;
@@ -61,9 +61,50 @@ public class ResponseDTO {
     private List<TownDTO> townList = new ArrayList<>();
     private List<EvaluationInsectDTO> evaluationInsectList = new ArrayList<>();
     private List<ConditionsDTO> conditionsList;
-
+    private List<String> evaluationImageFileName;
     private List<ErrorStoreDTO> errorStoreList = new ArrayList<>();
     private List<ErrorStoreAndroidDTO> errorStoreAndroidList = new ArrayList<>();
+
+
+    public List<String> getEvaluationImageFileName() {
+        return evaluationImageFileName;
+    }
+
+    public void setEvaluationImageFileName(List<String> evaluationImageFileName) {
+        this.evaluationImageFileName = evaluationImageFileName;
+    }
+
+    public Date getDateTaken() {
+        return dateTaken;
+    }
+
+    public void setDateTaken(Date dateTaken) {
+        this.dateTaken = dateTaken;
+    }
+
+    public Date getLastCacheDate() {
+        return lastCacheDate;
+    }
+
+    public void setLastCacheDate(Date lastCacheDate) {
+        this.lastCacheDate = lastCacheDate;
+    }
+
+    public Date getStartdate() {
+        return startdate;
+    }
+
+    public void setStartdate(Date startdate) {
+        this.startdate = startdate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
 
     public EvaluationDTO getEvaluation() {
         return evaluation;
@@ -87,30 +128,6 @@ public class ResponseDTO {
 
     public void setEvaluationImageList(List<EvaluationImageDTO> evaluationImageList) {
         this.evaluationImageList = evaluationImageList;
-    }
-
-    public Date getLastCacheDate() {
-        return lastCacheDate;
-    }
-
-    public void setLastCacheDate(Date lastCacheDate) {
-        this.lastCacheDate = lastCacheDate;
-    }
-
-    public Date getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-    }
-
-    public Date getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
     }
 
     public List<GcmDeviceDTO> getGcmDeviceList() {

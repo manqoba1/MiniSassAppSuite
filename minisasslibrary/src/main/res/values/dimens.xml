@@ -17,7 +17,11 @@
     <dimen name="mon_wide">24dp</dimen>
     <dimen name="mon_wider">48dp</dimen>
     <dimen name="time_label_size">60sp</dimen>
-
+    <dimen name="sas_margin">16dp</dimen>
+    <dimen name="sas_middle">12dp</dimen>
+    <dimen name="sas_picture_larger">460dp</dimen>
+    <dimen name="sas_divider">4dp</dimen>
+    <dimen name="sas_divider_tiny">1dp</dimen>
     <dimen name="extra_time_label_margin">-30dp</dimen>
     <dimen name="ampm_label_size">16sp</dimen>
     <dimen name="ampm_left_padding">6dip</dimen>
