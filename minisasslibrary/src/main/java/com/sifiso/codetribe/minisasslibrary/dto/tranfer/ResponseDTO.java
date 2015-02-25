@@ -25,6 +25,7 @@ import com.sifiso.codetribe.minisasslibrary.dto.TeamDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.TeamMemberDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.TownDTO;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -32,7 +33,7 @@ import java.util.List;
 /**
  * @author aubreyM
  */
-public class ResponseDTO {
+public class ResponseDTO implements Serializable{
 
     private Integer statusCode;
     private String message;

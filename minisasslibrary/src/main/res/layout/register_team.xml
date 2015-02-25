@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:padding="8dp"
     android:background="@color/white"
     android:layout_height="match_parent">
@@ -8,6 +9,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <RelativeLayout
             android:id="@+id/regImagelayout"
             android:layout_width="match_parent"
@@ -21,44 +23,44 @@
                 android:layout_height="160dp" />
         </RelativeLayout>
 
-    <TextView
-        android:id="@+id/txtReg"
-        android:textSize="20dp"
-        android:layout_below="@+id/regImagelayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Enter Team Details"
-        android:layout_centerHorizontal="true"
-        style="@style/TextAppearance.AppCompat.Large"
-        android:layout_marginTop="10dp"
-        android:textColor="@color/material_blue_grey_800"/>
+        <TextView
+            android:id="@+id/txtReg"
+            android:textSize="20dp"
+            android:layout_below="@+id/regImagelayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Enter Team Details"
+            android:layout_centerHorizontal="true"
+            style="@style/TextAppearance.AppCompat.Large"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/material_blue_grey_800" />
 
-    <TextView
-        android:layout_marginTop="10dp"
-        android:layout_below="@+id/txtReg"
-        android:text="*Mandatory fields"
-        android:id="@+id/txtRegMandatory"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        <TextView
+            android:layout_marginTop="10dp"
+            android:layout_below="@+id/txtReg"
+            android:text="*Mandatory fields"
+            android:id="@+id/txtRegMandatory"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
-    <EditText
-        android:id="@+id/edtRegTeamName"
-        android:layout_width="match_parent"
-        android:background="@drawable/xborder"
-        android:layout_below="@+id/txtRegMandatory"
-        android:hint="Enter Team Name*"
-        android:layout_height="50dp"/>
+        <EditText
+            android:id="@+id/edtRegTeamName"
+            android:layout_width="match_parent"
+            android:background="@drawable/xborder"
+            android:layout_below="@+id/txtRegMandatory"
+            android:hint="Enter Team Name*"
+            android:layout_height="50dp" />
 
-  <EditText
-      android:id="@+id/txtTown"
-      android:layout_marginTop="10dp"
-      android:hint="Select Town*"
-      android:focusable="false"
-      android:textAlignment="gravity"
-      android:background="@drawable/xborder"
-      android:layout_below="@+id/edtRegTeamName"
-      android:layout_width="match_parent"
-      android:layout_height="50dp" />
+        <EditText
+            android:id="@+id/txtTown"
+            android:layout_marginTop="10dp"
+            android:hint="Select Town*"
+            android:focusable="false"
+            android:textAlignment="gravity"
+            android:background="@drawable/xborder"
+            android:layout_below="@+id/edtRegTeamName"
+            android:layout_width="match_parent"
+            android:layout_height="50dp" />
 
         <ImageView
             android:layout_below="@+id/edtRegTeamName"
@@ -81,6 +83,7 @@
             android:textColor="@color/white"
             android:layout_width="120dp"
             android:layout_height="40dp" />
+
         <ImageView
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
