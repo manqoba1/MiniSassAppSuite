@@ -494,7 +494,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
         if (imageLocation != null) {
             Log.e(LOG, "image: " + imageLocation.getEvaluationImageID() + " " +
                     imageLocation.getAccuracy() + " _ " + imageLocation.getDateTaken().toString());
-            if (evaluationImage.getEvaluationImageID().intValue() != evaluationImage.getEvaluationImageID().intValue()) {
+            if (imageLocation.getEvaluationImageID().intValue() != imageLocation.getEvaluationImageID().intValue()) {
                 imageLocation = null;
             } else {
                 DateTime dateTime = new DateTime();
