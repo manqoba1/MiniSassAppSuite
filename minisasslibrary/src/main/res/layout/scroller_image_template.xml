@@ -9,7 +9,7 @@
     <ImageView
         android:id="@+id/image"
         android:scaleType="centerCrop"
-        android:src="@drawable/under_construction"
+        android:src="@drawable/blyde_river_canyon_by_hougaard"
         android:layout_width="@dimen/sas_picture_larger"
         android:layout_height="@dimen/sas_picture_larger" />
 
