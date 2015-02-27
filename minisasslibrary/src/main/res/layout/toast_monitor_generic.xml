@@ -12,12 +12,12 @@
             android:src="@drawable/banner_construction13"
             android:scaleType="centerCrop"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/mon_wider" />
+            android:layout_height="@dimen/sas_wider" />
         </RelativeLayout>
 
     <RelativeLayout
         android:layout_below="@id/MONTOAST_top"
-        android:padding="@dimen/mon_wide"
+        android:padding="@dimen/sas_wide"
         android:background="@color/beige_pale"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -37,7 +37,7 @@
     <TextView
         android:id="@+id/MONTOAST_indicator"
         android:layout_alignParentLeft="true"
-        android:layout_margin="@dimen/mon_padding"
+        android:layout_margin="@dimen/sas_padding"
         style="@style/BlueCircleSmall"
         android:text="M"
         android:layout_width="wrap_content"

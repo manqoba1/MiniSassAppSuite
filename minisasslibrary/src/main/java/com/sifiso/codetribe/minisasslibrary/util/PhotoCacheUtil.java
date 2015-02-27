@@ -9,13 +9,16 @@ import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ImagesDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ResponseDTO;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Chris on 2015-02-19.
@@ -121,6 +124,14 @@ public class PhotoCacheUtil {
             }
             return response;
         }
+        @Override
+        protected void onPostExecute(ResponseDTO re) {
+            if (photoCacheListener == null) {
+                return;
+            } else {
+                photoCacheListener.onFileDataDeserialized(re);
+            }
+        }
     }
 
     static class CacheRetrieveForUpdateTask extends AsyncTask<Void, Void, ResponseDTO> {
@@ -147,8 +158,115 @@ public class PhotoCacheUtil {
             }
             return response;
         }
+        @Override
+        protected void onPostExecute(ResponseDTO re) {
+            if (re.getImagesList() == null) {
+                re.setImagesList(new ArrayList<ImagesDTO>());
+            }
+            re.getImagesList().add(images);
+            response = re;
+            new CacheTask().execute();
+        }
 
 
     }
+
+    public static void clearCache(Context context,
+                                  final List<ImagesDTO> uploadedList) {
+
+        ctx = context;
+        getCachedPhotos(context, new PhotoCacheListener() {
+            @Override
+            public void onFileDataDeserialized(ResponseDTO r) {
+                List<ImagesDTO> pending = new ArrayList<>();
+                for (ImagesDTO i : r.getImagesList()) {
+                    for (ImagesDTO im : uploadedList) {
+                        if (im.getThumbFilePath().equalsIgnoreCase(i.getThumbFilePath())) {
+                            i.setDateUploaded(new Date());
+                            File f = new File(im.getThumbFilePath());
+                            if (f.exists()) {
+                                boolean del = f.delete();
+                                Log.w(LOG, "deleted Image file: " + im.getThumbFilePath() + " - " + del);
+
+                            }
+                        }
+
+                    }
+                    for (ImagesDTO ima : r.getImagesList()) {
+                        if (ima.getDateUploaded() == null) {
+                            pending.add(ima);
+                        }
+                    }
+                }
+                r.setImagesList(pending);
+                response = r;
+                Log.i(LOG, "photo's pending, after clearing cache: " + pending.size()
+                + "new cache ");
+                new CacheTask().execute();
+            }
+
+            @Override
+            public void onDataCached() {
+                Log.i(LOG, "DataCached Fired");
+            }
+
+            @Override
+            public void onError() {
+            Log.i(LOG, "onError Fired");
+            }
+        });
+    }
+
+    static class CacheTask extends AsyncTask<Void, Void, Integer> {
+
+        @Override
+        protected Integer doInBackground(Void... voids) {
+            String json;
+            File file;
+            FileOutputStream outputStream;
+            try {
+                json = gson.toJson(response);
+                outputStream = ctx.openFileOutput(JSON_PHOTO, Context.MODE_PRIVATE);
+                Write(outputStream, json);
+                file = ctx.getFileStreamPath(JSON_PHOTO);
+                if (file != null) {
+                    Log.e(LOG, "Photo cache path has been written: " + file.getAbsolutePath()
+                    + " - length: " + file.length() + "photos: " + response.getImagesList().size());
+                }
+                StringBuilder sb = new StringBuilder();
+                sb.append("\n Photos in cache\n");
+                for (ImagesDTO i : response.getImagesList()) {
+                    sb.append("++").append(i.getImageFilePath())
+                            .append("evaluationImageID: " + i.getEvaluationImageID())
+                            .append("\n");
+                }
+                sb.append("--->");
+                Log.w(LOG, sb.toString());
+
+            } catch (IOException e) {
+                Log.e(LOG, "data cache failed", e);
+                return 9;
+            }
+
+            return 0;
+        }
+        private void Write(FileOutputStream outputStream, String json)
+            throws IOException {
+            outputStream.write(json.getBytes());
+            outputStream.close();
+        }
+
+        @Override
+        protected void onPostExecute(Integer v) {
+            if (photoCacheListener != null) {
+                if (v > 0) {
+                    photoCacheListener.onError();
+                } else {
+                    photoCacheListener.onDataCached();
+                }
+            }
+        }
+    }
+
 
 }

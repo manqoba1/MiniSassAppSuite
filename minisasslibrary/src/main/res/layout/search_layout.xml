@@ -7,7 +7,7 @@
     <RelativeLayout
         android:id="@+id/SLT_bottomLayout"
         android:layout_width="match_parent"
-        android:padding="@dimen/mon_padding"
+        android:padding="@dimen/sas_padding"
         android:layout_height="wrap_content">
 
         <ImageView
@@ -22,8 +22,8 @@
 
         <EditText
             android:id="@+id/SLT_editSearch"
-            android:layout_marginLeft="@dimen/mon_padding"
-            android:layout_marginRight="@dimen/mon_wider"
+            android:layout_marginLeft="@dimen/sas_padding"
+            android:layout_marginRight="@dimen/sas_wider"
             android:hint="Search"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
@@ -33,7 +33,7 @@
             android:src="@android:drawable/ic_search_category_default"
             android:text="Find Something"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="@dimen/mon_padding"
+            android:layout_marginRight="@dimen/sas_padding"
             android:tint="@color/blue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />

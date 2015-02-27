@@ -34,9 +34,10 @@ import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
-import com.google.android.gms.location.LocationClient;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.sifiso.codetribe.minisasslibrary.R;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationDTO;
@@ -47,14 +48,10 @@ import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ImagesDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ResponseDTO;
 import com.sifiso.codetribe.minisasslibrary.util.ImageLocation;
 import com.sifiso.codetribe.minisasslibrary.util.ImageUtil;
-import com.sifiso.codetribe.minisasslibrary.util.PMException;
 import com.sifiso.codetribe.minisasslibrary.util.PhotoCacheUtil;
 import com.sifiso.codetribe.minisasslibrary.util.PhotoUploadService;
 import com.sifiso.codetribe.minisasslibrary.util.SharedUtil;
 import com.sifiso.codetribe.minisasslibrary.util.Util;
-
-import org.acra.ACRA;
-import org.joda.time.DateTime;
 
 import java.io.File;
 import java.io.IOException;
@@ -63,10 +60,11 @@ import java.util.Date;
 import java.util.List;
 
 public class PictureActivity extends ActionBarActivity implements LocationListener,
-        GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener{
+        GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener,
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
 
     LocationRequest mLocationRequest;
-    LocationClient mLocationClient;
+
     LayoutInflater inflater;
     File photoFile, currentThumbFile;
     Uri thumbUri, fileUri;
@@ -90,17 +88,34 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
     boolean isUploaded, mBound;
     String mCurrentPhotoPath;
     public final String LOG = PictureActivity.class.getSimpleName();
+    GoogleApiClient googleApiClient;
+    private TextView mLocationView;
+    boolean mRequestingLocationUpdates;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(LOG, "onCreate FIRED");
         ctx = getApplicationContext();
         inflater = getLayoutInflater();
-        setContentView(R.layout.camera);
+         setContentView(R.layout.camera);
         setFields();
-        mLocationClient = new LocationClient(getApplicationContext(), this, this);
+
+        evaluationImage = (EvaluationImageDTO) getIntent().getSerializableExtra("evaluationImage");
+        googleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+
+        setTitle(getString(R.string.evaluation_image_pics));
+        Util.showToast(ctx, "Start taking pictures for evaluation image");
+        dispatchTakePictureIntent();
+
+
         //getting objects
-        if (savedInstanceState != null) {
+  /*      if (savedInstanceState != null) {
             Log.e(LOG, "savedInstanceState, is now LOADED");
             type = savedInstanceState.getInt("type", 0);
             evaluationImage = (EvaluationImageDTO) savedInstanceState.getSerializable("evaluationImage");
@@ -130,7 +145,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
                 getSupportActionBar().setSubtitle(evaluation.getRemarks());
             }
         }
-
+*/
     }
     ActionBarActivity activity;
     Button btnStart;
@@ -188,6 +203,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
                     public void onAnimationEnded() {
                         showReminderDialog();
                         btnStart.setVisibility(View.GONE);
+                        dispatchTakePictureIntent();
                     }
                 });
 
@@ -234,8 +250,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
         if (Util.hasStorage(true)) {
             Log.i(LOG, "fetch file from getExternalStoragePublicDirectory");
             root = Environment.getExternalStoragePublicDirectory(
-                    Environment.DIRECTORY_PICTURES
-            );
+                    Environment.DIRECTORY_PICTURES);
         } else {
             Log.i(LOG, "fetch file from getDataDirectory");
             root = Environment.getDataDirectory();
@@ -259,7 +274,6 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
 
 
 
-
     private void showReminderDialog() {
         AlertDialog.Builder d = new AlertDialog.Builder(this);
         d.setTitle("Image Location Reminder")
@@ -273,11 +287,12 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
                         confirmedStandingAtLocation = true;
                         chrono.start();
                         try {
-                            if (mLocationClient.isConnected()) {
-                                mLocationClient.requestLocationUpdates(mLocationRequest, (LocationListener) activity);
+                            if (googleApiClient.isConnected()) {
+                                location = LocationServices.FusedLocationApi.getLastLocation(
+                                        googleApiClient);
                             }
                         } catch (Exception e) {
-                            Log.e(LOG, "could not connect");
+                            Log.e(LOG, " connection failed");
                         }
                     }
                 })
@@ -289,11 +304,13 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
                 })
                 .show();
     }
+
     PhotoUploadService mService;
 
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
             Log.w(LOG, "PhotoUploadService ServiceConnection onServiceConnected");
             PhotoUploadService.LocalBinder binder = (PhotoUploadService.LocalBinder) service;
             mService = binder.getService();
@@ -314,11 +331,13 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
     };
 
     List<String> currentSessionPhotos = new ArrayList<>();
+    static final int REQUEST_VIDEO_CAPTURE = 1;
 
     @Override
     public void onPause() {
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
         super.onPause();
+        stopLocationUpdates();
     }
 
     @Override
@@ -328,7 +347,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
             ResponseDTO r = new ResponseDTO();
             r.setEvaluationImageFileName(currentSessionPhotos);
             Intent i = new Intent();
-          //  i.putExtra("response", r);
+            i.putExtra("response", r);
             setResult(RESULT_OK, i);
         } else {
             Log.d(LOG, "onBackPressed has been cancelled");
@@ -339,7 +358,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
 
     @Override
     public void onSaveInstanceState(Bundle b) {
-        Log.e(LOG, "onSaveInstanceState");
+        Log.e(LOG, "onSaveInstanceState FIRED");
         b.putInt("type", type);
         if (currentThumbFile != null){
             b.putString("thumbPath", currentThumbFile.getAbsolutePath());
@@ -361,6 +380,11 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
         super.onSaveInstanceState(b);
     }
 
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+    }
+
     class PhotoTask extends AsyncTask<Void, Void, Integer> {
 
         @Override
@@ -369,7 +393,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
             pictureChanged = false;
             ExifInterface exif = null;
             if (photoFile == null || photoFile.length() == 0) {
-                Log.e(LOG, "photoFile is null or length = 0, leaving");
+                Log.e(LOG, "photoFile is null, length = 0, CHEERS!");
                 return 99;
             }
             fileUri = Uri.fromFile(photoFile);
@@ -406,7 +430,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
                         Util.writeLocationToExif(currentThumbFile.getAbsolutePath(), location);
                         boolean del = photoFile.delete();
                         Log.i(LOG, "Thumbnail file length: " + currentThumbFile.length() +
-                        " image file deleted: " + del);
+                        " main image file deleted: " + del);
                     } catch (Exception e) {
                         Log.e(LOG, "unable to process bitmap", e);
                         return 9;
@@ -431,6 +455,37 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
                     isUploaded = true;
                     currentSessionPhotos.add(Uri.fromFile(currentThumbFile).toString());
                     addImageToScroller();
+                    Log.i(LOG, "Images successfully added to Scroller");
+                    final ImagesDTO i = new ImagesDTO();
+                    i.setLongitude(images.getLongitude());
+                    i.setPictureType(images.getPictureType());
+                    i.setTeamMemberPicture(images.isTeamMemberPicture());
+                    i.setThumbFilePath(images.getThumbFilePath());
+                    i.setTeamMemberID(images.getTeamMemberID());
+                    i.setLatitude(images.getLatitude());
+                    i.setEvaluationImagePicture(images.isEvaluationImagePicture());
+                    i.setEvaluationImageID(images.getEvaluationImageID());
+                    i.setAccuracy(images.getAccuracy());
+                    i.setDateTaken(images.getDateTaken());
+                    i.setDateThumbUploaded(images.getDateThumbUploaded());
+
+                    PhotoCacheUtil.cachePhoto(ctx, i, new PhotoCacheUtil.PhotoCacheListener() {
+                        @Override
+                        public void onFileDataDeserialized(ResponseDTO response) {
+
+                        }
+
+                        @Override
+                        public void onDataCached() {
+                        Log.i(LOG, "evaluationImage successfully cached for evaluationImageID: " + i.getEvaluationImageID()
+                        + "type: " + images.getPictureType() +"_" + images.getDateTaken());
+                        }
+
+                        @Override
+                        public void onError() {
+
+                        }
+                    });
 
                 } catch (Exception e){
                     e.printStackTrace();
@@ -490,23 +545,12 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
     @Override
     public void onResume() {
         Log.d(LOG, "onResume FIRED");
-        imageLocation = SharedUtil.getImageLocation(ctx);
-        if (imageLocation != null) {
-            Log.e(LOG, "image: " + imageLocation.getEvaluationImageID() + " " +
-                    imageLocation.getAccuracy() + " _ " + imageLocation.getDateTaken().toString());
-            if (imageLocation.getEvaluationImageID().intValue() != imageLocation.getEvaluationImageID().intValue()) {
-                imageLocation = null;
-            } else {
-                DateTime dateTime = new DateTime();
-                DateTime then = new DateTime(imageLocation.getDateTaken().getTime());
-                long time = dateTime.toDate().getTime() - then.toDate().getTime();
-                if (time > ONE_MINUTE) {
-                    imageLocation = null;
-                }
-            }
-        }
         super.onResume();
+        if (googleApiClient.isConnected() && !mRequestingLocationUpdates) {
+            startLocationUpdates();
+        }
     }
+
 
     private void uploadPhotos() {
         Log.e(LOG,"uploadPhoto accuracy: " + location.getAccuracy());
@@ -536,6 +580,14 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
                 });
                 break;
         }
+
+        mService.UploadCachedPhotos(new PhotoUploadService.UploadListener() {
+            @Override
+            public void onUploadsComplete(int count) {
+
+                Log.e(LOG, "onUploadsComplete: " + count);
+            }
+        });
     }
     private interface CacheListener {
         public void onCachingDone();
@@ -645,7 +697,9 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
                     }
                 }
                 break;
+       //     case REQUEST_VIDEO_CAPTURE:
 
+         //       break;
         }
     pictureChanged = true;
 
@@ -654,10 +708,10 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
 
     @Override
     public void onStart() {
-        Log.i(LOG, "onStart - Connecting locationClient ");
-        if (mLocationClient != null) {
+        Log.i(LOG, "onStart - Connecting GoogleApi locationClient ");
+        if (googleApiClient != null) {
             if (location == null) {
-                mLocationClient.connect();
+              googleApiClient.connect();
             }
         }
         Log.i(LOG, "onStart Bind to PhotoUploadService");
@@ -670,9 +724,9 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
     public void onStop() {
         super.onStop();
 
-        if (mLocationClient != null) {
-            mLocationClient.disconnect();
-            Log.e(LOG, "onStop - LocationClient disconnecting");
+        if (googleApiClient != null) {
+            googleApiClient.disconnect();
+            Log.e(LOG, "onStop fired - GoogleApiClient disconnecting");
         }
         Log.e(LOG, "onStop unBind from PhotoUploadService");
         if (mBound) {
@@ -696,6 +750,12 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
+    /*    if (item.getItemId() == R.id.menu_video) {
+            Log.i(LOG, "still construction video dispatch");
+            dispatchTakeVideoIntent();
+            return true;
+        }
+*/
 
 
         if (item.getItemId() == R.id.menu_camera) {
@@ -718,13 +778,11 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
     @Override
     public void onConnected(Bundle bundle) {
         Log.i(LOG,
-                "+++ LocationClient onConnected() -  requestLocationUpdates ...");
-        if (imageLocation != null) {
-            Log.w(LOG,"## already have a good location, returning");
-            location = mLocationClient.getLastLocation();
-            location.setAccuracy(imageLocation.getAccuracy());
-            location.setLatitude(imageLocation.getLatitude());
-            location.setLongitude(imageLocation.getLongitude());
+                "+++ fired onConnected() -  requestLocationUpdates ...");
+        location = LocationServices.FusedLocationApi.getLastLocation(
+                googleApiClient );
+        if (location != null) {
+            Log.w(LOG,"## Good location spot");
             topLayout.setVisibility(View.GONE);
             gpsStatus.setVisibility(View.GONE);
             imgCamera.setVisibility(View.VISIBLE);
@@ -732,19 +790,46 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
             dispatchTakePictureIntent();
             return;
         }
+
         Log.w(LOG,"## requesting location updates ....");
         mLocationRequest = LocationRequest.create();
-        mLocationRequest.setInterval(1000);
+        mLocationRequest.setInterval(5000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mLocationRequest.setFastestInterval(500);
-
-        location = mLocationClient.getLastLocation();
-        mLocationClient.requestLocationUpdates(mLocationRequest, this);
-
+        mLocationRequest.setFastestInterval(2000);
+        startLocationUpdates();
 
     }
 
     @Override
+    public void onDisconnected() {
+
+    }
+
+    protected void startLocationUpdates() {
+        if(googleApiClient.isConnected()) {
+            mRequestingLocationUpdates = true;
+            LocationServices.FusedLocationApi.requestLocationUpdates(
+                    googleApiClient, mLocationRequest, this
+            );
+        }
+    }
+
+    protected void stopLocationUpdates() {
+        if (googleApiClient.isConnected()) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(
+                    googleApiClient, this
+            );
+        }
+    }
+
+ //   @Override
+    public void onConnectionSuspended (int i) {
+        Log.i(LOG,
+                "ConnectionSuspended");
+    }
+
+
+ /*   @Override
     public void onDisconnected() {
         Log.e(LOG, "onDisconnected FIRED");
     }
@@ -752,10 +837,10 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         ACRA.getErrorReporter().handleSilentException(new PMException(
-                "Google LocationClient onConnectionFailed: " + connectionResult.getErrorCode()
+                "GoogleApiClient onConnectionFailed: " + connectionResult.getErrorCode()
         ));
     }
-
+*/
     @Override
     public void onLocationChanged(Location locat) {
         Log.d(LOG, "onLocationChanged accuracy:" + locat.getAccuracy());
@@ -766,7 +851,6 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
         }
         if (locat.getAccuracy() <= ACCURACY_THRESHOLD) {
             this.location = locat;
-            mLocationClient.removeLocationUpdates(this);
             chrono.stop();
             SharedUtil.saveImageLocation(ctx, evaluationImage, location);
             if (confirmedStandingAtLocation) {
