@@ -9,7 +9,7 @@
 
     <ImageView
         android:id="@+id/HERO_image"
-        android:src="@drawable/olofants6"
+        android:src="@drawable/banner_water5"
         android:scaleType="fitXY"
         android:layout_width="match_parent"
         android:layout_height="100dp"/>

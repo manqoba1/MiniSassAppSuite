@@ -128,6 +128,7 @@
             android:id="@+id/CAM_btnStart"
             style="@style/ButtonBlue"
             android:background="@color/DodgerBlue"
+            android:drawableLeft="@drawable/small_water_droplet"
             android:text="@string/start_camera"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />

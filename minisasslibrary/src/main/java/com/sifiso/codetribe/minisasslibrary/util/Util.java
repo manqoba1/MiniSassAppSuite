@@ -6,9 +6,7 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -20,7 +18,6 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.text.Html;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
@@ -38,7 +35,6 @@ import android.widget.ImageView;
 import android.widget.ListPopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
-
 
 import com.sifiso.codetribe.minisasslibrary.R;
 import com.sifiso.codetribe.minisasslibrary.adapters.PopupListAdapter;
@@ -690,62 +686,62 @@ public class Util {
         int index = random.nextInt(17);
         switch (index) {
             case 0:
-                return ctx.getResources().getDrawable(R.drawable.banner_meeting);
+                return ctx.getResources().getDrawable(R.drawable.banner_water1);
             case 1:
                 return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction3);
+                        R.drawable.banner_water2);
             case 2:
                 return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction4);
+                        R.drawable.banner_water3);
             case 3:
                 return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction5);
+                        R.drawable.banner_water4);
             case 4:
                 return ctx.getResources().getDrawable(
-                        R.drawable.banner_meeting3);
+                        R.drawable.banner_water5);
             case 5:
                 return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction7);
+                        R.drawable.banner_droplet1);
             case 6:
                 return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction8);
+                        R.drawable.banner_droplet2);
             case 7:
                 return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction9);
+                        R.drawable.banner_droplet3);
             case 8:
                 return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction10);
+                        R.drawable.banner_droplet4);
             case 9:
                 return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction11);
+                        R.drawable.banner_droplet5);
             case 10:
                 return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction13);
+                        R.drawable.banner_droplet6);
             case 11:
                 return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction14);
+                        R.drawable.banner_water7);
             case 12:
                 return ctx.getResources().getDrawable(
-                        R.drawable.banner_report);
+                        R.drawable.banner_water6);
             case 13:
                 return ctx.getResources().getDrawable(
-                        R.drawable.banner_meeting3);
+                        R.drawable.banner_river1);
             case 14:
                 return ctx.getResources().getDrawable(
-                        R.drawable.banner_report2);
+                        R.drawable.banner_river2);
             case 15:
                 return ctx.getResources().getDrawable(
-                        R.drawable.banner_report);
+                        R.drawable.banner_river3);
             case 16:
                 return ctx.getResources().getDrawable(
-                        R.drawable.banner_meeting);
+                        R.drawable.banner_water8);
             case 17:
                 return ctx.getResources().getDrawable(
-                        R.drawable.banner_report3);
+                        R.drawable.banner_water9);
 
         }
         return ctx.getResources().getDrawable(
-                R.drawable.banner_report2);
+                R.drawable.banner_water1);
     }
 
     public static Drawable getRandomHeroImage(Context ctx) {
@@ -753,62 +749,62 @@ public class Util {
         int index = random.nextInt(17);
         switch (index) {
             case 0:
-                return ctx.getResources().getDrawable(R.drawable.banner_construction10);
+                return ctx.getResources().getDrawable(R.drawable.banner_droplet1);
             case 1:
                 return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction3);
+                        R.drawable.banner_droplet2);
             case 2:
                 return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction4);
+                        R.drawable.banner_droplet3);
             case 3:
                 return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction5);
+                        R.drawable.banner_droplet4);
             case 4:
                 return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction5);
+                        R.drawable.banner_droplet5);
             case 5:
                 return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction7);
+                        R.drawable.banner_droplet6);
             case 6:
                 return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction8);
+                        R.drawable.banner_river1);
             case 7:
                 return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction9);
+                        R.drawable.banner_river2);
             case 8:
                 return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction10);
+                        R.drawable.banner_river3);
             case 9:
                 return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction11);
+                        R.drawable.banner_water1);
             case 10:
                 return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction13);
+                        R.drawable.banner_water2);
             case 11:
                 return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction14);
+                        R.drawable.banner_water3);
             case 12:
                 return ctx.getResources().getDrawable(
-                        R.drawable.banner_report);
+                        R.drawable.banner_water4);
             case 13:
                 return ctx.getResources().getDrawable(
-                        R.drawable.banner_report3);
+                        R.drawable.banner_water5);
             case 14:
                 return ctx.getResources().getDrawable(
-                        R.drawable.banner_report2);
+                        R.drawable.banner_water6);
             case 15:
                 return ctx.getResources().getDrawable(
-                        R.drawable.banner_report);
+                        R.drawable.banner_water7);
             case 16:
                 return ctx.getResources().getDrawable(
-                        R.drawable.banner_report2);
+                        R.drawable.banner_water8);
             case 17:
                 return ctx.getResources().getDrawable(
-                        R.drawable.banner_report3);
+                        R.drawable.banner_water9);
 
         }
         return ctx.getResources().getDrawable(
-                R.drawable.banner_report2);
+                R.drawable.banner_droplet1);
     }
 
     public static void writeLocationToExif(String filePath, Location loc) {

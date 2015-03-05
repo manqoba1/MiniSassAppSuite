@@ -101,7 +101,7 @@ public class MinisassMapsActivity extends ActionBarActivity implements LocationL
        // setGoogleMap;
     }
 
-   /* private void setGoogleMap() {
+  /*  private void setGoogleMap() {
         googleMap.setMyLocationEnabled(true);
         googleMap.setBuildingsEnabled(true);
         googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {

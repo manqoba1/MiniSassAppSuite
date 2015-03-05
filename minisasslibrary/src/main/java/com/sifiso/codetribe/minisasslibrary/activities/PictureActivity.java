@@ -88,10 +88,10 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
     boolean isUploaded, mBound;
     String mCurrentPhotoPath;
     public final String LOG = PictureActivity.class.getSimpleName();
-    GoogleApiClient googleApiClient;
+
     private TextView mLocationView;
     boolean mRequestingLocationUpdates;
-
+    GoogleApiClient googleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -457,17 +457,17 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
                     addImageToScroller();
                     Log.i(LOG, "Images successfully added to Scroller");
                     final ImagesDTO i = new ImagesDTO();
-                    i.setLongitude(images.getLongitude());
-                    i.setPictureType(images.getPictureType());
-                    i.setTeamMemberPicture(images.isTeamMemberPicture());
-                    i.setThumbFilePath(images.getThumbFilePath());
-                    i.setTeamMemberID(images.getTeamMemberID());
-                    i.setLatitude(images.getLatitude());
-                    i.setEvaluationImagePicture(images.isEvaluationImagePicture());
-                    i.setEvaluationImageID(images.getEvaluationImageID());
-                    i.setAccuracy(images.getAccuracy());
-                    i.setDateTaken(images.getDateTaken());
-                    i.setDateThumbUploaded(images.getDateThumbUploaded());
+   //                i.setLongitude(images.getLongitude());
+//                    i.setPictureType(images.getPictureType());
+   //                 i.setTeamMemberPicture(images.isTeamMemberPicture());
+     //               i.setThumbFilePath(images.getThumbFilePath());
+       //             i.setTeamMemberID(images.getTeamMemberID());
+         //           i.setLatitude(images.getLatitude());
+          //          i.setEvaluationImagePicture(images.isEvaluationImagePicture());
+           //         i.setEvaluationImageID(images.getEvaluationImageID());
+            //        i.setAccuracy(images.getAccuracy());
+            //        i.setDateTaken(images.getDateTaken());
+             //       i.setDateThumbUploaded(images.getDateThumbUploaded());
 
                     PhotoCacheUtil.cachePhoto(ctx, i, new PhotoCacheUtil.PhotoCacheListener() {
                         @Override
@@ -477,8 +477,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
 
                         @Override
                         public void onDataCached() {
-                        Log.i(LOG, "evaluationImage successfully cached for evaluationImageID: " + i.getEvaluationImageID()
-                        + "type: " + images.getPictureType() +"_" + images.getDateTaken());
+                        Log.i(LOG, "evaluationImage successfully cached");
                         }
 
                         @Override
@@ -559,7 +558,12 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
                 addTeamPicture( new CacheListener() {
                     @Override
                     public void onCachingDone() {
-                        mService.UploadCachedPhotos(null);
+                        mService.UploadCachedPhotos(new PhotoUploadService.UploadListener() {
+                            @Override
+                            public void onUploadsComplete(int count) {
+                                Log.i(LOG, "onUploadsComplete, done uploading Team Picture");
+                            }
+                        });
                     }
                 });
                 break;
@@ -567,7 +571,12 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
                 addEvaluationImagePicture(new CacheListener() {
                     @Override
                     public void onCachingDone() {
-                        mService.UploadCachedPhotos(null);
+                        mService.UploadCachedPhotos(new PhotoUploadService.UploadListener() {
+                            @Override
+                            public void onUploadsComplete(int count) {
+                                Log.e(LOG, "onUploadsComplete, done uploading evaluationImage Picture : " + count);
+                            }
+                        });
                     }
                 });
                 break;
@@ -575,19 +584,18 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
                 addTeamMemberPicture( new CacheListener() {
                     @Override
                     public void onCachingDone() {
-                        mService.UploadCachedPhotos(null);
+                        mService.UploadCachedPhotos(new PhotoUploadService.UploadListener() {
+                            @Override
+                            public void onUploadsComplete(int count) {
+                                Log.i(LOG, "onUploadsComplete, done uploading Team Member Picture");
+                            }
+                        });
                     }
                 });
                 break;
         }
 
-        mService.UploadCachedPhotos(new PhotoUploadService.UploadListener() {
-            @Override
-            public void onUploadsComplete(int count) {
 
-                Log.e(LOG, "onUploadsComplete: " + count);
-            }
-        });
     }
     private interface CacheListener {
         public void onCachingDone();
@@ -697,9 +705,11 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
                     }
                 }
                 break;
-       //     case REQUEST_VIDEO_CAPTURE:
-
-         //       break;
+        //need videoClip dto class and video container for this..
+          //  case REQUEST_VIDEO_CAPTURE:
+        //        Uri videoUri = data.getData();
+         //       new FileTask().execute(videoUri);
+        //        break;
         }
     pictureChanged = true;
 
@@ -750,6 +760,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
+
     /*    if (item.getItemId() == R.id.menu_video) {
             Log.i(LOG, "still construction video dispatch");
             dispatchTakeVideoIntent();
@@ -757,13 +768,14 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
         }
 */
 
-
         if (item.getItemId() == R.id.menu_camera) {
             dispatchTakePictureIntent();
             return true;
         }
        if (item.getItemId() == R.id.menu_gallery) {
-            Util.showToast(ctx, "Still constructing");
+           Intent i = new Intent(this, PictureRecyclerGridActivity.class);
+           startActivity(i);
+           // Util.showToast(ctx, "Still constructing");
             return true;
         }
 
@@ -802,6 +814,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
 
     @Override
     public void onDisconnected() {
+        Log.i(LOG, "onDisconnected FIRED");
 
     }
 

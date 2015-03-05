@@ -21,12 +21,12 @@ public class ImagesDTO implements Serializable {
     }
 
     public static final int TEAM_MEMBER_IMAGE = 1, TEAM_IMAGE = 2, EVALUATION_IMAGE = 3;
-    private Integer teamMemberID, teamID, evaluationID, evaluationImageID, thumbFlag, pictureType;
+    private Integer teamMemberID,index, teamID, evaluationID, evaluationImageID, thumbFlag, pictureType;
     private boolean isFullPicture, isTeamPicture, isTeamMemberPicture, isEvaluationImagePicture;
     private double latitude, longitude;
     private Date dateTaken, dateUploaded, dateThumbUploaded, dateFullPictureUploaded;;
     private float accuracy;
-    private String thumbFilePath, imageFilePath;
+    private String thumbFilePath, imageFilePath, uri;
 
     private List<String> tags;
 
@@ -41,7 +41,15 @@ public class ImagesDTO implements Serializable {
         this.isTeamMemberPicture = isTeamMemberPicture;
     }
 
-        public boolean isEvaluationImagePicture() {
+    public String getUri() {
+        return uri;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
+
+    public boolean isEvaluationImagePicture() {
         return isEvaluationImagePicture;
     }
 
@@ -71,6 +79,14 @@ public class ImagesDTO implements Serializable {
 
     public void setEvaluationImageID(Integer evaluationImageID) {
         this.evaluationImageID = evaluationImageID;
+    }
+
+    public Integer getIndex() {
+        return index;
+    }
+
+    public void setIndex(Integer index) {
+        this.index = index;
     }
 
     public void setDateUploaded(Date dateUploaded) {

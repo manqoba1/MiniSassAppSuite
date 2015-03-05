@@ -9,7 +9,7 @@
         android:layout_height="wrap_content">
         <ImageView
             android:id="@+id/banner"
-            android:src="@drawable/banner_gold"
+            android:src="@drawable/banner_blue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
         <TextView

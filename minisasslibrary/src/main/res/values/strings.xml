@@ -34,21 +34,31 @@
     all you have to do is click OK.</string>
     <string name="yes">YES</string>
     <string name="action_camera">Camera</string>
-    <string name="camera_error">Unable to fet picture from camera, try again</string>
+    <string name="action_gallery">Gallery</string>
+    <string name="camera_error">Unable to fetch picture from camera, try again</string>
     <string name="no">NO</string>
     <string name="welcome">Welcome</string>
+    <string name="no_photos">No Photos</string>
+    <string name="check_image">Check Image on the Map</string>
+    <string name="check_image_text">Would you like to see where this picture was take?</string>
     <string name="refresh">Refresh</string>
     <string name="evaluation_image_pics">Evaluation Image Pictures</string>
     <string name="gps_complete">GPS Co-ordinates done, Begin by tapping camera</string>
     <string name="file_error">unable to createImageFile</string>
     <string name="crash_dialog_comment_prompt">You might add your comments about the problem below:</string>
     <string name="crash_dialog_ok_toast">Thank you !</string>
+    <string name="image_not_found">Evaluation Image not found in list</string>
     <string name="server_comms_failed">Server communications failed. Please try again</string>
     <string name="no_networks">Network connections unavailable</string>
     <string name="day_of_week_label_typeface" translatable="false">sans-serif</string>
     <string name="error_email">Problem sending email</string>
     <string name="photo_error">Unable to cache photo, insert SD card</string>
     <string name="choose_photo">Select Profile Photo</string>
+    <string name="image_status">Evaluation Image status</string>
+    <string name="image_gallery">Image Gallery</string>
+    <string name="site_on_map">Site On Map</string>
+    <string name="fetch_gps">Get GPS Coordinates</string>
+    <string name="image_colon">Image Colon</string>
     <string name="error_date">Enter end date equal or later than start date</string>
     <string name="error_database">Database error. Contact The CourseMaker support on the web site</string>
     <string name="error_local_databse">Local Database error. Contact The CourseMaker support on the web site</string>
@@ -64,5 +74,11 @@
     <string name="start_camera">Start Camera</string>
     <string name="title_activity_mini_sassma">MiniSassma</string>
     <string name="title_activity_minisass_maps">Map</string>
+    <string name="title_activity_picture_recycler_grid">PictureRecyclerGridActivity</string>
+    <string name="title_activity_full_photo">FullPhotoActivity</string>
+    <string name="title_activity_image">ImageActivity</string>
+    <string name="title_activity_evaluation_image_pager">EvaluationImagePagerActivity</string>
+    <string name="title_activity_evaluation_image_list_fragment">EvaluationImageListFragment
+    </string>
 
 </resources>

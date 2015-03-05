@@ -40,7 +40,9 @@ public class PhotoCacheUtil {
     }
     public interface PhotoCacheRetrieveListener {
         public void onFileDataDeserialized(ResponseDTO response);
-        public void onDataCached();
+        public void onDataCached(
+
+        );
         public void onError();
     }
 
@@ -236,8 +238,9 @@ public class PhotoCacheUtil {
                 StringBuilder sb = new StringBuilder();
                 sb.append("\n Photos in cache\n");
                 for (ImagesDTO i : response.getImagesList()) {
-                    sb.append("++").append(i.getImageFilePath())
-                            .append("evaluationImageID: " + i.getEvaluationImageID())
+                    sb.append("accuracy:").append(i.getAccuracy())
+           //                 .append(i.getUri())
+                      //      .append("evaluationImageID: " + i.getEvaluationImageID())
                             .append("\n");
                 }
                 sb.append("--->");
@@ -249,6 +252,7 @@ public class PhotoCacheUtil {
             }
 
             return 0;
+
         }
         private void Write(FileOutputStream outputStream, String json)
             throws IOException {
@@ -262,7 +266,8 @@ public class PhotoCacheUtil {
                 if (v > 0) {
                     photoCacheListener.onError();
                 } else {
-                    photoCacheListener.onDataCached();
+                    photoCacheRetrieveListener.onDataCached();
+                    Log.e(LOG, "onDataCached failed");
                 }
             }
         }
