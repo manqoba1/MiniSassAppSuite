@@ -2,12 +2,14 @@ package com.sifiso.codetribe.riverteamapp;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.sifiso.codetribe.minisasslibrary.activities.PictureActivity;
+import com.sifiso.codetribe.minisasslibrary.activities.PictureRecyclerGridActivity;
 import com.sifiso.codetribe.minisasslibrary.activities.SplashActivity;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ResponseDTO;
 import com.sifiso.codetribe.minisasslibrary.toolbox.WebCheck;
@@ -21,7 +23,8 @@ Context ctx;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ctx=getApplicationContext();
+        startActivity(new Intent(this, PictureActivity.class));
+        ctx = getApplicationContext();
     }
 
 
@@ -44,6 +47,15 @@ Context ctx;
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            return true;
+        }
+
+        if (id == R.id.CAM_btnStart) {
+            return true;
+        }
+        if (id == R.id.action_gallery) {
+            Intent i = new Intent(this, PictureRecyclerGridActivity.class);
+            startActivity(i);
             return true;
         }
 

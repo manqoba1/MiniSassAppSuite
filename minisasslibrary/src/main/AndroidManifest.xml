@@ -3,6 +3,15 @@
     package="com.sifiso.codetribe.minisasslibrary" >
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+    <!--
+ The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
+         Google Maps Android API v2, but are recommended.
+    -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:name=".MiniSassApp"
@@ -17,9 +26,26 @@
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name=".ObservationActivity"
-            android:label="@string/title_activity_observation" >
+            android:name=".activities.PictureActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait" >
         </activity>
-    </application>
+        <activity
+            android:name=".activities.MinisassMapsActivity"
+            android:label="@string/title_activity_minisass_maps" >
+        </activity>
+        <activity
+            android:name=".activities.PictureRecyclerGridActivity"
+            android:label="@string/title_activity_picture_recycler_grid" >
+        </activity>
+        <activity
+            android:name=".activities.FullPhotoActivity"
+            android:label="@string/title_activity_full_photo" >
+        </activity>
+        <activity
+            android:name=".activities.ImageActivity"
+            android:label="@string/title_activity_image" >
+        </activity>
+      </application>
 
 </manifest>

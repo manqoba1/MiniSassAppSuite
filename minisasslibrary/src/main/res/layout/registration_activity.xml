@@ -113,7 +113,7 @@
                             android:layout_alignParentStart="true"
                             android:layout_below="@+id/btnLogSubmit"
                             android:layout_marginTop="25dp"
-                            android:background="@color/dodger_blue" />
+                            android:background="@color/DodgerBlue" />
 
                         <View
                             android:id="@+id/geeline"
@@ -123,7 +123,7 @@
                             android:layout_alignParentRight="true"
                             android:layout_below="@+id/btnLogSubmit"
                             android:layout_marginTop="25dp"
-                            android:background="@color/dodger_blue" />
+                            android:background="@color/DodgerBlue" />
 
                         <TextView
                             android:id="@+id/txtor"
