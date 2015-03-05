@@ -39,7 +39,8 @@ public class RequestDTO {
             GENERATE_RIVER = 101,
             REGISTER_TEAM_MEMBER = 2,
             SIGN_IN_MEMBER = 3,
-            IMPORT_MEMBERS = 4;
+            IMPORT_MEMBERS = 4,
+            GET_SITE_STATUS = 80;
 
 
     public static final int
@@ -64,6 +65,7 @@ public class RequestDTO {
             UPDATE_EVALUATION_SITE = 32,
             UPDATE_INSECT = 33,
             UPDATE_INSECT_IMAGE = 34,
+
 
     UPDATE_TOWN = 35,
             UPDATE_TEAM = 36,

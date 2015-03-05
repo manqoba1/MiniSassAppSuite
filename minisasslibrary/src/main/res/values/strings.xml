@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">MinisassLibrary</string>
-
+    <string name="site_map">Site Location Map</string>
+    <string name="project_map">evaluation Map</string>
+    <string name="map_not_available">Map not available. Please try again!</string>
+    <string name="connect_wifi">Please connect your device to WIFI. Data will be downloaded to your device.</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="done_label">Done</string>
@@ -43,4 +46,10 @@
     <string name="error_encoding">Error encoding request. Contact support</string>
     <string name="error_server_comms">Problem communicating with the server. Please try again or contact mgGolf support</string>
     <string name="error_duplicate">Attempting to put duplicate data in database, ignored</string>
+    <string name="title_activity_observation">ObservationActivity</string>
+
+
+    <string name="title_section1">Section 1</string>
+    <string name="title_section2">Section 2</string>
+    <string name="title_section3">Section 3</string>
 </resources>
