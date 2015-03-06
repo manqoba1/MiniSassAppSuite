@@ -14,17 +14,55 @@ import java.io.Serializable;
 public class InsectImageDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    public boolean selected = false;
     private Integer insectImageID;
-    private String uri;
+    private String uri, groupName;
     private long dateRegistered;
     private Integer insectID;
-
+    private InsectDTO insect;
+    private int sensitivityScore;
 
     public InsectImageDTO() {
     }
 
+    public InsectDTO getInsect() {
+        return insect;
+    }
+
+    public void setInsect(InsectDTO insect) {
+        this.insect = insect;
+    }
+
+    public int getSensitivityScore() {
+        return sensitivityScore;
+    }
+
+    public void setSensitivityScore(int sensitivityScore) {
+        this.sensitivityScore = sensitivityScore;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
     public Integer getInsectImageID() {
         return insectImageID;
+    }
+
+    public void setInsectImageID(Integer insectImageID) {
+        this.insectImageID = insectImageID;
     }
 
     public Integer getInsectID() {
@@ -33,10 +71,6 @@ public class InsectImageDTO implements Serializable {
 
     public void setInsectID(Integer insectID) {
         this.insectID = insectID;
-    }
-
-    public void setInsectImageID(Integer insectImageID) {
-        this.insectImageID = insectImageID;
     }
 
     public String getUri() {

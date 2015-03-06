@@ -1,28 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    >
+    android:layout_height="match_parent">
 
     <EditText
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:hint="Select river"
-        android:focusable="false"
         android:id="@+id/WT_sp_river"
-        android:drawableRight="@android:drawable/arrow_down_float"
-        android:background="@drawable/xborder"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true" />
-
-    <EditText
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_marginTop="10dp"
-        android:hint="Select category"
+        android:background="@drawable/xborder"
+        android:editable="false"
         android:focusable="false"
+        android:hint="Select river"
+        android:padding="10dp" />
+
+    <Spinner
         android:id="@+id/WT_sp_category"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
         android:layout_below="@+id/WT_sp_river"
-        android:drawableRight="@android:drawable/arrow_down_float"
-        android:background="@drawable/xborder" />
+        android:layout_marginTop="10dp"
+        android:background="@drawable/xborder"
+        android:focusable="false" />
+
+    <Button
+        android:id="@+id/WT_gps_picker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/WT_sp_category"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/xsquare_red"
+        android:text="Site GSP location"
+        android:textColor="@color/white" />
+
+
 </RelativeLayout>

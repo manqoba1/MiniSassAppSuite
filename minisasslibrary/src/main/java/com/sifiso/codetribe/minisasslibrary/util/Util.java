@@ -6,21 +6,17 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.text.Html;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
@@ -39,9 +35,10 @@ import android.widget.ListPopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import com.sifiso.codetribe.minisasslibrary.R;
 import com.sifiso.codetribe.minisasslibrary.adapters.PopupListAdapter;
+import com.sifiso.codetribe.minisasslibrary.adapters.PopupRiverAdapter;
+import com.sifiso.codetribe.minisasslibrary.dto.RiverDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.TownDTO;
 
 import java.io.ByteArrayOutputStream;
@@ -59,14 +56,34 @@ import java.util.Random;
 
 public class Util {
 
-    public interface UtilAnimationListener {
-        public void onAnimationEnded();
-    }
-
-    public interface UtilPopupListener {
-        public void onItemSelected(int index);
-    }
-
+    public static final int EXEC = 1, OPS = 2, PROJ = 3, SITE = 4;
+    public static final int FLASH_SLOW = 1,
+            FLASH_MEDIUM = 2,
+            FLASH_FAST = 3,
+            INFINITE_FLASHES = 9999;
+    public static final long HOUR = 60 * 60 * 1000;
+    public static final long DAY = 24 * HOUR;
+    public static final long WEEK = 7 * DAY;
+    public static final long WEEKS = 2 * WEEK;
+    public static final long MONTH = 30 * DAY;
+    public static final String MONDAY = "Monday";
+    public static final String TUESDAY = "Tuesday";
+    public static final String WEDNESDAY = "Wednesday";
+    public static final String THURSDAY = "Thursday";
+    public static final String FRIDAY = "Friday";
+    public static final String SATURDAY = "Saturday";
+    public static final String SUNDAY = "Sunday";
+    public static final String FIRST_WEEK = "First";
+    public static final String SECOND_WEEK = "Second";
+    public static final String THIRD_WEEK = "Third";
+    public static final String FOURTH_WEEK = "Fourth";
+    static final String LOG = Util.class.getSimpleName();
+    static final int DURATION_FAST = 100, PAUSE_FAST = 100,
+            DURATION_MEDIUM = 300, PAUSE_MEDIUM = 300,
+            DURATION_SLOW = 500, PAUSE_SLOW = 500;
+    static Random random = new Random(System.currentTimeMillis());
+    static int maxFlashes, count;
+    private static int MAX_IMAGE_DIMENSION = 720;
 
     public static int getPopupWidth(Activity activity) {
         DisplayMetrics displaymetrics = new DisplayMetrics();
@@ -101,17 +118,12 @@ public class Util {
         return display.getHeight();
     }
 
-
-    public static final int EXEC = 1, OPS = 2, PROJ = 3, SITE = 4;
-
-
     private static String getFooter(Context ctx) {
         StringBuilder sb = new StringBuilder();
         sb.append(ctx.getString(R.string.contact_us));
         sb.append("<h2>").append(ctx.getResources().getString(R.string.enjoy)).append("</h2>");
         return sb.toString();
     }
-
 
     public static void pretendFlash(final View v, final int duration, final int max, final UtilAnimationListener listener) {
         final ObjectAnimator an = ObjectAnimator.ofFloat(v, "alpha", 1, 1);
@@ -188,25 +200,136 @@ public class Util {
         customtoast.show();
     }
 
+   /* public static Drawable getRandomHeroImageExec(Context ctx) {
+        random = new Random(System.currentTimeMillis());
+        int index = random.nextInt(17);
+        switch (index) {
+            case 0:
+                return ctx.getResources().getDrawable(R.drawable.banner_meeting);
+            case 1:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_construction3);
+            case 2:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_construction4);
+            case 3:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_construction5);
+            case 4:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_meeting3);
+            case 5:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_construction7);
+            case 6:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_construction8);
+            case 7:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_construction9);
+            case 8:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_construction10);
+            case 9:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_construction11);
+            case 10:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_construction13);
+            case 11:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_construction14);
+            case 12:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_report);
+            case 13:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_meeting3);
+            case 14:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_report2);
+            case 15:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_report);
+            case 16:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_meeting);
+            case 17:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_report3);
+
+        }
+        return ctx.getResources().getDrawable(
+                R.drawable.banner_report2);
+    }
+
+    public static Drawable getRandomHeroImage(Context ctx) {
+        random = new Random(System.currentTimeMillis());
+        int index = random.nextInt(17);
+        switch (index) {
+            case 0:
+                return ctx.getResources().getDrawable(R.drawable.banner_construction10);
+            case 1:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_construction3);
+            case 2:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_construction4);
+            case 3:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_construction5);
+            case 4:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_construction5);
+            case 5:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_construction7);
+            case 6:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_construction8);
+            case 7:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_construction9);
+            case 8:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_construction10);
+            case 9:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_construction11);
+            case 10:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_construction13);
+            case 11:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_construction14);
+            case 12:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_report);
+            case 13:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_report3);
+            case 14:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_report2);
+            case 15:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_report);
+            case 16:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_report2);
+            case 17:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_report3);
+
+        }
+        return ctx.getResources().getDrawable(
+                R.drawable.banner_report2);
+    }*/
 
     public static double getElapsed(long start, long end) {
         BigDecimal m = new BigDecimal(end - start).divide(new BigDecimal(1000));
         return m.doubleValue();
     }
-
-    static final String LOG = Util.class.getSimpleName();
-    static Random random = new Random(System.currentTimeMillis());
-    static int maxFlashes, count;
-
-    static final int DURATION_FAST = 100, PAUSE_FAST = 100,
-            DURATION_MEDIUM = 300, PAUSE_MEDIUM = 300,
-            DURATION_SLOW = 500, PAUSE_SLOW = 500;
-
-    public static final int FLASH_SLOW = 1,
-            FLASH_MEDIUM = 2,
-            FLASH_FAST = 3,
-            INFINITE_FLASHES = 9999;
-
 
     public static void expandOrCollapse(final View view, int duration, final boolean isExpandRequired, final UtilAnimationListener listener) {
         TranslateAnimation an = null;
@@ -366,6 +489,7 @@ public class Util {
         });
         view.startAnimation(a);
     }
+
     public static void showPopupBasicWithHeroImage(Context ctx, Activity act,
                                                    List<TownDTO> list,
                                                    View anchorView, String caption, final UtilPopupListener listener) {
@@ -379,7 +503,7 @@ public class Util {
             txt.setVisibility(View.GONE);
         }
         ImageView img = (ImageView) v.findViewById(R.id.HERO_image);
-        img.setImageDrawable(getRandomHeroImage(ctx));
+        // img.setImageDrawable(getRandomHeroImage(ctx));
 
         pop.setPromptView(v);
         pop.setPromptPosition(ListPopupWindow.POSITION_PROMPT_ABOVE);
@@ -401,6 +525,42 @@ public class Util {
         pop.show();
     }
 
+    public static void showPopupRiverWithHeroImage(Context ctx, Activity act,
+                                                   List<RiverDTO> list,
+                                                   View anchorView, String caption, final UtilPopupListener listener) {
+        final ListPopupWindow pop = new ListPopupWindow(act);
+        LayoutInflater inf = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View v = inf.inflate(R.layout.hero_image_popup, null);
+        TextView txt = (TextView) v.findViewById(R.id.HERO_caption);
+        if (caption != null) {
+            txt.setText(caption);
+        } else {
+            txt.setVisibility(View.GONE);
+        }
+        ImageView img = (ImageView) v.findViewById(R.id.HERO_image);
+        // img.setImageDrawable(getRandomHeroImage(ctx));
+
+        //pop.setPromptView(v);
+
+        pop.setPromptPosition(ListPopupWindow.POSITION_PROMPT_ABOVE);
+        pop.setAdapter(new PopupRiverAdapter(ctx, R.layout.xxsimple_spinner_item,
+                list, true));
+        Log.d(LOG, list.size() + " pop up length");
+        pop.setAnchorView(anchorView);
+        pop.setHorizontalOffset(getPopupHorizontalOffset(act));
+        pop.setModal(true);
+        pop.setWidth(getPopupWidth(act));
+        pop.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                pop.dismiss();
+                if (listener != null) {
+                    listener.onItemSelected(position);
+                }
+            }
+        });
+        pop.show();
+    }
 
     public static void flashOnce(View view, long duration, final UtilAnimationListener listener) {
         ObjectAnimator an = ObjectAnimator.ofFloat(view, "alpha", 0, 1);
@@ -685,132 +845,6 @@ public class Util {
         set.start();
     }
 
-    public static Drawable getRandomHeroImageExec(Context ctx) {
-        random = new Random(System.currentTimeMillis());
-        int index = random.nextInt(17);
-        switch (index) {
-            case 0:
-                return ctx.getResources().getDrawable(R.drawable.banner_meeting);
-            case 1:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction3);
-            case 2:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction4);
-            case 3:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction5);
-            case 4:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_meeting3);
-            case 5:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction7);
-            case 6:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction8);
-            case 7:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction9);
-            case 8:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction10);
-            case 9:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction11);
-            case 10:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction13);
-            case 11:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction14);
-            case 12:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_report);
-            case 13:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_meeting3);
-            case 14:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_report2);
-            case 15:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_report);
-            case 16:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_meeting);
-            case 17:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_report3);
-
-        }
-        return ctx.getResources().getDrawable(
-                R.drawable.banner_report2);
-    }
-
-    public static Drawable getRandomHeroImage(Context ctx) {
-        random = new Random(System.currentTimeMillis());
-        int index = random.nextInt(17);
-        switch (index) {
-            case 0:
-                return ctx.getResources().getDrawable(R.drawable.banner_construction10);
-            case 1:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction3);
-            case 2:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction4);
-            case 3:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction5);
-            case 4:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction5);
-            case 5:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction7);
-            case 6:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction8);
-            case 7:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction9);
-            case 8:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction10);
-            case 9:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction11);
-            case 10:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction13);
-            case 11:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction14);
-            case 12:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_report);
-            case 13:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_report3);
-            case 14:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_report2);
-            case 15:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_report);
-            case 16:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_report2);
-            case 17:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_report3);
-
-        }
-        return ctx.getResources().getDrawable(
-                R.drawable.banner_report2);
-    }
-
     public static void writeLocationToExif(String filePath, Location loc) {
         try {
             ExifInterface ef = new ExifInterface(filePath);
@@ -884,13 +918,6 @@ public class Util {
         }
         return dRV;
     }
-
-    public static final long HOUR = 60 * 60 * 1000;
-    public static final long DAY = 24 * HOUR;
-    public static final long WEEK = 7 * DAY;
-    public static final long WEEKS = 2 * WEEK;
-    public static final long MONTH = 30 * DAY;
-
 
     public static String getTruncated(double num) {
         String x = "" + num;
@@ -1125,20 +1152,6 @@ public class Util {
         return MONDAY;
     }
 
-
-    public static final String MONDAY = "Monday";
-    public static final String TUESDAY = "Tuesday";
-    public static final String WEDNESDAY = "Wednesday";
-    public static final String THURSDAY = "Thursday";
-    public static final String FRIDAY = "Friday";
-    public static final String SATURDAY = "Saturday";
-    public static final String SUNDAY = "Sunday";
-
-    public static final String FIRST_WEEK = "First";
-    public static final String SECOND_WEEK = "Second";
-    public static final String THIRD_WEEK = "Third";
-    public static final String FOURTH_WEEK = "Fourth";
-
     public static int[] getDateParts(Date date) {
         Calendar cal = GregorianCalendar.getInstance();
         cal.setTime(date);
@@ -1356,9 +1369,6 @@ public class Util {
         return cursor.getInt(0);
     }
 
-
-    private static int MAX_IMAGE_DIMENSION = 720;
-
     static public boolean hasStorage(boolean requireWriteAccess) {
         String state = Environment.getExternalStorageState();
         Log.w("Util", "--------- disk storage state is: " + state);
@@ -1389,5 +1399,13 @@ public class Util {
             }
         }
         return directory.canWrite();
+    }
+
+    public interface UtilAnimationListener {
+        public void onAnimationEnded();
+    }
+
+    public interface UtilPopupListener {
+        public void onItemSelected(int index);
     }
 }

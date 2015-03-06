@@ -14,18 +14,52 @@ import java.util.List;
 public class EvaluationSiteDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    private Integer evaluationSiteID;
-    private double latitude;
-    private double longitude;
+    private Integer evaluationSiteID, locationConfirmed;
+    private Double latitude;
+    private Double longitude;
+    private Float accuracy;
     private long dateRegistered;
     private Integer categoryID;
     private Integer riverID;
     private String riverName, categoryName;
     private List<EvaluationDTO> evaluationList;
+    private RiverDTO river;
+    private CategoryDTO category;
 
     public EvaluationSiteDTO() {
     }
 
+    public RiverDTO getRiver() {
+        return river;
+    }
+
+    public void setRiver(RiverDTO river) {
+        this.river = river;
+    }
+
+    public CategoryDTO getCategory() {
+        return category;
+    }
+
+    public void setCategory(CategoryDTO category) {
+        this.category = category;
+    }
+
+    public Integer getLocationConfirmed() {
+        return locationConfirmed;
+    }
+
+    public void setLocationConfirmed(Integer locationConfirmed) {
+        this.locationConfirmed = locationConfirmed;
+    }
+
+    public Float getAccuracy() {
+        return accuracy;
+    }
+
+    public void setAccuracy(Float accuracy) {
+        this.accuracy = accuracy;
+    }
 
     public Integer getCategoryID() {
         return categoryID;
@@ -67,19 +101,19 @@ public class EvaluationSiteDTO implements Serializable {
         this.evaluationSiteID = evaluationSiteID;
     }
 
-    public double getLatitude() {
+    public Double getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(double latitude) {
+    public void setLatitude(Double latitude) {
         this.latitude = latitude;
     }
 
-    public double getLongitude() {
+    public Double getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(double longitude) {
+    public void setLongitude(Double longitude) {
         this.longitude = longitude;
     }
 

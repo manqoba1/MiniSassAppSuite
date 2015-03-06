@@ -4,8 +4,8 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
-
 import com.google.gson.Gson;
+import com.sifiso.codetribe.minisasslibrary.dto.EvaluationDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ResponseDTO;
 import com.sifiso.codetribe.minisasslibrary.services.RequestCache;
 
@@ -25,36 +25,21 @@ import java.util.Date;
  */
 public class CacheUtil implements Serializable {
 
-    public interface CacheUtilListener {
-        public void onFileDataDeserialized(ResponseDTO response);
-
-        public void onDataCached();
-
-        public void onError();
-    }
-
-    public interface CacheRequestListener {
-        public void onDataCached();
-
-        public void onRequestCacheReturned(RequestCache cache);
-
-        public void onError();
-    }
-
-
-    static CacheUtilListener utilListener;
-    static CacheRequestListener cacheListener;
     public static final int CACHE_DATA = 1, CACHE_TEAM_MEMBER = 2, CACHE_COUNTRIES = 3, CACHE_EVALUATION = 4, CACHE_REQUEST = 5;
-    static int dataType;
-    static Integer projectID;
-    static ResponseDTO response;
-
-    static Context ctx;
-    static RequestCache requestCache;
     static final String JSON_DATA = "data.json", JSON_COUNTRIES = "countries.json",
             JSON_EVALUATION_DATA = "evaluation_data", JSON_TEAM_MEMBER_DATA = "team_member_data",
             JSON_REQUEST = "requestCache.json";
-
+    static final String LOG = CacheUtil.class.getSimpleName();
+    static final Gson gson = new Gson();
+    static CacheUtilListener utilListener;
+    static CacheRequestListener cacheListener;
+    static CacheEvaluationListener evaluationListener;
+    static int dataType;
+    static long evaluationDate;
+    static ResponseDTO response;
+    static EvaluationDTO evaluation;
+    static Context ctx;
+    static RequestCache requestCache;
 
     public static void cacheRequest(Context context, RequestCache cache, CacheRequestListener listener) {
         requestCache = cache;
@@ -73,13 +58,22 @@ public class CacheUtil implements Serializable {
         new CacheTask().execute();
     }
 
+    public static void cacheEvaluationData(Context context, EvaluationDTO r,
+                                           CacheEvaluationListener l) {
+        dataType = CACHE_EVALUATION;
+        evaluation = r;
+        evaluationDate = r.getEvaluationDate();
+        evaluationListener = l;
+        ctx = context;
+        new CacheTask().execute();
+    }
+
     public static void getCachedData(Context context, int type, CacheUtilListener cacheUtilListener) {
         dataType = type;
         utilListener = cacheUtilListener;
         ctx = context;
         new CacheRetrieveTask().execute();
     }
-
 
     public static void getCachedRequests(Context context, CacheRequestListener listener) {
         dataType = CACHE_REQUEST;
@@ -88,6 +82,58 @@ public class CacheUtil implements Serializable {
         new CacheRetrieveRequestTask().execute();
     }
 
+    public static void getCachedEvaluation(Context context, long evDate, CacheUtilListener cacheUtilListener) {
+        evaluationDate = evDate;
+        utilListener = cacheUtilListener;
+        ctx = context;
+        new CacheRetrieveEvaluationTask().execute();
+    }
+
+    private static String getStringFromInputStream(InputStream is) throws IOException {
+
+        BufferedReader br = null;
+        StringBuilder sb = new StringBuilder();
+        String line;
+        try {
+            br = new BufferedReader(new InputStreamReader(is));
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+            }
+
+        } finally {
+            if (br != null) {
+                br.close();
+            }
+        }
+        String json = sb.toString();
+        return json;
+
+    }
+
+    public interface CacheUtilListener {
+        public void onFileDataDeserialized(ResponseDTO response);
+
+        public void onDataCached();
+
+        public void onError();
+    }
+
+    public interface CacheRequestListener {
+        public void onDataCached();
+
+        public void onRequestCacheReturned(RequestCache cache);
+
+        public void onError();
+    }
+
+
+    public interface CacheEvaluationListener {
+        public void onEvaluationReturnedFromCache(EvaluationDTO site);
+
+        public void onDataCached();
+
+        public void onError();
+    }
 
     static class CacheTask extends AsyncTask<Void, Void, Integer> {
 
@@ -113,6 +159,13 @@ public class CacheUtil implements Serializable {
                     case CACHE_EVALUATION:
                         json = gson.toJson(response);
 
+                        outputStream = ctx.openFileOutput(JSON_EVALUATION_DATA + evaluationDate + ".json", Context.MODE_PRIVATE);
+                        write(outputStream, json);
+                        file = ctx.getFileStreamPath(JSON_REQUEST);
+                        if (file != null) {
+                            Log.e(LOG, "Request cache written, path: " + file.getAbsolutePath() +
+                                    " - length: " + file.length());
+                        }
                         break;
                     case CACHE_TEAM_MEMBER:
                         json = gson.toJson(response);
@@ -170,6 +223,13 @@ public class CacheUtil implements Serializable {
                     cacheListener.onDataCached();
                 }
             }
+            if (evaluationListener != null) {
+                if (v > 0) {
+                    cacheListener.onError();
+                } else {
+                    cacheListener.onDataCached();
+                }
+            }
 
         }
     }
@@ -190,7 +250,9 @@ public class CacheUtil implements Serializable {
                 switch (dataType) {
 
                     case CACHE_EVALUATION:
-
+                        stream = ctx.openFileInput(JSON_EVALUATION_DATA + evaluationDate + ".json");
+                        response = getData(stream);
+                        Log.i(LOG, "++ request cache retrieved");
                         break;
                     case CACHE_TEAM_MEMBER:
 
@@ -229,12 +291,8 @@ public class CacheUtil implements Serializable {
         protected void onPostExecute(ResponseDTO v) {
             if (utilListener == null) return;
             utilListener.onFileDataDeserialized(v);
-
-
         }
     }
-
-
 
     static class CacheRetrieveRequestTask extends AsyncTask<Void, Void, RequestCache> {
 
@@ -276,30 +334,47 @@ public class CacheUtil implements Serializable {
         }
     }
 
+    static class CacheRetrieveEvaluationTask extends AsyncTask<Void, Void, EvaluationDTO> {
 
-    private static String getStringFromInputStream(InputStream is) throws IOException {
-
-        BufferedReader br = null;
-        StringBuilder sb = new StringBuilder();
-        String line;
-        try {
-            br = new BufferedReader(new InputStreamReader(is));
-            while ((line = br.readLine()) != null) {
-                sb.append(line);
-            }
-
-        } finally {
-            if (br != null) {
-                br.close();
-            }
+        private EvaluationDTO getData(FileInputStream stream) throws IOException {
+            String json = getStringFromInputStream(stream);
+            EvaluationDTO response = gson.fromJson(json, EvaluationDTO.class);
+            return response;
         }
-        String json = sb.toString();
-        return json;
 
+        @Override
+        protected EvaluationDTO doInBackground(Void... voids) {
+            EvaluationDTO site = null;
+            FileInputStream stream;
+            try {
+
+                stream = ctx.openFileInput(JSON_EVALUATION_DATA + evaluationDate + ".json");
+                site = getData(stream);
+                Log.i(LOG, "++ site cache retrieved");
+
+            } catch (FileNotFoundException e) {
+                Log.d(LOG, "## site cache file not found. not initialised yet. no problem");
+
+
+            } catch (IOException e) {
+                Log.v(LOG, "-- Failed to retrieve cache", e);
+            }
+
+            return site;
+        }
+
+        @Override
+        protected void onPostExecute(EvaluationDTO result) {
+            if (evaluationListener == null) return;
+            if (result != null) {
+                evaluationListener.onEvaluationReturnedFromCache(result);
+            } else {
+                Log.e(LOG, "-- No cache, util returns null site object");
+                evaluationListener.onError();
+            }
+
+        }
     }
-
-    static final String LOG = CacheUtil.class.getSimpleName();
-    static final Gson gson = new Gson();
 
 
 }

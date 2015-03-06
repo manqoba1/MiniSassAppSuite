@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
  * @author aubreyM
  */
 public class TeamDTO implements Serializable {
@@ -24,11 +23,19 @@ public class TeamDTO implements Serializable {
     private String teamImage;
     private List<GcmDeviceDTO> gcmdeviceList;
     private List<TeamMemberDTO> teamMemberList = new ArrayList<>();
+    private TownDTO town;
 
     public TeamDTO() {
     }
 
 
+    public TownDTO getTown() {
+        return town;
+    }
+
+    public void setTown(TownDTO town) {
+        this.town = town;
+    }
 
     public Integer getTownID() {
         return townID;

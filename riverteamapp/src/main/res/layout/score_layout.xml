@@ -1,93 +1,125 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:padding="5dp"
-    android:layout_height="wrap_content"
-    android:backgroundTint="@color/background_floating_material_light"
-    android:elevation="5dp">
+    android:layout_height="match_parent"
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Total score"
-        android:id="@+id/textView"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true" />
+    android:backgroundTint="@color/background_floating_material_light">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="5"
-        android:layout_marginRight="5dp"
-        android:id="@+id/TV_total_score"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true" />
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/LL1"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Number of Groups"
-        android:id="@+id/textView3"
-        android:layout_below="@+id/textView"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="10dp" />
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="10dp"
+        android:orientation="horizontal">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="6"
-        android:layout_marginRight="5dp"
-        android:id="@+id/TV_average_score"
-        android:layout_alignTop="@+id/textView3"
-        android:layout_alignParentEnd="true" />
+        <Button
+            android:id="@+id/SL_show_insect"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/xsquare_blue"
+            android:backgroundTint="@color/white"
+            android:drawableRight="@drawable/ic_insect"
+            android:text="Select insect group"
+            android:textColor="@color/white" />
+    </LinearLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Avarage score"
-        android:id="@+id/textView5"
-        android:layout_below="@+id/textView3"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="10dp" />
 
     <RelativeLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/textView5"
-        android:layout_toEndOf="@+id/textView3">
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/LL1"
+        android:background="@drawable/xborder">
 
         <TextView
+            android:id="@+id/textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="14.0"
-            android:layout_marginRight="10dp"
-            android:id="@+id/TV_avg_score"
-            android:layout_alignBottom="@+id/IMG_score_icon"
-            android:layout_centerHorizontal="true" />
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/IMG_score_icon"
-            android:layout_marginRight="5dp"
-            android:src="@android:drawable/btn_star_big_on"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true" />
+            android:text="Total score"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <TextView
+            android:id="@+id/TV_total_score"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="natural"
-            android:id="@+id/TV_score_status"
-            android:layout_marginTop="15dp"
-            android:layout_below="@+id/TV_avg_score"
-            android:layout_alignStart="@+id/TV_avg_score" />
+            android:layout_alignStart="@+id/TV_average_score"
+            android:layout_alignTop="@+id/textView"
+            android:layout_marginRight="15dp"
+            android:text="0.0"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/textView"
+            android:layout_marginTop="10dp"
+            android:text="Number of Groups"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <TextView
+            android:id="@+id/TV_average_score"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@+id/relativeLayout2"
+            android:layout_alignTop="@+id/textView3"
+            android:layout_marginRight="15dp"
+            android:text="0.0"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <TextView
+            android:id="@+id/textView5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/textView3"
+            android:layout_marginTop="10dp"
+            android:text="Avarage score"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <RelativeLayout
+            android:id="@+id/relativeLayout2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/textView5"
+            android:layout_toEndOf="@+id/textView3">
+
+            <TextView
+                android:id="@+id/TV_avg_score"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/IMG_score_icon"
+                android:layout_centerHorizontal="true"
+                android:layout_marginRight="10dp"
+                android:text="0.0"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+            <ImageView
+                android:id="@+id/IMG_score_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginRight="5dp"
+                android:src="@android:drawable/btn_star_big_on" />
+
+            <TextView
+                android:id="@+id/TV_score_status"
+                style="@style/TextStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@+id/TV_avg_score"
+                android:layout_below="@+id/TV_avg_score"
+                android:layout_marginTop="15dp"
+                android:text="not specified"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+        </RelativeLayout>
+
     </RelativeLayout>
+
+
 </RelativeLayout>

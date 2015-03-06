@@ -25,6 +25,7 @@ public class EvaluationDTO implements Serializable {
     private Double waterClarity;
     private Double latitude;
     private Double longitude;
+    private Double electricityConductivity;
     private List<EvaluationImageDTO> evaluationImageList;
     private TeamMemberDTO teamMember;
     private EvaluationSiteDTO evaluationSite;
@@ -35,21 +36,12 @@ public class EvaluationDTO implements Serializable {
     public EvaluationDTO() {
     }
 
-
-    public List<EvaluationCommentDTO> getEvaluationCommentList() {
-        return evaluationCommentList;
+    public Double getElectricityConductivity() {
+        return electricityConductivity;
     }
 
-    public void setEvaluationCommentList(List<EvaluationCommentDTO> evaluationCommentList) {
-        this.evaluationCommentList = evaluationCommentList;
-    }
-
-    public String getRemarks() {
-        return remarks;
-    }
-
-    public void setRemarks(String remarks) {
-        this.remarks = remarks;
+    public void setElectricityConductivity(Double electricityConductivity) {
+        this.electricityConductivity = electricityConductivity;
     }
 
     public Integer getEvaluationID() {
@@ -66,6 +58,14 @@ public class EvaluationDTO implements Serializable {
 
     public void setTeamMemberID(Integer teamMemberID) {
         this.teamMemberID = teamMemberID;
+    }
+
+    public Integer getConditionsID() {
+        return conditionsID;
+    }
+
+    public void setConditionsID(Integer conditionsID) {
+        this.conditionsID = conditionsID;
     }
 
     public Integer getEvaluationSiteID() {
@@ -100,12 +100,20 @@ public class EvaluationDTO implements Serializable {
         this.score = score;
     }
 
-    public Double getPH() {
+    public Double getpH() {
         return pH;
     }
 
-    public void setPH(Double pH) {
+    public void setpH(Double pH) {
         this.pH = pH;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
     }
 
     public Double getWaterTemperature() {
@@ -156,14 +164,6 @@ public class EvaluationDTO implements Serializable {
         this.evaluationImageList = evaluationImageList;
     }
 
-    public Double getpH() {
-        return pH;
-    }
-
-    public void setpH(Double pH) {
-        this.pH = pH;
-    }
-
     public TeamMemberDTO getTeamMember() {
         return teamMember;
     }
@@ -180,6 +180,14 @@ public class EvaluationDTO implements Serializable {
         this.evaluationSite = evaluationSite;
     }
 
+    public ConditionsDTO getConditions() {
+        return conditions;
+    }
+
+    public void setConditions(ConditionsDTO conditions) {
+        this.conditions = conditions;
+    }
+
     public List<EvaluationInsectDTO> getEvaluationInsectList() {
         return evaluationInsectList;
     }
@@ -188,20 +196,12 @@ public class EvaluationDTO implements Serializable {
         this.evaluationInsectList = evaluationInsectList;
     }
 
-    public Integer getConditionsID() {
-        return conditionsID;
+    public List<EvaluationCommentDTO> getEvaluationCommentList() {
+        return evaluationCommentList;
     }
 
-    public void setConditionsID(Integer conditionsID) {
-        this.conditionsID = conditionsID;
-    }
-
-    public ConditionsDTO getConditions() {
-        return conditions;
-    }
-
-    public void setConditions(ConditionsDTO conditions) {
-        this.conditions = conditions;
+    public void setEvaluationCommentList(List<EvaluationCommentDTO> evaluationCommentList) {
+        this.evaluationCommentList = evaluationCommentList;
     }
 
     @Override

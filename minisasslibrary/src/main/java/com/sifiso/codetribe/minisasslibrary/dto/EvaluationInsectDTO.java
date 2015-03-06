@@ -19,10 +19,27 @@ public class EvaluationInsectDTO implements Serializable {
     private String remarks;
     private Integer evaluationID;
     private Integer insectID;
+    private EvaluationDTO evaluation;
+    private InsectDTO insect;
 
     public EvaluationInsectDTO() {
     }
 
+    public EvaluationDTO getEvaluation() {
+        return evaluation;
+    }
+
+    public void setEvaluation(EvaluationDTO evaluation) {
+        this.evaluation = evaluation;
+    }
+
+    public InsectDTO getInsect() {
+        return insect;
+    }
+
+    public void setInsect(InsectDTO insect) {
+        this.insect = insect;
+    }
 
     public Integer getEvaluationID() {
         return evaluationID;

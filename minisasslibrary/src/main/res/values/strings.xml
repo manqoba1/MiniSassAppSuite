@@ -2,6 +2,8 @@
 <resources>
 
     <string name="app_name">MinisassLibrary</string>
+    <string name="river_not_found">River not found</string>
+
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="done_label">Done</string>
@@ -29,7 +31,10 @@
     application to stop. Please help us fix this by sending us error data,
     all you have to do is click OK.</string>
     <string name="yes">YES</string>
-
+    <string name="stop_scan">Stop GPS Scan</string>
+    <string name="save_coords">Save Coordinates</string>
+    <string name="start_scan">Start GPS Scan</string>
+    <string name="elapsed_time">Elapsed Time in seconds</string>
     <string name="action_camera">Camera</string>
     <string name="camera_error">Unable to fet picture from camera, try again</string>
     <string name="no">NO</string>
@@ -58,4 +63,7 @@
     <string name="gallery">Gallery</string>
     <string name="finding_gps">Finding GPS</string>
     <string name="start_pic_rep">Start Pic Rep</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
