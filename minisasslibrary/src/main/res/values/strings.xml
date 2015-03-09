@@ -9,11 +9,16 @@
     <string name="evaluation_map">Evaluation Map</string>
     <string name="txt">Text for Design Purpose</string>
     <string name="zero">00</string>
+    <string name="select_action">Select Action</string>
     <string name="evaluation_image_map">Evaluation Image Map</string>
     <string name="sans_serif" translatable="false">sans-serif</string>
     <string name="radial_numbers_typeface" translatable="false">sans-serif</string>
     <string name="hour_picker_description">Hours circular slider</string>
     <string name="select_hours">Select hours</string>
+    <string name="get_status">Get Status Details</string>
+    <string name="take_picture">Take Picture</string>
+    <string name="send_app_link">Send App Link</string>
+    <string name="edit_staff">Edit team Details</string>
     <string name="enter_firstname">Enter FirstName</string>
     <string name="enter_lastname">Enter Surname</string>
     <string name="enter_id">Enter ID Number</string>

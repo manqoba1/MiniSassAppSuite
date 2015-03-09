@@ -47,7 +47,7 @@
             android:label="@string/title_activity_image" >
         </activity>
         <activity
-            android:name=".activities.TeamActivity"
+            android:name=".activities.TeamMemberActivity"
             android:label="@string/title_activity_team" >
         </activity>
     </application>

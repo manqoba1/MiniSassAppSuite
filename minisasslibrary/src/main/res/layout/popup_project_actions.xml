@@ -5,7 +5,7 @@
 
     <ImageView
         android:id="@+id/POP_image"
-        android:src="@drawable/banner_blue"
+        android:src="@drawable/banner_water5"
         android:scaleType="centerCrop"
         android:layout_width="match_parent"
         android:layout_height="@dimen/mon_hero_height_small" />

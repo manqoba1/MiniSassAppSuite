@@ -63,6 +63,15 @@ public class Util {
         public void onItemSelected(int index);
     }
 
+    public static View getHeroView(Context ctx, String caption) {
+        LayoutInflater inflater = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View v = inflater.inflate(R.layout.hero_image, null);
+        ImageView img = (ImageView) v.findViewById(R.id.HERO_image);
+        TextView txt = (TextView) v.findViewById(R.id.HERO_caption);
+        img.setImageDrawable(getRandomHeroImage(ctx));
+        txt.setText(caption);
+        return v;
+    }
 
     public static int getPopupWidth(Activity activity) {
         DisplayMetrics displaymetrics = new DisplayMetrics();
@@ -363,7 +372,7 @@ public class Util {
         view.startAnimation(a);
     }
     public static void showPopupBasicWithHeroImage(Context ctx, Activity act,
-                                                   List<TownDTO> list,
+                                                   List<String> list,
                                                    View anchorView, String caption, final UtilPopupListener listener) {
         final ListPopupWindow pop = new ListPopupWindow(act);
         LayoutInflater inf = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

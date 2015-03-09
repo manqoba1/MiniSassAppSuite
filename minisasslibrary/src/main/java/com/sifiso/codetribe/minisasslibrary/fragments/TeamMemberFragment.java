@@ -23,11 +23,11 @@ import com.sifiso.codetribe.minisasslibrary.util.Statics;
 import com.sifiso.codetribe.minisasslibrary.util.Util;
 import com.sifiso.codetribe.minisasslibrary.util.WebSocketUtil;
 
-public class TeamFragment extends Fragment {
+public class TeamMemberFragment extends Fragment {
 
   private TeamFragmentListener listener;
 
-    public TeamFragment(){
+    public TeamMemberFragment(){
 
     }
 

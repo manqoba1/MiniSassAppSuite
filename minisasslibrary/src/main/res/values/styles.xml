@@ -30,6 +30,14 @@
         <item name="android:textSize">@dimen/time_label_size</item>
         <item name="android:textColor">@color/numbers_text_color</item>
     </style>
+    <style name="TransparentCircleSmall" parent="@android:style/TextAppearance.Small">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:gravity">center</item>
+        <item name="android:width">32dp</item>
+        <item name="android:height">32dp</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:background">@drawable/xtransparent_black_small</item>
+    </style>
 
     <style name="ampm_label">
         <item name="android:textSize">@dimen/ampm_label_size</item>
@@ -40,6 +48,22 @@
         <item name="android:textColor">@color/white</item>
         <item name="android:textStyle">normal</item>
         <item name="android:background">@drawable/xgrey_rounded_corners</item>
+    </style>
+    <style name="BlackCircle" parent="@android:style/TextAppearance.Small">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/xblack_oval</item>
+    </style>
+    <style name="Title2TextStyleGrey" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textColor">@color/grey2</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">24sp</item>
+    </style>
+    <style name="RedCircleSmall" parent="@android:style/TextAppearance.Small">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/xred_oval_small</item>
     </style>
     <style name="GreyCircleSmall" parent="@android:style/TextAppearance.Small">
         <item name="android:textColor">@color/white</item>

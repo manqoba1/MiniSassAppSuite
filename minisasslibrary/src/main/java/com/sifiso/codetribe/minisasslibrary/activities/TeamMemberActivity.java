@@ -8,25 +8,25 @@ import android.view.MenuItem;
 
 import com.sifiso.codetribe.minisasslibrary.R;
 import com.sifiso.codetribe.minisasslibrary.dto.TeamMemberDTO;
-import com.sifiso.codetribe.minisasslibrary.fragments.TeamFragment;
+import com.sifiso.codetribe.minisasslibrary.fragments.TeamMemberFragment;
 
-public class TeamActivity extends ActionBarActivity implements TeamFragment.TeamFragmentListener {
-    TeamFragment teamFragment;
+public class TeamMemberActivity extends ActionBarActivity implements TeamMemberFragment.TeamFragmentListener {
+    TeamMemberFragment teamMemberFragment;
     TeamMemberDTO teamMember;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_team);
-        teamFragment = (TeamFragment)getFragmentManager().findFragmentById(R.id.fragment);
-        teamMember  = (TeamMemberDTO) getIntent().getSerializableExtra("companyStaff");
-        teamFragment.setCompanyStaff(teamMember);
+        setContentView(R.layout.activity_teammember);
+        teamMemberFragment = (TeamMemberFragment)getFragmentManager().findFragmentById(R.id.fragment);
+        teamMember  = (TeamMemberDTO) getIntent().getSerializableExtra("teamMember");
+        teamMemberFragment.setCompanyStaff(teamMember);
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_team, menu);
+        getMenuInflater().inflate(R.menu.menu_teammember, menu);
         return true;
     }
 

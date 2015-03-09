@@ -5,7 +5,7 @@
     android:layout_height="match_parent">
     <fragment
         android:id="@+id/fragment"
-        android:name="com.sifiso.codetribe.minisasslibrary.fragments.TeamFragment"
+        android:name="com.sifiso.codetribe.minisasslibrary.fragments.TeamMemberFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
