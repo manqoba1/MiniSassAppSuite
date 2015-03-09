@@ -7,12 +7,20 @@
     <string name="done_label">Done</string>
     <string name="map_unavailable">Map Unavailable, please try again</string>
     <string name="evaluation_map">Evaluation Map</string>
-
+    <string name="txt">Text for Design Purpose</string>
+    <string name="zero">00</string>
     <string name="evaluation_image_map">Evaluation Image Map</string>
     <string name="sans_serif" translatable="false">sans-serif</string>
     <string name="radial_numbers_typeface" translatable="false">sans-serif</string>
     <string name="hour_picker_description">Hours circular slider</string>
     <string name="select_hours">Select hours</string>
+    <string name="enter_firstname">Enter FirstName</string>
+    <string name="enter_lastname">Enter Surname</string>
+    <string name="enter_id">Enter ID Number</string>
+    <string name="enter_desc">Enter Description</string>
+    <string name="enter_cell">Enter Cellphone Number</string>
+    <string name="enter_name">Enter Name</string>
+    <string name="enter_email">Enter Email address</string>
     <string name="select_minutes">Select minutes</string>
     <string name="minute_picker_description">Minutes circular slider</string>
     <string name="time_placeholder" translatable="false">--</string>
@@ -80,5 +88,9 @@
     <string name="title_activity_evaluation_image_pager">EvaluationImagePagerActivity</string>
     <string name="title_activity_evaluation_image_list_fragment">EvaluationImageListFragment
     </string>
+    <string name="title_activity_team">TeamActivity</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

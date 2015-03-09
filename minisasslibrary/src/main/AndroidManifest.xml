@@ -46,6 +46,10 @@
             android:name=".activities.ImageActivity"
             android:label="@string/title_activity_image" >
         </activity>
-      </application>
+        <activity
+            android:name=".activities.TeamActivity"
+            android:label="@string/title_activity_team" >
+        </activity>
+    </application>
 
 </manifest>

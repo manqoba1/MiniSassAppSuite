@@ -13,7 +13,7 @@
     <RelativeLayout
         android:id="@+id/POP_siteLayout"
         android:layout_below="@id/POP_image"
-        android:padding="@dimen/mon_padding"
+        android:padding="@dimen/sas_padding"
         android:background="@color/white"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -39,8 +39,8 @@
     <RelativeLayout
         android:id="@+id/POP_mapLayout"
         android:layout_below="@id/POP_siteLayout"
-        android:layout_marginTop="@dimen/mon_padding"
-        android:padding="@dimen/mon_padding"
+        android:layout_marginTop="@dimen/sas_padding"
+        android:padding="@dimen/sas_padding"
         android:background="@color/white"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">

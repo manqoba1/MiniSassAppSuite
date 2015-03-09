@@ -13,8 +13,8 @@
         <TextView
             android:id="@+id/text"
             android:text="Title"
-            android:padding="@dimen/mon_padding"
-            style="@style/TextStyleRedSmall"
+            android:padding="@dimen/sas_padding"
+            style="@style/TextStyleBlueSmall"
             android:textStyle="bold"
             android:layout_marginLeft="100dp"
             android:layout_centerHorizontal="true"
@@ -32,17 +32,17 @@
         android:layout_weight="1" />
 
     <TextView
-        style="@style/RedCircle"
+        style="@style/BlueCircle"
         android:id="@+id/count"
         android:text="999"
-        android:layout_marginTop="@dimen/mon_padding"
-        android:layout_marginLeft="@dimen/mon_padding"
+        android:layout_marginTop="@dimen/sas_padding"
+        android:layout_marginLeft="@dimen/sas_padding"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
     <ProgressBar
         android:id="@+id/progressBar"
-        android:layout_margin="@dimen/mon_wider"
+        android:layout_margin="@dimen/sas_wider"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 

@@ -36,6 +36,22 @@
         <item name="android:textColor">@color/ampm_text_color</item>
         <item name="android:textStyle">bold</item>
     </style>
+    <style name="ButtonCancelSmall" parent="@android:style/TextAppearance.Small">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:background">@drawable/xgrey_rounded_corners</item>
+    </style>
+    <style name="GreyCircleSmall" parent="@android:style/TextAppearance.Small">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:background">@drawable/xgrey_oval_small</item>
+    </style>
+    <style name="RedCircle" parent="@android:style/TextAppearance.Small">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/xred_oval</item>
+    </style>
 
     <style name="Title3TextStyleBlack" parent="@android:style/TextAppearance.Medium">
         <item name="android:textColor">@color/black</item>
