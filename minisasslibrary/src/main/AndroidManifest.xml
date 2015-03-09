@@ -46,6 +46,12 @@
             android:name=".activities.ImageActivity"
             android:label="@string/title_activity_image" >
         </activity>
-      </application>
+
+   <!--     <activity
+            android:name=".fragments.EvaluationImageListFragment"
+            android:label="@string/title_activity_evaluation_image_list_fragment" >
+        </activity>
+        -->
+    </application>
 
 </manifest>

@@ -38,10 +38,13 @@ public class PictureRecyclerGridActivity extends ActionBarActivity {
     EvaluationSiteDTO evaluationSite;
     Button RCVbtn;
     PictureRecyclerAdapter adapter;
-   // List<ImagesDTO> imagesList;
-    List<EvaluationImageDTO> imagesList;
+   // ImageAdapter adapter;
+    List<ImagesDTO> imagesList;
+    int lastIndex;
+    //List<EvaluationImageDTO> imagesList;
     Activity activity;
     private List<ImagesDTO> imagesForDeletion = new ArrayList<>();
+
 
 
     @Override
@@ -60,23 +63,22 @@ public class PictureRecyclerGridActivity extends ActionBarActivity {
 
 
         evaluation = (EvaluationDTO) getIntent().getSerializableExtra("evaluation");
-        if (evaluation != null) {
-            if (evaluation.getImagesList() == null || evaluation.getImagesList().isEmpty()) {
+        if (evaluationImage != null) {
+            if (evaluation.getEvaluationImageList() == null || evaluation.getEvaluationImageList().isEmpty()) {
                 Util.showErrorToast(ctx, getString(R.string.no_photos));
                 finish();
             }
+            imagesList = evaluation.getImagesList();
+            if (evaluationImage.getFileName() != null){
+                title.setText(evaluationImage.getFileName());
+            }
 
-            adapter = new PictureRecyclerAdapter(evaluation.getImagesList(), 1, ctx, new PictureRecyclerAdapter.PictureListener() {
-                @Override
-                public void onPictureClicked(int position) {
-                    Log.e(LOG, "picture has been clicked,  position: " + position);
-                    Intent i = new Intent(getApplicationContext(), FullPhotoActivity.class);
-                    i.putExtra("evaluationImage", evaluationImage);
-                    startActivity(i);
-                }
-            });
+            setGrid();
+
             list.setAdapter(adapter);
         }
+
+
         RCVbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -89,7 +91,35 @@ public class PictureRecyclerGridActivity extends ActionBarActivity {
             }
         });
 
+
     }
+
+    private void setGrid() {
+        list = (RecyclerView) findViewById(R.id.FI_recyclerView);
+        list.setLayoutManager(new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL));
+        list.setItemAnimator(new DefaultItemAnimator());
+        list.addItemDecoration(new DividerItemDecoration(ctx, RecyclerView.VERTICAL));
+
+        adapter = new PictureRecyclerAdapter(imagesList, ctx,
+                new PictureRecyclerAdapter.PictureListener() {
+                    @Override
+                    public void onPictureClicked(int position) {
+                        Log.e(LOG, "Picture has been clicked. position:" + position);
+                        lastIndex = position;
+                        imagesForDeletion.add(imagesList.get(position));
+                        Intent i = new Intent(getApplicationContext(), FullPhotoActivity.class);
+                        i.putExtra("evaluationImage", evaluationImage);
+                        startActivity(i);
+                    }
+                });
+
+        list.setAdapter(adapter);
+        if (lastIndex < imagesList.size()) {
+            list.getLayoutManager().scrollToPosition(lastIndex);
+        }
+
+    }
+
 
     private class TouchListener implements RecyclerView.OnItemTouchListener, View.OnTouchListener {
         @Override
@@ -115,6 +145,7 @@ public class PictureRecyclerGridActivity extends ActionBarActivity {
         public boolean onCreateOptionsMenu (Menu menu){
             // Inflate the menu; this adds items to the action bar if it is present.
             getMenuInflater().inflate(R.menu.menu_picture_recycler_grid, menu);
+
             return true;
         }
 
@@ -131,29 +162,10 @@ public class PictureRecyclerGridActivity extends ActionBarActivity {
             }
             if (id == R.id.action_gallery) {
 
-
-           /*   PhotoCacheUtil.getCachedPhotos(ctx, new PhotoCacheUtil.PhotoCacheListener() {
-                    @Override
-                    public void onFileDataDeserialized(ResponseDTO response) {
-
-                    }
-
-                    @Override
-                    public void onDataCached() {
-
-                    }
-
-                    @Override
-                    public void onError() {
-
-                    }
-                }
-
-                );
                 Intent i = new Intent(ctx, FullPhotoActivity.class);
                 i.putExtra("evaluationImage", evaluationImage);
                 startActivity(i);
-               */ return true;
+                return true;
 
             }
 
@@ -161,7 +173,11 @@ public class PictureRecyclerGridActivity extends ActionBarActivity {
         }
 
 
-
+        @Override
+        public void onPause() {
+             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+             super.onPause();
+    }
 
     static final String LOG = PictureRecyclerGridActivity.class.getSimpleName();
 }

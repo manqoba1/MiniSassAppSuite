@@ -19,6 +19,11 @@
         <item name="android:background">@drawable/xtransparent_oval</item>
     </style>
 
+    <style name="PagerSmall">
+        <item name="android:textColor">@color/blue</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
     <style name="Title3TextStyleBlue" parent="@android:style/TextAppearance.Medium">
         <item name="android:textColor">@color/navy_blue</item>
         <item name="android:textStyle">bold</item>

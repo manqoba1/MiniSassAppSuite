@@ -255,7 +255,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
             Log.i(LOG, "fetch file from getDataDirectory");
             root = Environment.getDataDirectory();
         }
-        File pics = new File(root, "minisass_app");
+        File pics = new File(root, "Minisass_app");
         if (!pics.exists()) {
             pics.mkdir();
         }
@@ -604,6 +604,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
     private ImagesDTO getObject() {
         ImagesDTO img = new ImagesDTO();
         img.setEvaluationID(evaluation.getEvaluationID());
+
         img.setDateTaken(new Date());
         img.setLongitude(location.getLongitude());
         img.setLatitude(location.getLatitude());
@@ -724,7 +725,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
               googleApiClient.connect();
             }
         }
-        Log.i(LOG, "onStart Bind to PhotoUploadService");
+        Log.i(LOG, "onStart Binding to PhotoUploadService");
         Intent intent = new Intent(this, PhotoUploadService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
         super.onStart();
@@ -736,7 +737,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
 
         if (googleApiClient != null) {
             googleApiClient.disconnect();
-            Log.e(LOG, "onStop fired - GoogleApiClient disconnecting");
+            Log.e(LOG, "onStop FIRED - GoogleApiClient disconnecting");
         }
         Log.e(LOG, "onStop unBind from PhotoUploadService");
         if (mBound) {
@@ -775,7 +776,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
        if (item.getItemId() == R.id.menu_gallery) {
            Intent i = new Intent(this, PictureRecyclerGridActivity.class);
            startActivity(i);
-           // Util.showToast(ctx, "Still constructing");
+            Util.showToast(ctx, "Still constructing");
             return true;
         }
 
@@ -835,10 +836,10 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
         }
     }
 
- //   @Override
+   @Override
     public void onConnectionSuspended (int i) {
         Log.i(LOG,
-                "ConnectionSuspended");
+                "FIRED onConnectionSuspended");
     }
 
 

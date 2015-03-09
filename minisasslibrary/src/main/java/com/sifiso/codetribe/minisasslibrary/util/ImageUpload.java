@@ -48,7 +48,7 @@ public class ImageUpload {
         if (!BaseVolley.checkNetworkOnDevice(ctx)) {
             return;
         }
-        Log.i(LOG, "Fired ImageUpload");
+        Log.i(LOG, "FIRED ImageUpload");
         new ImageUploadTask().execute();
     }
 

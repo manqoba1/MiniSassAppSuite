@@ -24,6 +24,9 @@ import java.util.Locale;
  */
 public class PictureRecyclerAdapter extends RecyclerView.Adapter<PictureRecyclerAdapter.PhotoViewHolder>{
 
+    public PictureRecyclerAdapter(List<ImagesDTO> imagesList, Context ctx, PictureListener evaluationImage) {
+    }
+
     public interface PictureListener {
         public void onPictureClicked(int position);
     }

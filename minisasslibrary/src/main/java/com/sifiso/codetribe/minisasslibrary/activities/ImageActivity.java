@@ -70,7 +70,7 @@ public class ImageActivity extends ActionBarActivity {
         if (evaluation != null) {
             photoCache.setImageUploadList(evaluation.getEvaluationImageList());
             EvaluationImageDTO dto = photoCache.getImageUploadList().get(index);
-            sb.append(dto.getUri());
+            sb.append(dto.getFileName());
             txtTitle.setText(evaluationImage.getEvaluationImageID());
             txtSubTitle.setText(evaluation.getRemarks());
             txtDate.setText(sdf.format(dto.getDateTaken()));
@@ -163,7 +163,7 @@ public class ImageActivity extends ActionBarActivity {
         StringBuilder sb = new StringBuilder();
         EvaluationImageDTO dto = photoCache.getImageUploadList().get(index);
         sb.append(Statics.IMAGE_URL)
-                .append(dto.getUri());
+                .append(dto.getFileName());
         Picasso.with(ctx).load(sb.toString()).into(imageView);
         com.nostra13.universalimageloader.core.ImageLoader.getInstance().displayImage(sb.toString(),
                 imageView, new ImageLoadingListener() {

@@ -16,7 +16,7 @@ public class EvaluationImageDTO implements Serializable {
     private static final long serialVersionUID = 1L;
     private Integer evaluationImageID;
     private long dateTaken;
-    private String fileName, uri;
+    private String fileName;
     private Integer evaluationID, index;
 
     public EvaluationImageDTO() {
@@ -45,14 +45,6 @@ public class EvaluationImageDTO implements Serializable {
 
     public void setIndex(Integer index) {
         this.index = index;
-    }
-
-    public String getUri() {
-        return uri;
-    }
-
-    public void setUri(String uri) {
-        this.uri = uri;
     }
 
     public long getDateTaken() {

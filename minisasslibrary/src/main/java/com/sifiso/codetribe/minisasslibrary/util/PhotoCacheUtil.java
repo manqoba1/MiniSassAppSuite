@@ -266,8 +266,8 @@ public class PhotoCacheUtil {
                 if (v > 0) {
                     photoCacheListener.onError();
                 } else {
-                    photoCacheRetrieveListener.onDataCached();
-                    Log.e(LOG, "onDataCached failed");
+                    photoCacheListener.onDataCached();
+                    Log.e(LOG, "onDataCached fired");
                 }
             }
         }
