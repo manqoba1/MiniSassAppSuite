@@ -76,10 +76,10 @@ public class WebCheck {
         }
 
         if (wifiInfo.isConnected()) {
-            Log.w(TAG, "###### WIFI CONNECTED on check");
+         //   Log.w(TAG, "###### WIFI CONNECTED on check");
             result.setWifiConnected(true);
         } else {
-            Log.e(TAG, "------ WIFI NOT CONNECTED on check");
+     ///       Log.e(TAG, "------ WIFI NOT CONNECTED on check");
             result.setWifiConnected(false);
         }
         //

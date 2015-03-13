@@ -15,7 +15,7 @@
         <TextView
             android:id="@+id/RCV_title"
             android:layout_marginLeft="@dimen/sas_divider"
-            android:text="PlaceHolder Title"
+            android:text="PlaceHolder Title 001"
             style="@style/TextStyleBlue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />

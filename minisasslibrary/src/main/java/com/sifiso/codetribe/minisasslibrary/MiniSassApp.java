@@ -7,6 +7,8 @@ import android.util.Log;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.Tracker;
 import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiscCache;
 import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -14,7 +16,6 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.utils.L;
 import com.nostra13.universalimageloader.utils.StorageUtils;
-import com.sifiso.codetribe.minisasslibrary.dto.RiverDTO;
 import com.sifiso.codetribe.minisasslibrary.toolbox.BitmapLruCache;
 import com.sifiso.codetribe.minisasslibrary.util.Statics;
 
@@ -23,6 +24,7 @@ import org.acra.ReportField;
 import org.acra.annotation.ReportsCrashes;
 
 import java.io.File;
+import java.util.HashMap;
 
 /**
  * Created by CodeTribe1 on 2015-02-16.
@@ -84,6 +86,30 @@ public class MiniSassApp extends Application {
         L.writeLogs(false);
 
         Log.w(LOG, "###### ImageLoaderConfiguration has been initialised");
+    }
+
+    public enum TrackerName {
+        APP_TRACKER, //Tracker used for this app use only
+        GLOBAL_TRACKER, //Tracker used by all apps from company
+        ECOMMERCE_TRACKER //tracker used by all ecommerce transaction from a company
+    }
+    static final String PROPERTY_ID = "UA-53661372-2";
+    HashMap<TrackerName, Tracker>mTrackers = new HashMap<>();
+
+    public synchronized Tracker getTracker(TrackerName trackerId) {
+        if (!mTrackers.containsKey(trackerId)) {
+            GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
+            Tracker t = null;
+            if (trackerId == TrackerName.APP_TRACKER) {
+                t = analytics.newTracker(PROPERTY_ID);
+            }
+            if (trackerId == TrackerName.GLOBAL_TRACKER) {
+                t = analytics.newTracker(R.xml.global_tracker);
+            }
+            mTrackers.put(trackerId, t);
+        }
+        Log.i(LOG, "analytics trackerID:" + trackerId.toString());
+        return mTrackers.get(trackerId);
     }
 
     /**

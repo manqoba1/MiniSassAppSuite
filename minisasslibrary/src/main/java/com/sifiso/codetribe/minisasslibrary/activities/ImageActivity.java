@@ -22,6 +22,7 @@ import com.sifiso.codetribe.minisasslibrary.dto.EvaluationDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationImageDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationSiteDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ImagesDTO;
+import com.sifiso.codetribe.minisasslibrary.fragments.ImageFragment;
 import com.sifiso.codetribe.minisasslibrary.util.PhotoCache;
 import com.sifiso.codetribe.minisasslibrary.util.Statics;
 import com.sifiso.codetribe.minisasslibrary.util.Util;
@@ -227,7 +228,7 @@ public class ImageActivity extends ActionBarActivity {
             return true;
         }
         if (id == R.id.action_camera) {
-            Intent i = new Intent(this, PictureActivity.class);
+            Intent i = new Intent(this, ImageFragment.class);
             if (evaluation != null) {
                 i.putExtra("type", ImagesDTO.EVALUATION_IMAGE);
                 i.putExtra("evaluation", evaluation);

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
-
 import com.google.gson.Gson;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ResponseDTO;
 import com.sifiso.codetribe.minisasslibrary.services.RequestCache;
@@ -46,7 +45,7 @@ public class CacheUtil implements Serializable {
     static CacheRequestListener cacheListener;
     public static final int CACHE_DATA = 1, CACHE_TEAM_MEMBER = 2, CACHE_COUNTRIES = 3, CACHE_EVALUATION = 4, CACHE_REQUEST = 5;
     static int dataType;
-    static Integer projectID;
+    static Integer evaluationID, teamMemberID;
     static ResponseDTO response;
 
     static Context ctx;
@@ -171,12 +170,6 @@ public class CacheUtil implements Serializable {
                 }
             }
 
-
-
-
-
-
-
         }
     }
 
@@ -196,10 +189,14 @@ public class CacheUtil implements Serializable {
                 switch (dataType) {
 
                     case CACHE_EVALUATION:
-
+                        stream = ctx.openFileInput(JSON_EVALUATION_DATA + evaluationID + ".json");
+                        response = getData(stream);
+                        Log.i(LOG, " evaluation data cache retrieved");
                         break;
                     case CACHE_TEAM_MEMBER:
-
+                        stream = ctx.openFileInput(JSON_TEAM_MEMBER_DATA + teamMemberID + ".json");
+                        response = getData(stream);
+                        Log.i(LOG, "team member cache retrieved");
                         break;
                     case CACHE_REQUEST:
                         stream = ctx.openFileInput(JSON_REQUEST);

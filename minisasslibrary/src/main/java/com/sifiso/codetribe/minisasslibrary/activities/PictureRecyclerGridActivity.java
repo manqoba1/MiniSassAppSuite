@@ -16,13 +16,19 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+import com.sifiso.codetribe.minisasslibrary.MiniSassApp;
 import com.sifiso.codetribe.minisasslibrary.R;
 import com.sifiso.codetribe.minisasslibrary.adapters.PictureRecyclerAdapter;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationImageDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationSiteDTO;
+import com.sifiso.codetribe.minisasslibrary.dto.TeamMemberDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ImagesDTO;
 import com.sifiso.codetribe.minisasslibrary.util.DividerItemDecoration;
+import com.sifiso.codetribe.minisasslibrary.util.SharedUtil;
+import com.sifiso.codetribe.minisasslibrary.util.Statics;
 import com.sifiso.codetribe.minisasslibrary.util.Util;
 
 import java.util.ArrayList;
@@ -72,13 +78,19 @@ public class PictureRecyclerGridActivity extends ActionBarActivity {
             if (evaluationImage.getFileName() != null){
                 title.setText(evaluationImage.getFileName());
             }
-
-            setGrid();
+            adapter = new PictureRecyclerAdapter(evaluation.getImagesList(), 1, ctx, new PictureRecyclerAdapter.PictureListener() {
+                @Override
+                public void onPictureClicked(int position) {
+                    Log.e(LOG, "Picture has been clicked, position: " + position);
+                    Intent i = new Intent(getApplicationContext(), FullPhotoActivity.class);
+                    i.putExtra("evaluationImage", evaluationImage);
+                    startActivity(i);
+                }
+            });
+//            setGrid();
 
             list.setAdapter(adapter);
         }
-
-
         RCVbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -91,10 +103,19 @@ public class PictureRecyclerGridActivity extends ActionBarActivity {
             }
         });
 
+        setTitle(SharedUtil.getEvaluation(ctx).getEvaluationID());
+        TeamMemberDTO member = SharedUtil.getTeamMember(ctx);
+        getSupportActionBar().setSubtitle(member.getFirstName() + member.getLastName());
+        Statics.setRobotoFontLight(ctx, title);
+        MiniSassApp app = (MiniSassApp) getApplication();
+        Tracker t = app.getTracker(MiniSassApp.TrackerName.APP_TRACKER);
+
+        t.setScreenName("PictureRecyclerGridActivity");
+        t.send(new HitBuilders.AppViewBuilder().build());
 
     }
 
-    private void setGrid() {
+  /*  private void setGrid() {
         list = (RecyclerView) findViewById(R.id.FI_recyclerView);
         list.setLayoutManager(new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL));
         list.setItemAnimator(new DefaultItemAnimator());
@@ -114,12 +135,13 @@ public class PictureRecyclerGridActivity extends ActionBarActivity {
                 });
 
         list.setAdapter(adapter);
+
         if (lastIndex < imagesList.size()) {
             list.getLayoutManager().scrollToPosition(lastIndex);
         }
 
     }
-
+*/
 
     private class TouchListener implements RecyclerView.OnItemTouchListener, View.OnTouchListener {
         @Override

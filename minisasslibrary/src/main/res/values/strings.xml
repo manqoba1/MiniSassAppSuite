@@ -78,8 +78,7 @@
     <string name="title_activity_full_photo">FullPhotoActivity</string>
     <string name="title_activity_image">ImageActivity</string>
     <string name="title_activity_evaluation_image_pager">EvaluationImagePagerActivity</string>
-    <string name="title_activity_evaluation_image_list_fragment">EvaluationImageListFragment
-    </string>
+    <string name="title_activity_evaluation_image_list_fragment">EvaluationImageListFragment</string>
     <string name="title_activity_image_adapter">ImageAdapter</string>
     <string name="title_activity_evaluation_image_adapter">EvaluationImageAdapter</string>
 

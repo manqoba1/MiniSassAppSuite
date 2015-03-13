@@ -7,7 +7,9 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.sifiso.codetribe.minisasslibrary.dto.EvaluationDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationImageDTO;
+import com.sifiso.codetribe.minisasslibrary.dto.TeamMemberDTO;
 
 import java.util.Date;
 
@@ -22,6 +24,7 @@ public class SharedUtil {
         TEAM_MEMBER_JSON = "teamMember",
         TEAM_JSON = "team",
         EVALUATION_IMAGE_ID = "evaluationImageID",
+        EVALUATION_JSON = ".evaluation",
         EVALUATION_ID = "evaluationID",
         GCM_REGISTRAION_ID = "gcm",
         IMAGE_LOCATION = "imageLocation",
@@ -37,6 +40,26 @@ public class SharedUtil {
             return null;
         }
         return gson.fromJson(s,ImageLocation.class);
+    }
+
+    public static EvaluationDTO getEvaluation(Context ctx) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ctx);
+        String st = sp.getString(EVALUATION_JSON, null);
+        EvaluationDTO e = null;
+        if (st != null){
+            e = gson.fromJson(st, EvaluationDTO.class);
+        }
+        return e;
+    }
+
+    public static TeamMemberDTO getTeamMember(Context ctx) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ctx);
+        String st = sp.getString(TEAM_MEMBER_JSON, null);
+        TeamMemberDTO tm =null;
+        if (st != null) {
+            tm = gson.fromJson(st, TeamMemberDTO.class);
+        }
+        return tm;
     }
 
     public static void saveLastEvaluationImageID(Context ctx, Integer evaluationImageID) {

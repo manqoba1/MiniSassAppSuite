@@ -182,18 +182,18 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
 
     private void setFields() {
         activity = this;
-        gpsStatus = findViewById(R.id.CAM_gpsStatus);
-        chrono = (Chronometer) findViewById(R.id.CAM_chrono);
-        txtMsg = (TextView) findViewById(R.id.CAM_message);
-        progressBar = (ProgressBar) findViewById(R.id.CAM_progressBar);
+       // gpsStatus = findViewById(R.id.CAM_gpsStatus);
+        //chrono = (Chronometer) findViewById(R.id.CAM_chrono);
+      //  txtMsg = (TextView) findViewById(R.id.CAM_message);
+      //  progressBar = (ProgressBar) findViewById(R.id.CAM_progressBar);
         imageContainerLayout = (LinearLayout) findViewById(R.id.CAM_imageContainer);
-        txtAccuracy = (TextView) findViewById(R.id.CAM_accuracy);
+        //txtAccuracy = (TextView) findViewById(R.id.CAM_accuracy);
         btnStart = (Button) findViewById(R.id.CAM_btnStart);
         topLayout =  findViewById(R.id.CAM_topLayout);
         imgCamera = (ImageView) findViewById(R.id.CAM_imgCamera);
         imgCamera.setVisibility(View.GONE);
         topLayout.setVisibility(View.GONE);
-        gpsStatus.setVisibility(View.GONE);
+//        gpsStatus.setVisibility(View.GONE);
 
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -217,7 +217,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
                     @Override
                     public void onAnimationEnded() {
                         topLayout.setVisibility(View.GONE);
-                        gpsStatus.setVisibility(View.GONE);
+                   //     gpsStatus.setVisibility(View.GONE);
                         dispatchTakePictureIntent();
                     }
                 });
@@ -225,8 +225,6 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
             }
         });
     }
-
-
 
     private File createImageFile() throws IOException {
         //creating image file names
@@ -604,7 +602,6 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
     private ImagesDTO getObject() {
         ImagesDTO img = new ImagesDTO();
         img.setEvaluationID(evaluation.getEvaluationID());
-
         img.setDateTaken(new Date());
         img.setLongitude(location.getLongitude());
         img.setLatitude(location.getLatitude());
@@ -776,7 +773,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
        if (item.getItemId() == R.id.menu_gallery) {
            Intent i = new Intent(this, PictureRecyclerGridActivity.class);
            startActivity(i);
-            Util.showToast(ctx, "Still constructing");
+            //Util.showToast(ctx, "Still constructing");
             return true;
         }
 
@@ -797,7 +794,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
         if (location != null) {
             Log.w(LOG,"## Good location spot");
             topLayout.setVisibility(View.GONE);
-            gpsStatus.setVisibility(View.GONE);
+//            gpsStatus.setVisibility(View.GONE);
             imgCamera.setVisibility(View.VISIBLE);
             btnStart.setVisibility(View.GONE);
             dispatchTakePictureIntent();

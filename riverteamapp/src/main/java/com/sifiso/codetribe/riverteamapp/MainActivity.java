@@ -8,17 +8,21 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.sifiso.codetribe.minisasslibrary.activities.ImageActivity;
 import com.sifiso.codetribe.minisasslibrary.activities.PictureActivity;
-import com.sifiso.codetribe.minisasslibrary.activities.PictureRecyclerGridActivity;
 import com.sifiso.codetribe.minisasslibrary.activities.SplashActivity;
+import com.sifiso.codetribe.minisasslibrary.dto.EvaluationDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ResponseDTO;
 import com.sifiso.codetribe.minisasslibrary.toolbox.WebCheck;
 import com.sifiso.codetribe.minisasslibrary.toolbox.WebCheckResult;
 import com.sifiso.codetribe.minisasslibrary.util.CacheUtil;
 
+import java.util.List;
+
 
 public class MainActivity extends ActionBarActivity {
 Context ctx;
+    private List<EvaluationDTO> evaluationList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,8 +57,8 @@ Context ctx;
         if (id == R.id.CAM_btnStart) {
             return true;
         }
-        if (id == R.id.action_gallery) {
-            Intent i = new Intent(this, PictureRecyclerGridActivity.class);
+        if (id == R.id.menu_gallery) {
+            Intent i = new Intent(this, ImageActivity.class);
             startActivity(i);
             return true;
         }

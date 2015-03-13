@@ -12,7 +12,7 @@
         android:padding="@dimen/sas_wider"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-
+    <!--
         <ProgressBar
             android:id="@+id/CAM_progressBar"
             android:layout_width="wrap_content"
@@ -27,11 +27,12 @@
             android:text="@string/finding_gps"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
-
+-->
     </RelativeLayout>
-    <RelativeLayout
+
+ <!--   <RelativeLayout
         android:id="@+id/CAM_gpsStatus"
-        android:background="@color/BlanchedAlmond"
+        android:background="@color/AntiqueWhite"
         android:padding="@dimen/sas_middle"
         android:layout_below="@id/CAM_topLayout"
         android:layout_width="match_parent"
@@ -76,18 +77,17 @@
             android:layout_height="wrap_content" />
 
     </RelativeLayout>
-
+-->
 
     <RelativeLayout
         android:id="@+id/CAM_imageLayout"
         android:layout_width="match_parent"
         android:background="@color/black"
-        android:layout_below="@+id/CAM_gpsStatus"
         android:layout_height="match_parent">
         <HorizontalScrollView
-
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
             <LinearLayout
                 android:id="@+id/CAM_imageContainer"
                 android:orientation="horizontal"
@@ -97,7 +97,6 @@
                 <include layout="@layout/scroller_image_template"/>
                 <include layout="@layout/scroller_image_template"/>
                 <include layout="@layout/scroller_image_template"/>
-
                 </LinearLayout>
             </HorizontalScrollView>
 
@@ -108,14 +107,12 @@
 
     <ImageView
         android:id="@+id/CAM_imgCamera"
-        android:src="@android:drawable/ic_menu_camera"
-        android:tint="@color/yellow"
-        android:background="@drawable/xblue_oval_large"
+        android:src="@drawable/water_cam"
         android:layout_alignParentRight="true"
         android:layout_marginTop="@dimen/sas_wider"
-        android:layout_width="wrap_content"
+        android:layout_width="100dp"
         android:layout_marginRight="@dimen/sas_margin"
-        android:layout_height="wrap_content" />
+        android:layout_height="100dp" />
 
     <RelativeLayout
         android:padding="@dimen/sas_wide"
@@ -128,7 +125,6 @@
             android:id="@+id/CAM_btnStart"
             style="@style/ButtonBlue"
             android:background="@color/DodgerBlue"
-            android:drawableLeft="@drawable/small_water_droplet"
             android:text="@string/start_camera"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
