@@ -5,6 +5,8 @@
  */
 package com.sifiso.codetribe.minisasslibrary.dto;
 
+import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ImagesDTO;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -28,10 +30,19 @@ public class EvaluationDTO implements Serializable {
     private Double electricityConductivity;
     private List<EvaluationImageDTO> evaluationImageList;
     private TeamMemberDTO teamMember;
+    private List<ImagesDTO> imagesList;
     private EvaluationSiteDTO evaluationSite;
     private ConditionsDTO conditions;
     private List<EvaluationInsectDTO> evaluationInsectList;
     private List<EvaluationCommentDTO> evaluationCommentList;
+
+    public List<ImagesDTO> getImagesList() {
+        return imagesList;
+    }
+
+    public void setImagesList(List<ImagesDTO> imagesList) {
+        this.imagesList = imagesList;
+    }
 
     public String getConditionName() {
         return conditionName;

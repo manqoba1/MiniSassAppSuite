@@ -29,7 +29,7 @@ import java.util.List;
  * Created by CodeTribe1 on 2015-03-09.
  */
 public class TeamMemberListFragment extends Fragment
-        implements  PageFragment {
+        implements PageFragment {
     private TeamMemberListListener mListener;
 
     /**
@@ -93,6 +93,7 @@ public class TeamMemberListFragment extends Fragment
 
     ListPopupWindow staffActionsWindow;
     List<String> list;
+
     private void setList() {
 
         if (teamMemberList == null) {
@@ -126,8 +127,10 @@ public class TeamMemberListFragment extends Fragment
                     list.add(ctx.getString(R.string.edit_staff));
                     View v = Util.getHeroView(ctx, "Select Action");
 
-                    Util.showPopupBasicWithHeroImage(ctx,getActivity(),list,txtName, ctx.getString(R.string.select_action),new Util.UtilPopupListener() {
+                    //Util.showPopupRiverWithHeroImage(ctx,);
+                    Util.showPopupWithHeroImage(ctx, getActivity(), list, txtName, ctx.getString(R.string.select_action), new Util.UtilPopupListener() {
                         TeamMemberDTO team;
+
                         @Override
                         public void onItemSelected(int index) {
                             switch (index) {
@@ -139,13 +142,13 @@ public class TeamMemberListFragment extends Fragment
                                     break;
                                 case 2:
                                     int index2 = 0;
-                                    for (TeamMemberDTO s: teamMemberList) {
+                                    for (TeamMemberDTO s : teamMemberList) {
                                         if (s.getTeamMemberID().intValue() == team.getTeamMemberID().intValue()) {
                                             break;
                                         }
                                         index2++;
                                     }
-                                    mListener.onTeamMemberInvitationRequested(teamMemberList,index2);
+                                    mListener.onTeamMemberInvitationRequested(teamMemberList, index2);
                                     break;
                                 case 3:
                                     mListener.onTeamMemberEditRequested(team);
@@ -191,14 +194,14 @@ public class TeamMemberListFragment extends Fragment
         //Collections.sort(teamMemberList);
         teamMemberAdapter.notifyDataSetChanged();
         txtCount.setText("" + teamMemberList.size());
-        Util.pretendFlash(txtCount,300,4,new Util.UtilAnimationListener() {
+        Util.pretendFlash(txtCount, 300, 4, new Util.UtilAnimationListener() {
             @Override
             public void onAnimationEnded() {
                 Util.animateRotationY(txtCount, 500);
             }
         });
         int index = 0;
-        for (TeamMemberDTO s: teamMemberList) {
+        for (TeamMemberDTO s : teamMemberList) {
             if (s.getTeamMemberID().intValue() == team.getTeamMemberID().intValue()) {
                 break;
             }
@@ -214,7 +217,7 @@ public class TeamMemberListFragment extends Fragment
         setList();
 
         int index = 0;
-        for (TeamMemberDTO c: teamMemberList) {
+        for (TeamMemberDTO c : teamMemberList) {
             if (team.getTeamMemberID() == c.getTeamMemberID()) {
                 break;
             }
@@ -227,8 +230,11 @@ public class TeamMemberListFragment extends Fragment
 
     public interface TeamMemberListListener {
         public void onTeamMemberClicked(TeamMemberDTO teamMember);
+
         public void onTeamMemberInvitationRequested(List<TeamMemberDTO> teamMemberList, int index);
+
         public void onTeamMemberPictureRequested(TeamMemberDTO teamMember);
+
         public void onTeamMemberEditRequested(TeamMemberDTO teamMember);
     }
 

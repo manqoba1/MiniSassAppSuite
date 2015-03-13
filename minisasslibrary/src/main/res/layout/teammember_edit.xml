@@ -11,7 +11,7 @@
         android:layout_height="match_parent">
         <ImageView
             android:id="@+id/ED_PSN_banner"
-            android:src="@drawable/banner_report"
+            android:src="@drawable/komatiriver"
             android:scaleType="centerCrop"
             android:layout_width="match_parent"
             android:layout_height="@dimen/mon_hero_height_small" />

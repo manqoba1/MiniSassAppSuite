@@ -34,9 +34,10 @@ import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
-import com.google.android.gms.location.LocationClient;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.sifiso.codetribe.minisasslibrary.R;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationDTO;
@@ -63,10 +64,11 @@ import java.util.Date;
 import java.util.List;
 
 public class PictureActivity extends ActionBarActivity implements LocationListener,
-        GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener{
+        GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener,
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     LocationRequest mLocationRequest;
-    LocationClient mLocationClient;
+    GoogleApiClient mLocationClient;
     LayoutInflater inflater;
     File photoFile, currentThumbFile;
     Uri thumbUri, fileUri;
@@ -90,6 +92,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
     boolean isUploaded, mBound;
     String mCurrentPhotoPath;
     public final String LOG = PictureActivity.class.getSimpleName();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,7 +101,11 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
         inflater = getLayoutInflater();
         setContentView(R.layout.camera);
         setFields();
-        mLocationClient = new LocationClient(getApplicationContext(), this, this);
+        mLocationClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
         //getting objects
         if (savedInstanceState != null) {
             Log.e(LOG, "savedInstanceState, is now LOADED");
@@ -122,7 +129,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
             type = getIntent().getIntExtra("type", 0);
             evaluation = (EvaluationDTO) getIntent().getSerializableExtra("evaluation");
             evaluationImage = (EvaluationImageDTO) getIntent().getSerializableExtra("evaluationImage");
-            }
+        }
         setTitle("Evaluation Image");
         if (evaluationImage != null) {
             getSupportActionBar().setSubtitle(evaluationImage.getFileName());
@@ -132,6 +139,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
         }
 
     }
+
     ActionBarActivity activity;
     Button btnStart;
     View gpsStatus, topLayout;
@@ -174,7 +182,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
         imageContainerLayout = (LinearLayout) findViewById(R.id.CAM_imageContainer);
         txtAccuracy = (TextView) findViewById(R.id.CAM_accuracy);
         btnStart = (Button) findViewById(R.id.CAM_btnStart);
-        topLayout =  findViewById(R.id.CAM_topLayout);
+        topLayout = findViewById(R.id.CAM_topLayout);
         imgCamera = (ImageView) findViewById(R.id.CAM_imgCamera);
         imgCamera.setVisibility(View.GONE);
         topLayout.setVisibility(View.GONE);
@@ -209,7 +217,6 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
             }
         });
     }
-
 
 
     private File createImageFile() throws IOException {
@@ -258,8 +265,6 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
     boolean confirmedStandingAtLocation;
 
 
-
-
     private void showReminderDialog() {
         AlertDialog.Builder d = new AlertDialog.Builder(this);
         d.setTitle("Image Location Reminder")
@@ -274,7 +279,9 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
                         chrono.start();
                         try {
                             if (mLocationClient.isConnected()) {
-                                mLocationClient.requestLocationUpdates(mLocationRequest, (LocationListener) activity);
+
+                                LocationServices.FusedLocationApi.requestLocationUpdates(
+                                        mLocationClient, mLocationRequest, (LocationListener) activity);
                             }
                         } catch (Exception e) {
                             Log.e(LOG, "could not connect");
@@ -289,6 +296,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
                 })
                 .show();
     }
+
     PhotoUploadService mService;
 
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -328,7 +336,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
             ResponseDTO r = new ResponseDTO();
             r.setEvaluationImageFileName(currentSessionPhotos);
             Intent i = new Intent();
-          //  i.putExtra("response", r);
+            //  i.putExtra("response", r);
             setResult(RESULT_OK, i);
         } else {
             Log.d(LOG, "onBackPressed has been cancelled");
@@ -341,7 +349,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
     public void onSaveInstanceState(Bundle b) {
         Log.e(LOG, "onSaveInstanceState");
         b.putInt("type", type);
-        if (currentThumbFile != null){
+        if (currentThumbFile != null) {
             b.putString("thumbPath", currentThumbFile.getAbsolutePath());
         }
         if (photoFile != null) {
@@ -350,8 +358,8 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
         if (evaluationImage != null) {
             b.putSerializable("evaluationImage", evaluationImage);
         }
-        if (evaluation != null){
-        b.putSerializable("evaluation", evaluation);
+        if (evaluation != null) {
+            b.putSerializable("evaluation", evaluation);
         }
         if (location != null) {
             b.putDouble("latitude", location.getLatitude());
@@ -406,7 +414,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
                         Util.writeLocationToExif(currentThumbFile.getAbsolutePath(), location);
                         boolean del = photoFile.delete();
                         Log.i(LOG, "Thumbnail file length: " + currentThumbFile.length() +
-                        " image file deleted: " + del);
+                                " image file deleted: " + del);
                     } catch (Exception e) {
                         Log.e(LOG, "unable to process bitmap", e);
                         return 9;
@@ -432,7 +440,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
                     currentSessionPhotos.add(Uri.fromFile(currentThumbFile).toString());
                     addImageToScroller();
 
-                } catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 
@@ -448,7 +456,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
         View v = inflater.inflate(R.layout.scroller_image_template, null);
         ImageView img = (ImageView) v.findViewById(R.id.image);
         TextView num = (TextView) v.findViewById(R.id.number);
-        num.setText(" "+ currentSessionPhotos.size());
+        num.setText(" " + currentSessionPhotos.size());
         Uri uri = Uri.fromFile(currentThumbFile);
         ImageLoader.getInstance().displayImage(uri.toString(), img);
         imageContainerLayout.addView(v, 0);
@@ -509,10 +517,10 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
     }
 
     private void uploadPhotos() {
-        Log.e(LOG,"uploadPhoto accuracy: " + location.getAccuracy());
+        Log.e(LOG, "uploadPhoto accuracy: " + location.getAccuracy());
         switch (type) {
             case ImagesDTO.TEAM_IMAGE:
-                addTeamPicture( new CacheListener() {
+                addTeamPicture(new CacheListener() {
                     @Override
                     public void onCachingDone() {
                         mService.UploadCachedPhotos(null);
@@ -528,7 +536,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
                 });
                 break;
             case ImagesDTO.TEAM_MEMBER_IMAGE:
-                addTeamMemberPicture( new CacheListener() {
+                addTeamMemberPicture(new CacheListener() {
                     @Override
                     public void onCachingDone() {
                         mService.UploadCachedPhotos(null);
@@ -537,6 +545,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
                 break;
         }
     }
+
     private interface CacheListener {
         public void onCachingDone();
     }
@@ -595,7 +604,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
 
             @Override
             public void onDataCached() {
-            Log.w(LOG, "photo cached");
+                Log.w(LOG, "photo cached");
                 listener.onCachingDone();
             }
 
@@ -621,13 +630,13 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
 
             @Override
             public void onDataCached() {
-            Log.w(LOG, "photo cached: ");
+                Log.w(LOG, "photo cached: ");
                 listener.onCachingDone();
             }
 
             @Override
             public void onError() {
-            Util.showErrorToast(ctx, getString(R.string.photo_error));
+                Util.showErrorToast(ctx, getString(R.string.photo_error));
             }
         });
     }
@@ -647,7 +656,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
                 break;
 
         }
-    pictureChanged = true;
+        pictureChanged = true;
 
 
     }
@@ -682,7 +691,6 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
     }
 
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -702,7 +710,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
             dispatchTakePictureIntent();
             return true;
         }
-       if (item.getItemId() == R.id.menu_gallery) {
+        if (item.getItemId() == R.id.menu_gallery) {
             Util.showToast(ctx, "Still constructing");
             return true;
         }
@@ -720,8 +728,8 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
         Log.i(LOG,
                 "+++ LocationClient onConnected() -  requestLocationUpdates ...");
         if (imageLocation != null) {
-            Log.w(LOG,"## already have a good location, returning");
-            location = mLocationClient.getLastLocation();
+            Log.w(LOG, "## already have a good location, returning");
+            location = LocationServices.FusedLocationApi.getLastLocation(mLocationClient);
             location.setAccuracy(imageLocation.getAccuracy());
             location.setLatitude(imageLocation.getLatitude());
             location.setLongitude(imageLocation.getLongitude());
@@ -732,15 +740,20 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
             dispatchTakePictureIntent();
             return;
         }
-        Log.w(LOG,"## requesting location updates ....");
+        Log.w(LOG, "## requesting location updates ....");
         mLocationRequest = LocationRequest.create();
         mLocationRequest.setInterval(1000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         mLocationRequest.setFastestInterval(500);
 
-        location = mLocationClient.getLastLocation();
-        mLocationClient.requestLocationUpdates(mLocationRequest, this);
+        location = LocationServices.FusedLocationApi.getLastLocation(mLocationClient);
+        LocationServices.FusedLocationApi.requestLocationUpdates(mLocationClient, mLocationRequest, this);
 
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
 
     }
 
@@ -766,7 +779,9 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
         }
         if (locat.getAccuracy() <= ACCURACY_THRESHOLD) {
             this.location = locat;
-            mLocationClient.removeLocationUpdates(this);
+            LocationServices.FusedLocationApi.removeLocationUpdates(
+                    mLocationClient, this
+            );
             chrono.stop();
             SharedUtil.saveImageLocation(ctx, evaluationImage, location);
             if (confirmedStandingAtLocation) {

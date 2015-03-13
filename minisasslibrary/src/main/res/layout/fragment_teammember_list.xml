@@ -14,7 +14,7 @@
 
             <ImageView
                 android:id="@+id/STAFF_LIST_hero"
-                android:src="@drawable/banner_office1"
+                android:src="@drawable/olifantsriver"
                 android:scaleType="centerCrop"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/mon_hero_height_small" />

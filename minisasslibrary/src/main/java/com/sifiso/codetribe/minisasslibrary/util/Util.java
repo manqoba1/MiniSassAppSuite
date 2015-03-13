@@ -12,6 +12,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.media.ExifInterface;
 import android.net.Uri;
@@ -32,6 +33,7 @@ import android.view.animation.Animation;
 import android.view.animation.OvershootInterpolator;
 import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListPopupWindow;
@@ -189,6 +191,7 @@ public class Util {
         });
         pop.show();
     }
+
     public static void pretendFlash(final View v, final int duration, final int max, final UtilAnimationListener listener) {
         final ObjectAnimator an = ObjectAnimator.ofFloat(v, "alpha", 1, 1);
         an.setRepeatMode(ObjectAnimator.REVERSE);
@@ -263,6 +266,115 @@ public class Util {
         customtoast.setDuration(Toast.LENGTH_SHORT);
         customtoast.show();
     }
+
+    public static void showPopupWithHeroImage(Context ctx, Activity act,
+                                              List<String> list,
+                                              View anchorView, String caption, final UtilPopupListener listener) {
+        final ListPopupWindow pop = new ListPopupWindow(act);
+        LayoutInflater inf = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View v = inf.inflate(R.layout.hero_image_popup, null);
+        TextView txt = (TextView) v.findViewById(R.id.HERO_caption);
+        if (caption != null) {
+            txt.setText(caption);
+        } else {
+            txt.setVisibility(View.GONE);
+        }
+        ImageView img = (ImageView) v.findViewById(R.id.HERO_image);
+        img.setImageDrawable(getRandomHeroImage(ctx));
+
+        pop.setPromptView(v);
+        pop.setPromptPosition(ListPopupWindow.POSITION_PROMPT_ABOVE);
+
+        pop.setAdapter(new ArrayAdapter(ctx, R.layout.xxsimple_spinner_item, R.id.text1, list));
+        pop.setAnchorView(anchorView);
+        pop.setHorizontalOffset(getPopupHorizontalOffset(act));
+        pop.setModal(true);
+        pop.setWidth(getPopupWidth(act));
+        pop.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                pop.dismiss();
+                if (listener != null) {
+                    listener.onItemSelected(position);
+                }
+            }
+        });
+        pop.show();
+    }
+
+    public static View getHeroView(Context ctx, String caption) {
+        LayoutInflater inflater = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View v = inflater.inflate(R.layout.hero_image, null);
+        ImageView img = (ImageView) v.findViewById(R.id.HERO_image);
+        TextView txt = (TextView) v.findViewById(R.id.HERO_caption);
+        img.setImageDrawable(getRandomHeroImage(ctx));
+        txt.setText(caption);
+        return v;
+    }
+
+    public static Drawable getRandomHeroImage(Context ctx) {
+        random = new Random(System.currentTimeMillis());
+        int index = random.nextInt(17);
+        switch (index) {
+            case 0:
+                return ctx.getResources().getDrawable(R.drawable.banner_droplet1);
+            case 1:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_droplet2);
+            case 2:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_droplet3);
+            case 3:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_droplet4);
+            case 4:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_droplet5);
+            case 5:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_droplet6);
+            case 6:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_river1);
+            case 7:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_river2);
+            case 8:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_river3);
+            case 9:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_water1);
+            case 10:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_water2);
+            case 11:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_water3);
+            case 12:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_water4);
+            case 13:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_water5);
+            case 14:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_water6);
+            case 15:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_water7);
+            case 16:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_water8);
+            case 17:
+                return ctx.getResources().getDrawable(
+                        R.drawable.banner_water9);
+
+        }
+        return ctx.getResources().getDrawable(
+                R.drawable.banner_droplet1);
+    }
+
 
    /* public static Drawable getRandomHeroImageExec(Context ctx) {
         random = new Random(System.currentTimeMillis());
