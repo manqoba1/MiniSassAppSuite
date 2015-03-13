@@ -80,12 +80,12 @@ public class PhotoUploadService extends IntentService{
 
             @Override
             public void onDataCached() {
-
+            Log.i(LOG, "found photo's cached");
             }
 
             @Override
             public void onError() {
-
+            Log.e(LOG, "Failed to getCachedPhotos");
             }
         });
     }

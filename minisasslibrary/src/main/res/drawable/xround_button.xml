@@ -4,7 +4,6 @@
     <gradient
         android:angle="45"
         android:startColor="@color/DodgerBlue"
-
         android:endColor="@color/DodgerBlue" />
 
     <size

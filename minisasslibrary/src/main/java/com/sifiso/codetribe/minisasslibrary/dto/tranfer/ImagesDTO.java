@@ -15,13 +15,18 @@ import java.util.List;
  */
 public class ImagesDTO implements Serializable {
 
+    public interface PhotoUploadedListener {
+        public void onPhotoUploaded();
+        public void onPhotoUploadFailed();
+    }
+
     public static final int TEAM_MEMBER_IMAGE = 1, TEAM_IMAGE = 2, EVALUATION_IMAGE = 3;
-    private Integer teamMemberID, teamID, evaluationID, evaluationImageID, thumbFlag, pictureType;
+    private Integer teamMemberID,index, teamID, evaluationID, evaluationImageID, thumbFlag, pictureType;
     private boolean isFullPicture, isTeamPicture, isTeamMemberPicture, isEvaluationImagePicture;
     private double latitude, longitude;
-    private Date dateTaken;
+    private Date dateTaken, dateUploaded, dateThumbUploaded, dateFullPictureUploaded;;
     private float accuracy;
-    private String thumbFilePath, imageFilePath, dateThumbUploaded, dateUploaded, dateFullPictureUploaded;
+    private String thumbFilePath, imageFilePath, uri;
 
     private List<String> tags;
 
@@ -34,6 +39,14 @@ public class ImagesDTO implements Serializable {
 
     public void setTeamMemberPicture(boolean isTeamMemberPicture) {
         this.isTeamMemberPicture = isTeamMemberPicture;
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
     }
 
     public boolean isEvaluationImagePicture() {
@@ -68,27 +81,35 @@ public class ImagesDTO implements Serializable {
         this.evaluationImageID = evaluationImageID;
     }
 
-    public String getDateThumbUploaded() {
-        return dateThumbUploaded;
+    public Integer getIndex() {
+        return index;
     }
 
-    public void setDateThumbUploaded(String dateThumbUploaded) {
-        this.dateThumbUploaded = dateThumbUploaded;
+    public void setIndex(Integer index) {
+        this.index = index;
     }
 
-    public String getDateUploaded() {
-        return dateUploaded;
-    }
-
-    public void setDateUploaded(String dateUploaded) {
+    public void setDateUploaded(Date dateUploaded) {
         this.dateUploaded = dateUploaded;
     }
 
-    public String getDateFullPictureUploaded() {
+    public Date getDateUploaded() {
+        return dateUploaded;
+    }
+
+    public Date getDateThumbUploaded() {
+        return dateThumbUploaded;
+    }
+
+    public void setDateThumbUploaded(Date dateThumbUploaded) {
+        this.dateThumbUploaded = dateThumbUploaded;
+    }
+
+    public Date getDateFullPictureUploaded() {
         return dateFullPictureUploaded;
     }
 
-    public void setDateFullPictureUploaded(String dateFullPictureUploaded) {
+    public void setDateFullPictureUploaded(Date dateFullPictureUploaded) {
         this.dateFullPictureUploaded = dateFullPictureUploaded;
     }
 

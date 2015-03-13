@@ -19,7 +19,7 @@
         android:layout_centerVertical="true"
         android:text="Spinner item text here"
         android:layout_toRightOf="@id/image1"
-        android:layout_marginLeft="@dimen/mon_padding"
+        android:layout_marginLeft="@dimen/sas_padding"
         android:textStyle="normal"
         android:singleLine="true"
         android:textColor="@color/black" />

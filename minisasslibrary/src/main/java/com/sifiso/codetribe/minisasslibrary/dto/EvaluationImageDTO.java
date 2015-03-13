@@ -7,6 +7,7 @@ package com.sifiso.codetribe.minisasslibrary.dto;
 
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author aubreyM
@@ -16,8 +17,9 @@ public class EvaluationImageDTO implements Serializable {
     private static final long serialVersionUID = 1L;
     private Integer evaluationImageID;
     private long dateTaken;
-    private String fileName;
-    private Integer evaluationID;
+    private String fileName, uri;
+    private Integer evaluationID, index;
+ 
     private Double latitude;
     private Double longitude;
     private Float accuracy;
@@ -63,6 +65,22 @@ public class EvaluationImageDTO implements Serializable {
 
     public void setEvaluationImageID(Integer evaluationImageID) {
         this.evaluationImageID = evaluationImageID;
+    }
+
+    public Integer getIndex() {
+        return index;
+    }
+
+    public void setIndex(Integer index) {
+        this.index = index;
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
     }
 
     public long getDateTaken() {

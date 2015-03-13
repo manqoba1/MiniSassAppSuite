@@ -39,6 +39,23 @@ public class SharedUtil {
         return gson.fromJson(s,ImageLocation.class);
     }
 
+    public static void saveLastEvaluationImageID(Context ctx, Integer evaluationImageID) {
+        SharedPreferences sp = PreferenceManager
+                .getDefaultSharedPreferences(ctx);
+        SharedPreferences.Editor ed = sp.edit();
+        ed.putInt(EVALUATION_IMAGE_ID, evaluationImageID);
+        ed.commit();
+        Log.e("SharedUtil", "evaluationImageID:" + evaluationImageID + "save in SharedPreferences");
+    }
+
+    public static Integer getLastEvaluationImageID(Context ctx) {
+        SharedPreferences sp = PreferenceManager
+                .getDefaultSharedPreferences(ctx);
+        int id = sp.getInt(EVALUATION_IMAGE_ID, 0);
+        return id;
+
+    }
+
     public static void saveImageLocation(Context ctx, EvaluationImageDTO evi, Location loc) {
         ImageLocation il = new ImageLocation();
         il.setLongitude(loc.getLongitude());
