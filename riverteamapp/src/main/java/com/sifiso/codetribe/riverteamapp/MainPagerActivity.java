@@ -16,12 +16,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
-import com.google.android.gms.location.LocationClient;
-import com.sifiso.codetribe.minisasslibrary.activities.SplashActivity;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.sifiso.codetribe.minisasslibrary.activities.MapsActivity;
+import com.sifiso.codetribe.minisasslibrary.dto.EvaluationSiteDTO;
+import com.sifiso.codetribe.minisasslibrary.dto.RiverDTO;
+import com.sifiso.codetribe.minisasslibrary.dto.RiverTownDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.RequestDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ResponseDTO;
+import com.sifiso.codetribe.minisasslibrary.fragments.EvaluationListFragment;
 import com.sifiso.codetribe.minisasslibrary.fragments.PageFragment;
 import com.sifiso.codetribe.minisasslibrary.fragments.RiverListFragment;
 import com.sifiso.codetribe.minisasslibrary.toolbox.WebCheck;
@@ -35,20 +38,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainPagerActivity extends ActionBarActivity {
+public class MainPagerActivity extends ActionBarActivity implements EvaluationListFragment.EvaluationListFragmentListener, RiverListFragment.RiverListFragmentListener {
     static final int NUM_ITEMS = 2;
     static final String LOG = MainPagerActivity.class.getSimpleName();
     Context ctx;
     ProgressBar progressBar;
     RiverListFragment riverListFragment;
+    EvaluationListFragment evaluationListFragment;
     List<PageFragment> pageFragmentList;
     ViewPager mPager;
     Menu mMenu;
     PagerAdapter adapter;
     Location mCurrentLocation;
-    LocationClient mLocationClient;
+    GoogleApiClient mLocationClient;
     private ResponseDTO response;
-    private TextView AM_add;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,14 +59,7 @@ public class MainPagerActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
         ctx = getApplicationContext();
         mPager = (ViewPager) findViewById(R.id.SITE_pager);
-        AM_add = (TextView) findViewById(R.id.AM_add);
-        AM_add.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
 
-                return false;
-            }
-        });
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         // mPager.setOffscreenPageLimit(NUM_ITEMS - 1);
 
@@ -90,12 +86,15 @@ public class MainPagerActivity extends ActionBarActivity {
         riverListFragment = new RiverListFragment();
         Bundle data = new Bundle();
         data.putSerializable("response", response);
+        data.putSerializable("evaluationSite", (java.io.Serializable) evaluationSite);
 
         riverListFragment.setArguments(data);
+        evaluationListFragment = new EvaluationListFragment();
+        evaluationListFragment.setArguments(data);
 
 
         pageFragmentList.add(riverListFragment);
-
+        pageFragmentList.add(evaluationListFragment);
         initializeAdapter();
 
     }
@@ -107,7 +106,11 @@ public class MainPagerActivity extends ActionBarActivity {
             mPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                 @Override
                 public void onPageSelected(int arg0) {
-
+                    if (currentView == 1) {
+                        mPager.setCurrentItem(1);
+                    } else {
+                        mPager.setCurrentItem(0);
+                    }
 
                 }
 
@@ -131,7 +134,7 @@ public class MainPagerActivity extends ActionBarActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         mMenu = menu;
         getLocalData();
-        startActivity(new Intent(MainPagerActivity.this, SplashActivity.class));
+        // startActivity(new Intent(MainPagerActivity.this, SplashActivity.class));
 
         return true;
     }
@@ -185,7 +188,9 @@ public class MainPagerActivity extends ActionBarActivity {
 
             @Override
             public void onError() {
-
+                if (w.isWifiConnected()) {
+                    getData();
+                }
             }
         });
 
@@ -242,7 +247,43 @@ public class MainPagerActivity extends ActionBarActivity {
         }
     }
 
-    private class PagerAdapter extends FragmentStatePagerAdapter {
+
+    private List<EvaluationSiteDTO> evaluationSite;
+
+    @Override
+    public void onRefreshEvaluation(List<EvaluationSiteDTO> siteList, int index) {
+        Log.d(LOG, "onclick" + siteList.toString());
+        evaluationSite = siteList;
+
+        currentView = 0;
+        initializeAdapter();
+        // mPager.setCurrentItem(1);
+        //  evaluationListFragment.setEvaluation(siteList);
+    }
+
+    @Override
+    public void onRefreshTown(List<RiverTownDTO> riverTownList, int index) {
+
+    }
+
+    @Override
+    public void onRefreshMap(RiverDTO river,int result) {
+        startActivity(new Intent(MainPagerActivity.this, MapsActivity.class).putExtra("river",river));
+    }
+
+    @Override
+    public void onCreateEvaluationRL(RiverDTO river) {
+
+    }
+
+    private int currentView;
+
+    @Override
+    public void onCreateEvaluation(ResponseDTO response) {
+
+    }
+
+    private class PagerAdapter extends FragmentStatePagerAdapter implements PageFragment {
 
         public PagerAdapter(FragmentManager fm) {
             super(fm);
@@ -273,6 +314,11 @@ public class MainPagerActivity extends ActionBarActivity {
                     break;
             }
             return title;
+        }
+
+        @Override
+        public void animateCounts() {
+
         }
     }
 }

@@ -21,12 +21,14 @@ import com.sifiso.codetribe.minisasslibrary.dto.TeamDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.TeamMemberDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.TownDTO;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author aubreyM
  */
-public class RequestDTO {
+public class RequestDTO implements Serializable{
 
     public static final int REGISTER_TEAM = 1,
             GENERATE_TEAM = 100,
@@ -117,6 +119,15 @@ public class RequestDTO {
     private TownDTO town;
     private ProvinceDTO province;
     private List<TeamMemberDTO> members;
+    private List<InsectImageDTO> insectImages = new ArrayList<>();
+
+    public List<InsectImageDTO> getInsectImages() {
+        return insectImages;
+    }
+
+    public void setInsectImages(List<InsectImageDTO> insectImages) {
+        this.insectImages = insectImages;
+    }
 
     public RequestDTO(Integer requestType) {
         this.requestType = requestType;

@@ -31,6 +31,7 @@
     <dimen name="minimum_margin_sides">48dip</dimen>
     <dimen name="minimum_margin_top_bottom">24dip</dimen>
     <dimen name="mon_padding">8dp</dimen>
+    <dimen name="mon_padding_4">4dp</dimen>
     <dimen name="padding_top_25">25dp</dimen>
     <dimen name="padding_top_10">10dp</dimen>
     <dimen name="month_label_size">16sp</dimen>
@@ -38,7 +39,9 @@
     <dimen name="month_day_label_text_size">10sp</dimen>
     <dimen name="day_number_select_circle_radius">16dip</dimen>
     <dimen name="month_list_item_header_height">50dip</dimen>
-
+    <dimen name="sas_wide">20dp</dimen>
+    <dimen name="sas_wider">48dp</dimen>
+    <dimen name="sas_padding">8dp</dimen>
     <dimen name="mon_divider">4dp</dimen>
     <dimen name="mon_widest">72dp</dimen>
     <dimen name="mon_margin">16dp</dimen>

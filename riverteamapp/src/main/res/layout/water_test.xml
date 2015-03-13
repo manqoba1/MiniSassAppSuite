@@ -23,7 +23,7 @@
 
         <TextView
             android:id="@+id/WC_add"
-            style="@style/BlueCircleSmall"
+            style="@style/GreenCircleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
@@ -76,7 +76,7 @@
 
         <TextView
             android:id="@+id/WT_add"
-            style="@style/BlueCircleSmall"
+            style="@style/GreenCircleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
@@ -129,7 +129,7 @@
 
         <TextView
             android:id="@+id/WP_add"
-            style="@style/BlueCircleSmall"
+            style="@style/GreenCircleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
@@ -182,7 +182,7 @@
 
         <TextView
             android:id="@+id/WO_add"
-            style="@style/BlueCircleSmall"
+            style="@style/GreenCircleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
@@ -235,7 +235,7 @@
 
         <TextView
             android:id="@+id/WE_add"
-            style="@style/BlueCircleSmall"
+            style="@style/GreenCircleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"

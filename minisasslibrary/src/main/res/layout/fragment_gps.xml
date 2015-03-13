@@ -36,11 +36,12 @@
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:layout_alignParentRight="true"
+
                     android:layout_marginLeft="@dimen/mon_margin"
                     android:layout_marginTop="@dimen/mon_divider"
                     android:elevation="@dimen/mon_divider"
-                    android:src="@android:drawable/ic_dialog_map"
-                    android:tint="@color/green" />
+                    android:src="@drawable/ic_point"
+                    android:tint="@color/absa_red" />
 
             </RelativeLayout>
 

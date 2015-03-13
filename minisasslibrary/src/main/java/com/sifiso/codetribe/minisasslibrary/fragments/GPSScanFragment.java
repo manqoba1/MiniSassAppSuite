@@ -192,7 +192,7 @@ public class GPSScanFragment extends Fragment implements PageFragment {
                 Util.flashOnce(btnSave, 100, new Util.UtilAnimationListener() {
                     @Override
                     public void onAnimationEnded() {
-                        sendGPSData();
+
                     }
                 });
 

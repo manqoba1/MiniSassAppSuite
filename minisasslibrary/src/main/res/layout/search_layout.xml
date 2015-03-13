@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/SLT_searchLayout"
     android:layout_width="match_parent"
+    android:background="@color/grey"
     android:layout_height="wrap_content">
 
     <ImageView
@@ -32,7 +33,7 @@
             android:id="@+id/SLT_editSearch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/mon_padding"
+            android:layout_marginLeft="@dimen/mon_padding_4"
             android:layout_marginRight="@dimen/mon_wider"
             android:layout_marginTop="@dimen/padding_top_10"
             android:hint="Search" />

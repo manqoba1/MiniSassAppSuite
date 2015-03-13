@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:padding="8dp"
+        android:background="@color/WhiteSmoke"
+        android:layout_height="wrap_content">
+
+        <AutoCompleteTextView
+            android:id="@+id/edtLogEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:backgroundTint="@color/DodgerBlue"
+            android:hint="email address" />
+
+        <EditText
+            android:id="@+id/edtLogPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:layout_below="@+id/edtLogEmail"
+            android:layout_marginTop="10dp"
+            android:hint="enter pin"
+            android:inputType="numberPassword" />
+
+        <Button
+            android:id="@+id/btnLogSubmit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:background="@color/OrangeRed"
+            android:text="Sign in"
+            android:textColor="@color/white" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_marginTop="10dp"
+        android:padding="8dp"
+        android:background="@color/WhiteSmoke"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="sign in with..:"
+            style="@style/Title4TextStyleBlue"
+            android:id="@+id/textView8"
+            android:layout_weight="1"
+            android:layout_marginTop="15dp" />
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/DeepSkyBlue"
+            android:text="Facebook"
+            android:layout_marginTop="@dimen/padding_top_10"
+            android:layout_weight="1"
+
+            android:textColor="@color/white"
+            android:id="@+id/button2"
+            android:layout_gravity="center_horizontal" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/common_signin_btn_default_background"
+            android:text="Google"
+
+            android:textColor="@color/white"
+            android:layout_weight="1"
+            android:id="@+id/button3"
+            android:layout_gravity="center_horizontal" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Twitter "
+            android:layout_weight="1"
+
+            android:textColor="@color/navy_blue"
+            android:id="@+id/button"
+            android:background="@drawable/xboarder_tranparate"
+            android:layout_gravity="center_horizontal" />
+
+    </LinearLayout>
+
+
+</LinearLayout>

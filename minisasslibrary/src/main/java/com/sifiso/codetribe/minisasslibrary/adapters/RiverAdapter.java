@@ -4,6 +4,8 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -13,6 +15,9 @@ import com.sifiso.codetribe.minisasslibrary.R;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationSiteDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverTownDTO;
+import com.sifiso.codetribe.minisasslibrary.util.ToastUtil;
+import com.sifiso.codetribe.minisasslibrary.viewsUtil.CircleTransform;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -55,45 +60,69 @@ public class RiverAdapter extends BaseAdapter {
             v = inflater.inflate(R.layout.river_list_items, parent,
                     false);
             h.RLI_evaluation = (TextView) v.findViewById(R.id.RLI_evaluation);
-            h.RLI_river_map = (TextView) v.findViewById(R.id.RLI_river_map);
             h.RLI_image = (ImageView) v.findViewById(R.id.RLI_image);
             h.RLI_town = (TextView) v.findViewById(R.id.RLI_town);
             h.RLI_river_name = (TextView) v.findViewById(R.id.RLI_river_name);
-            h.RLI_map_eval = (ImageButton) v.findViewById(R.id.RLI_map_eval);
+            h.RLI_map_eval = (ImageView) v.findViewById(R.id.RLI_map_eval);
+            h.RLI_end = (TextView) v.findViewById(R.id.RLI_end);
+            h.RLI_start = (TextView) v.findViewById(R.id.RLI_start);
             v.setTag(h);
         } else {
             h = (Holder) v.getTag();
         }
         final RiverDTO dto = mList.get(position);
         h.RLI_river_name.setText(dto.getRiverName());
-        h.RLI_river_map.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mListener.onMapRequest(dto);
-            }
-        });
+        h.RLI_end.setText(dto.getEndCountryName());
+        h.RLI_start.setText(dto.getOriginCountryName());
         h.RLI_town.setText("" + dto.getRiverTownList().size());
         h.RLI_town.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.onTownshipRequest(dto.getRiverTownList());
+                if (dto.getRiverTownList() != null) {
+                    mListener.onTownshipRequest(dto.getRiverTownList());
+                } else {
+                    ToastUtil.toast(mCtx, "No town yet");
+                }
             }
         });
+
         h.RLI_evaluation.setText("" + dto.getEvaluationSiteList().size());
         h.RLI_evaluation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.onEvaluationRequest(dto.getEvaluationSiteList());
+                //ToastUtil.toast(mCtx,dto.getRiverName());
+                if (dto.getEvaluationSiteList() != null) {
+                    mListener.onEvaluationRequest(dto.getEvaluationSiteList());
+                } else {
+                    ToastUtil.toast(mCtx, "No evaluations yet");
+                }
             }
         });
         h.RLI_image.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.greatfishriver));
+        h.RLI_image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.onMapRequest(dto, RIVER_VIEW);
+            }
+        });
+        CircleTransform transform = new CircleTransform();
+        //Picasso.with(context).load(movie.getCast().get(position).getPhoto_url()).transform(transform).into(img);
         h.RLI_map_eval.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.onMapRequest(dto);
+                mListener.onMapRequest(dto, EVALUATION_VIEW);
             }
         });
+        animateView(v);
         return v;
+    }
+
+    public void animateView(final View view) {
+        Animation a = AnimationUtils.loadAnimation(mCtx, R.anim.grow_fade_in_center);
+        a.setDuration(500);
+        if (view == null)
+            return;
+        view.startAnimation(a);
     }
 
     public interface RiverAdapterListener {
@@ -103,12 +132,15 @@ public class RiverAdapter extends BaseAdapter {
 
         public void onTownshipRequest(List<RiverTownDTO> riverTownList);
 
-        public void onMapRequest(RiverDTO river);
+        public void onMapRequest(RiverDTO river, int result);
     }
+
+    static final int EVALUATION_VIEW = 12;
+    static final int RIVER_VIEW = 13;
 
     class Holder {
         ImageView RLI_image;
-        TextView RLI_evaluation, RLI_town, RLI_river_map, RLI_river_name;
-        ImageButton RLI_map_eval;
+        TextView RLI_evaluation, RLI_town, RLI_river_name, RLI_end, RLI_start;
+        ImageView RLI_map_eval;
     }
 }

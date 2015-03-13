@@ -4,7 +4,9 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
+import android.graphics.PorterDuff;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -24,9 +26,11 @@ import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
-import com.google.android.gms.location.LocationClient;
+
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.gson.Gson;
 import com.sifiso.codetribe.minisasslibrary.dialogs.GPSScannerDialog;
 import com.sifiso.codetribe.minisasslibrary.dialogs.InsectSelectionDialog;
@@ -36,6 +40,7 @@ import com.sifiso.codetribe.minisasslibrary.dto.EvaluationDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationSiteDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.InsectDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.InsectImageDTO;
+import com.sifiso.codetribe.minisasslibrary.dto.RiverDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.RequestDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ResponseDTO;
 import com.sifiso.codetribe.minisasslibrary.services.CachedSyncService;
@@ -46,6 +51,7 @@ import com.sifiso.codetribe.minisasslibrary.util.CacheUtil;
 import com.sifiso.codetribe.minisasslibrary.util.ErrorUtil;
 import com.sifiso.codetribe.minisasslibrary.util.RequestCacheUtil;
 import com.sifiso.codetribe.minisasslibrary.util.Statics;
+import com.sifiso.codetribe.minisasslibrary.util.TimerUtil;
 import com.sifiso.codetribe.minisasslibrary.util.ToastUtil;
 import com.sifiso.codetribe.minisasslibrary.util.Util;
 import com.sifiso.codetribe.minisasslibrary.util.WebSocketUtil;
@@ -55,13 +61,15 @@ import java.util.Date;
 import java.util.List;
 
 
-public class Evaluation extends ActionBarActivity implements LocationListener, GooglePlayServicesClient.ConnectionCallbacks,
-        GooglePlayServicesClient.OnConnectionFailedListener, GPSScannerDialog.GPSScannerDialogListener {
+public class Evaluation extends ActionBarActivity implements LocationListener,
+        GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener,
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, GPSScannerDialog.GPSScannerDialogListener {
     static final String LOG = Evaluation.class.getSimpleName();
     static final int ACCURACY_THRESHOLD = 5;
     static final int MAP_REQUESTED = 9007;
+    static final int STATUS_CODE = 220;
     Location mCurrentLocation;
-    LocationClient mLocationClient;
+    GoogleApiClient mLocationClient;
     List<String> categoryStr;
     String catType = "Select category";
     double wc = 0.0, wt = 0.0, we = 0.0, wp = 0.0, wo = 0.0;
@@ -97,6 +105,7 @@ public class Evaluation extends ActionBarActivity implements LocationListener, G
                     @Override
                     public void onTasksSynced(int goodResponses, int badResponses) {
                         Log.w(LOG, "@@ cached requests done, good: " + goodResponses + " bad: " + badResponses);
+                        getData();
                     }
 
                     @Override
@@ -104,7 +113,7 @@ public class Evaluation extends ActionBarActivity implements LocationListener, G
 
                     }
                 });
-                getData();
+
                /* Util.pretendFlash(progressBar, 1000, 2, new Util.UtilAnimationListener() {
                     @Override
                     public void onAnimationEnded() {
@@ -130,18 +139,33 @@ public class Evaluation extends ActionBarActivity implements LocationListener, G
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+      //  setTheme(R.style.EvalListTheme);
         setContentView(R.layout.activity_evaluation);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         ctx = getApplicationContext();
-        mLocationClient = new LocationClient(ctx, this, this);
-        setField();
+        setTitle("Create Evaluations");
+        mLocationClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+
         if (savedInstanceState != null) {
             response = (ResponseDTO) savedInstanceState.getSerializable("response");
         } else {
             response = (ResponseDTO) getIntent().getSerializableExtra("response");
         }
-        addMinus();
-        startGPSDialog();
+        codeStatus = getIntent().getIntExtra("statusCode", 0);
+
+
+        setField();
+
     }
+
+    int codeStatus;
+    RiverDTO river;
 
     private void setSpinner(final ResponseDTO resp) {
         if (resp.getCategoryList().isEmpty()) {
@@ -227,6 +251,33 @@ public class Evaluation extends ActionBarActivity implements LocationListener, G
         AE_create = (Button) findViewById(R.id.AE_create);
 
         viewStub = (ViewStub) findViewById(R.id.viewStub);
+        if (codeStatus == CREATE_EVALUATION) {
+            river = (RiverDTO) getIntent().getSerializableExtra("riverCreate");
+            WT_sp_river.setTextColor(getResources().getColor(R.color.gray));
+            WT_sp_river.setText(river.getRiverName());
+            riverID = river.getRiverID();
+        }
+        buildUI();
+    }
+
+    private void cleanForm() {
+        TV_total_score.setText("");
+        TV_average_score.setText("");
+        TV_avg_score.setText("");
+        IMG_score_icon.setImageDrawable(getResources().getDrawable(android.R.drawable.star_big_off));
+        WT_sp_river.setText("");
+        WT_sp_category.refreshDrawableState();
+        EDT_comment.setText("");
+        AE_pin_point.setVisibility(View.GONE);
+        evaluationSite = new EvaluationSiteDTO();
+
+        TV_score_status.setText("not specified");
+        TV_score_status.setTextColor(getResources().getColor(R.color.gray));
+        WE_score.setText("");
+        WO_score.setText("");
+        WC_score.setText("");
+        WP_score.setText("");
+        WT_score.setText("");
     }
 
     private void addMinus() {
@@ -408,7 +459,7 @@ public class Evaluation extends ActionBarActivity implements LocationListener, G
         getMenuInflater().inflate(R.menu.menu_evaluation, menu);
         // WebCheckResult webCheckResult = WebCheck.checkNetworkAvailability(ctx);
 
-        getLocalData();
+        //getLocalData();
         return true;
     }
 
@@ -437,8 +488,27 @@ public class Evaluation extends ActionBarActivity implements LocationListener, G
                     // projectSiteListFragment.updateSiteLocation(projectSite);
                 }
                 break;
+            case STATUS_CODE:
+                Log.w(LOG, "### setting ui has returned with data?");
+                if (resultCode == RESULT_OK) {
+                    response = (ResponseDTO) data.getSerializableExtra("response");
+                    buildUI();
+                }
+                break;
+            case CREATE_EVALUATION:
+                Log.w(LOG, "### setting ui has returned with data?");
+                if (resultCode == RESULT_OK) {
+                    RiverDTO riv = (RiverDTO) data.getSerializableExtra("riverCreate");
+                    //response = (ResponseDTO) data.getSerializableExtra("response");
+                    riverID = riv.getRiverID();
+                    WT_sp_river.setText(riv.getRiverName());
+                    buildUI();
+                }
+                break;
         }
     }
+
+    static final int CREATE_EVALUATION = 108;
 
     private void startGPSDialog() {
         gpsScannerDialog = new GPSScannerDialog();
@@ -459,7 +529,11 @@ public class Evaluation extends ActionBarActivity implements LocationListener, G
         AE_create.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                localSaveRequests();
+                if (evaluationSite != null) {
+                    localSaveRequests();
+                } else {
+
+                }
             }
         });
 
@@ -496,7 +570,7 @@ public class Evaluation extends ActionBarActivity implements LocationListener, G
 
                                     TV_avg_score.setText(calculateAverage(insectImages) + "");
                                     TV_average_score.setText(((insectImages != null) ? insectImages.size() : 0.0) + "");
-
+                                    selectedInsects = insectImages;
                                     statusScore(insectImages, catType);
                                     TV_total_score.setText(calculateScore(insectImages) + "");
                                     Log.e(LOG, calculateScore(insectImages) + "Yes");
@@ -511,25 +585,32 @@ public class Evaluation extends ActionBarActivity implements LocationListener, G
         });
     }
 
+    private List<InsectImageDTO> selectedInsects;
+
     private void getGPSCoordinates() {
         if (!mLocationClient.isConnected()) {
             mLocationClient.connect();
         }
-        mCurrentLocation = mLocationClient.getLastLocation();
+        mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mLocationClient);
         mLocationRequest = LocationRequest.create();
         mLocationRequest.setInterval(1000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         mLocationRequest.setFastestInterval(1000);
 
         try {
-            mLocationClient.requestLocationUpdates(mLocationRequest, this);
+            LocationServices.FusedLocationApi.requestLocationUpdates(
+                    mLocationClient, mLocationRequest, this
+            );
         } catch (IllegalStateException e) {
             Log.e(LOG, "---- mLocationClient.requestLocationUpdates ILLEGAL STATE", e);
         }
     }
 
     private void stopPeriodicUpdates() {
-        mLocationClient.removeLocationUpdates(this);
+        LocationServices.FusedLocationApi.removeLocationUpdates(
+                mLocationClient, this
+        );
         Log.e(LOG,
                 "#################### stopPeriodicUpdates - removeLocationUpdates");
     }
@@ -549,6 +630,14 @@ public class Evaluation extends ActionBarActivity implements LocationListener, G
 
 
     }
+
+    @Override
+    protected void onDestroy() {
+        overridePendingTransition(com.sifiso.codetribe.minisasslibrary.R.anim.slide_in_left, com.sifiso.codetribe.minisasslibrary.R.anim.slide_out_right);
+        //  TimerUtil.killFlashTimer();
+        super.onDestroy();
+    }
+
 
     @Override
     public void onStop() {
@@ -588,7 +677,9 @@ public class Evaluation extends ActionBarActivity implements LocationListener, G
             //gpsScannerDialog.dismiss();
             gpsScannerDialog.setLocation(loc);
             gpsScannerDialog.stopScan();
-            mLocationClient.removeLocationUpdates(this);
+            LocationServices.FusedLocationApi.removeLocationUpdates(
+                    mLocationClient, this
+            );
             Log.e(LOG, "+++ best accuracy found: " + location.getAccuracy());
         }
 
@@ -598,7 +689,13 @@ public class Evaluation extends ActionBarActivity implements LocationListener, G
     public void onConnected(Bundle bundle) {
         Log.i(LOG,
                 "### ---> PlayServices onConnected() - gotta start something! >>");
-        location = mLocationClient.getLastLocation();
+        location = LocationServices.FusedLocationApi.getLastLocation(
+                mLocationClient);
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
     }
 
     @Override
@@ -689,49 +786,67 @@ public class Evaluation extends ActionBarActivity implements LocationListener, G
         }
         average = total / dtos.size();
 
+
         if (type.equalsIgnoreCase("Sandy Type")) {
             if (average > 6.9) {
                 status = "Unmodified(NATURAL condition)";
                 TV_score_status.setTextColor(getResources().getColor(R.color.purple));
                 TV_avg_score.setTextColor(getResources().getColor(R.color.purple));
+                IMG_score_icon.setColorFilter(getResources().getColor(R.color.purple), PorterDuff.Mode.MULTIPLY);
             } else if (average > 5.8 && average < 6.9) {
                 status = "Largely natural/few modifications(GOOD condition)";
                 TV_score_status.setTextColor(getResources().getColor(R.color.green));
                 TV_avg_score.setTextColor(getResources().getColor(R.color.green));
+                IMG_score_icon.setColorFilter(getResources().getColor(R.color.green), PorterDuff.Mode.MULTIPLY);
             } else if (average > 4.9 && average < 5.8) {
                 status = "Moderately modified(FAIR condition)";
                 TV_score_status.setTextColor(getResources().getColor(R.color.yellow_dark));
                 TV_avg_score.setTextColor(getResources().getColor(R.color.yellow_dark));
+                IMG_score_icon.setColorFilter(getResources().getColor(R.color.yellow_dark), PorterDuff.Mode.MULTIPLY);
             } else if (average > 4.3 && average < 4.9) {
                 status = "Largely modified(POOR condition)";
                 TV_score_status.setTextColor(getResources().getColor(R.color.orange));
                 TV_avg_score.setTextColor(getResources().getColor(R.color.orange));
+                IMG_score_icon.setColorFilter(getResources().getColor(R.color.orange), PorterDuff.Mode.MULTIPLY);
             } else if (average < 4.3) {
                 status = "Seriously/critically modified";
                 TV_score_status.setTextColor(getResources().getColor(R.color.red));
                 TV_avg_score.setTextColor(getResources().getColor(R.color.red));
+                IMG_score_icon.setColorFilter(getResources().getColor(R.color.red), PorterDuff.Mode.MULTIPLY);
+            } else {
+                status = "Not specified";
+                TV_score_status.setTextColor(getResources().getColor(R.color.gray));
+                TV_avg_score.setTextColor(getResources().getColor(R.color.gray));
+                IMG_score_icon.setColorFilter(getResources().getColor(R.color.gray), PorterDuff.Mode.MULTIPLY);
             }
         } else if (type.equalsIgnoreCase("Rocky Type")) {
             if (average > 7.9) {
                 status = "Unmodified(NATURAL condition)";
                 TV_score_status.setTextColor(getResources().getColor(R.color.purple));
                 TV_avg_score.setTextColor(getResources().getColor(R.color.purple));
+                IMG_score_icon.setColorFilter(getResources().getColor(R.color.purple), PorterDuff.Mode.MULTIPLY);
             } else if (average > 6.8 && average < 7.9) {
                 status = "Largely natural/few modifications(GOOD condition)";
                 TV_score_status.setTextColor(getResources().getColor(R.color.green));
                 TV_avg_score.setTextColor(getResources().getColor(R.color.green));
+                IMG_score_icon.setColorFilter(getResources().getColor(R.color.green), PorterDuff.Mode.MULTIPLY);
             } else if (average > 6.1 && average < 6.8) {
                 status = "Moderately modified(FAIR condition)";
                 TV_score_status.setTextColor(getResources().getColor(R.color.yellow_dark));
                 TV_avg_score.setTextColor(getResources().getColor(R.color.yellow_dark));
+                IMG_score_icon.setColorFilter(getResources().getColor(R.color.yellow_dark), PorterDuff.Mode.MULTIPLY);
             } else if (average > 5.1 && average < 6.1) {
                 status = "Largely modified(POOR condition)";
                 TV_score_status.setTextColor(getResources().getColor(R.color.orange));
                 TV_avg_score.setTextColor(getResources().getColor(R.color.orange));
+                IMG_score_icon.setColorFilter(getResources().getColor(R.color.orange), PorterDuff.Mode.MULTIPLY);
             } else if (average < 5.1) {
                 status = "Seriously/critically modified";
                 TV_avg_score.setTextColor(getResources().getColor(R.color.red));
                 TV_score_status.setTextColor(getResources().getColor(R.color.red));
+                IMG_score_icon.setColorFilter(getResources().getColor(R.color.red), PorterDuff.Mode.MULTIPLY);
+            } else {
+
             }
         }
 
@@ -750,7 +865,9 @@ public class Evaluation extends ActionBarActivity implements LocationListener, G
 
     private double calculateAverage(List<InsectImageDTO> dtos) {
         double average = 0.0, total = 0.0;
-
+        if (dtos.isEmpty()) {
+            return 0.0;
+        }
         for (InsectImageDTO ii : dtos) {
             total = total + ii.getSensitivityScore();
         }
@@ -771,9 +888,7 @@ public class Evaluation extends ActionBarActivity implements LocationListener, G
                             return;
                         }
                         response = respond;
-                        setSpinner(respond);
-                        Log.d(LOG, "******* getting cached data");
-                        startSelectionDialog();
+                        buildUI();
                         WebCheckResult rc = WebCheck.checkNetworkAvailability(ctx);
                         if (rc.isMobileConnected()) {
                             getData();
@@ -802,6 +917,14 @@ public class Evaluation extends ActionBarActivity implements LocationListener, G
             }
         });
 
+    }
+
+    private void buildUI() {
+        setSpinner(response);
+        Log.d(LOG, "******* getting cached data");
+        startSelectionDialog();
+        addMinus();
+        startGPSDialog();
     }
 
     public void getData() {
@@ -873,6 +996,8 @@ public class Evaluation extends ActionBarActivity implements LocationListener, G
             public void onMessage(ResponseDTO response) {
                 if (response.getStatusCode() > 0) {
                     addRequestToCache(request);
+                } else {
+                    cleanForm();
                 }
             }
 
@@ -892,9 +1017,7 @@ public class Evaluation extends ActionBarActivity implements LocationListener, G
         RequestCacheUtil.addRequest(ctx, request, new CacheUtil.CacheRequestListener() {
             @Override
             public void onDataCached() {
-                if (evaluationSite == null) return;
-
-                Log.e(LOG, "----onDataCached, onEndScanRequested - please stop scanning");
+                cleanForm();
 
 
             }
@@ -915,6 +1038,14 @@ public class Evaluation extends ActionBarActivity implements LocationListener, G
         RequestDTO w = new RequestDTO(RequestDTO.ADD_EVALUATION);
 
         evaluationDTO = new EvaluationDTO();
+        if (selectedInsects == null) {
+            selectedInsects = new ArrayList<>();
+            ToastUtil.errorToast(Evaluation.this, "If you don't select insect group, you can't score evaluation(hint: SELECT INSECT GROUP)");
+            return;
+        }
+
+        Log.d(LOG, "" + selectedInsects.size());
+
 
         evaluationDTO.setConditionsID(conditionID);
         evaluationDTO.setTeamMemberID(1);
@@ -934,7 +1065,9 @@ public class Evaluation extends ActionBarActivity implements LocationListener, G
         evaluationDTO.setLongitude(evaluationSite.getLongitude());
 
 
+        w.setInsectImages(selectedInsects);
         w.setEvaluation(evaluationDTO);
+
 
         Log.i(LOG, (new Gson()).toJson(w));
         WebCheckResult wcr = WebCheck.checkNetworkAvailability(ctx);
@@ -946,6 +1079,7 @@ public class Evaluation extends ActionBarActivity implements LocationListener, G
             ToastUtil.errorToast(Evaluation.this, "If you don't select insect group, you can't score evaluation(hint: SELECT INSECT GROUP)");
             return;
         }
+
         if (wcr.isWifiConnected()) {
             sendRequest(w);
         } else {

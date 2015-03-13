@@ -5,7 +5,13 @@
         <item name="android:windowTitleStyle">@style/actionBarStyle</item>
         <item name="colorPrimary">@color/blue</item>
         <item name="colorPrimaryDark">@color/blue_dark2</item>
+        <item name="android:fontFamily">sans-serif-light</item>
 
+    </style>
+    <style name="EvalListTheme" parent="Theme.AppCompat.Light">
+        <item name="android:windowTitleStyle">@style/actionBarStyleEv</item>
+        <item name="colorPrimary">@color/Brown</item>
+        <item name="colorPrimaryDark">@color/SaddleBrown</item>
         <item name="android:fontFamily">sans-serif-light</item>
 
     </style>
@@ -15,7 +21,11 @@
         <item name="android:textSize">18sp</item>
         <item name="android:textStyle">bold</item>
     </style>
-
+    <style name="actionBarStyleEv" parent="@android:style/TextAppearance.Small">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:background">@color/Brown</item>
+        <item name="android:textStyle">normal</item>
+    </style>
     <style name="actionBarStyle" parent="@android:style/TextAppearance.Small">
         <item name="android:textColor">@color/white</item>
         <item name="android:background">@color/blue</item>
@@ -50,12 +60,35 @@
         <item name="android:gravity">center</item>
         <item name="android:background">@drawable/xblue_oval_small</item>
     </style>
+    <style name="GreenCircleSmall" parent="@android:style/TextAppearance.Small">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:background">@drawable/xgreen_oval_small</item>
+    </style>
+
+    <style name="GreenCircleSmallMap" parent="@android:style/TextAppearance.Small">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:background">@drawable/xgreen_oval_map</item>
+    </style>
 
     <style name="RedCircleSmall" parent="@android:style/TextAppearance.Small">
         <item name="android:textColor">@color/white</item>
         <item name="android:textSize">12sp</item>
         <item name="android:gravity">center</item>
+        <item name="android:textStyle">bold</item>
         <item name="android:background">@drawable/xred_oval_small</item>
+    </style>
+    <style name="BrownCircleSmall" parent="@android:style/TextAppearance.Small">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">12sp</item>
+
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/xbrown_oval_small</item>
     </style>
 
     <style name="PurpleCircleSmall" parent="@android:style/TextAppearance.Small">
@@ -86,6 +119,11 @@
 
     <style name="Title2TextStyleGray" parent="@android:style/TextAppearance.Medium">
         <item name="android:textColor">@color/gray</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">24sp</item>
+    </style>
+    <style name="Title2TextStyleSpinnerGray" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textColor">@color/gray</item>
     </style>
 
     <style name="TextStyle" parent="@android:style/TextAppearance.Medium">
@@ -94,26 +132,42 @@
     </style>
 
     <style name="TextStyleSmall" parent="@android:style/TextAppearance.Small">
+        <item name="android:textColor">@color/grey</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="TextStyleSmallRed" parent="@android:style/TextAppearance.Small">
+        <item name="android:textColor">@color/red</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="TextStyleBlueSmall" parent="@android:style/TextAppearance.Small">
+        <item name="android:textColor">@color/navy_blue</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="TextStyleSmallNormal" parent="@android:style/TextAppearance.Small">
+        <item name="android:textColor">@color/green</item>
         <item name="android:textStyle">normal</item>
-        <item name="android:textColor">@color/gray</item>
     </style>
 
-    <style name="TextStyleBlueSmall" parent="@android:style/TextAppearance.Small">
+    <style name="TextStyleBlueSmallNormal" parent="@android:style/TextAppearance.Small">
         <item name="android:textColor">@color/navy_blue</item>
         <item name="android:textStyle">normal</item>
     </style>
 
     <style name="TextStyleGreySmall" parent="@android:style/TextAppearance.Small">
-        <item name="android:textColor">@color/grey</item>
+        <item name="android:textColor">@color/gray</item>
         <item name="android:textStyle">bold</item>
     </style>
 
     <style name="Title2TextStyleGreen" parent="@android:style/TextAppearance.Medium">
         <item name="android:textColor">@color/green</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:textSize">24sp</item>
+        <item name="android:textSize">30sp</item>
     </style>
-
+    <style name="Title2TextStyleAzure" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textColor">@color/Azure</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">18sp</item>
+    </style>
     <style name="ButtonRed" parent="@android:style/TextAppearance.Small">
         <item name="android:textColor">@color/white</item>
         <item name="android:textStyle">normal</item>
@@ -133,7 +187,14 @@
     <style name="Title3TextStyleBlue" parent="@android:style/TextAppearance.Medium">
         <item name="android:textColor">@color/navy_blue</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">28sp</item>
+
+    </style>
+    <style name="Title4TextStyleBlue" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textColor">@color/navy</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:fontFamily">sans-serif-light</item>
 
     </style>
 
@@ -150,7 +211,7 @@
     </style>
 
     <style name="TextStyleLarge" parent="@android:style/TextAppearance.Medium">
-        <item name="android:textColor">@color/maroon</item>
+        <item name="android:textColor">@color/gray</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">24sp</item>
         <item name="android:fontFamily">fonts/Roboto-Black</item>

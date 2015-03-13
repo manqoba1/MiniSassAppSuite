@@ -17,6 +17,8 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
@@ -30,6 +32,7 @@ import android.view.animation.Animation;
 import android.view.animation.OvershootInterpolator;
 import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListPopupWindow;
 import android.widget.TextView;
@@ -125,6 +128,67 @@ public class Util {
         return sb.toString();
     }
 
+    public static void showPopupBasicTown(final Context ctx, Activity act,
+                                          final List<TownDTO> list,
+                                          View anchorView, String caption, final UtilPopupListener listener) {
+        final ListPopupWindow pop = new ListPopupWindow(act);
+        LayoutInflater inf = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View v = inf.inflate(R.layout.search_layout, null);
+        final EditText SLT_editSearch = (EditText) v.findViewById(R.id.SLT_editSearch);
+        final String inp = SLT_editSearch.getText().toString();
+        SLT_editSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                pop.setAdapter(new PopupListAdapter(ctx, R.layout.xxsimple_spinner_item,
+                        list, false));
+
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                for (int i = 0; i < list.size(); ++i) {
+                    String ser = list.get(i).getTownName();
+                    if (ser.substring(0, ser.indexOf(i)).equalsIgnoreCase(inp)) {
+                        pop.setAdapter(new PopupListAdapter(ctx, R.layout.xxsimple_spinner_item,
+                                list, false));
+                    }
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                for (int i = 0; i < list.size(); ++i) {
+                    String ser = list.get(i).getTownName();
+                    if (ser.substring(0, ser.indexOf(i)).equalsIgnoreCase(inp)) {
+                        pop.setAdapter(new PopupListAdapter(ctx, R.layout.xxsimple_spinner_item,
+                                list, false));
+                    }
+                }
+            }
+        });
+
+
+        pop.setPromptView(v);
+        pop.setPromptPosition(ListPopupWindow.POSITION_PROMPT_ABOVE);
+
+        pop.setAnchorView(anchorView);
+        pop.setHorizontalOffset(getPopupHorizontalOffset(act));
+        pop.setModal(true);
+        pop.setWidth(getPopupWidth(act));
+        pop.setHeight(getWindowWidth(act));
+        pop.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                pop.dismiss();
+                if (listener != null) {
+                    listener.onItemSelected(position);
+                }
+            }
+        });
+        pop.show();
+    }
     public static void pretendFlash(final View v, final int duration, final int max, final UtilAnimationListener listener) {
         final ObjectAnimator an = ObjectAnimator.ofFloat(v, "alpha", 1, 1);
         an.setRepeatMode(ObjectAnimator.REVERSE);

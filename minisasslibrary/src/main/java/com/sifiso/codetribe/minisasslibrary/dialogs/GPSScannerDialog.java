@@ -160,9 +160,10 @@ public class GPSScannerDialog extends DialogFragment {
                 Util.flashOnce(btnSave, 100, new Util.UtilAnimationListener() {
                     @Override
                     public void onAnimationEnded() {
-
-                        listener.onLocationConfirmed(evaluationSite);
-                        btnSave.setVisibility(View.GONE);
+                        if (evaluationSite != null) {
+                            listener.onLocationConfirmed(evaluationSite);
+                            btnSave.setVisibility(View.GONE);
+                        }
 
                     }
                 });

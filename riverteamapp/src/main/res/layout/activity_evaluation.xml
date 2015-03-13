@@ -70,7 +70,7 @@
                 android:layout_marginRight="10dp"
                 android:backgroundTint="@color/blue"
                 android:src="@drawable/ic_point"
-                android:tint="@color/blue"
+                android:tint="@color/red"
                 android:visibility="gone" />
 
 

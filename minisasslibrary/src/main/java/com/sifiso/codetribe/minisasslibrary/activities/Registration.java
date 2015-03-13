@@ -320,7 +320,7 @@ public class Registration extends ActionBarActivity implements GooglePlayService
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_registration, menu);
 
-        startActivity(new Intent(this, SplashActivity.class));
+        //startActivity(new Intent(this, SplashActivity.class));
         return true;
     }
 
@@ -348,7 +348,19 @@ public class Registration extends ActionBarActivity implements GooglePlayService
         }
         return super.onOptionsItemSelected(item);
     }
+    @Override
+    protected void onActivityResult(int reqCode, int resultCode, Intent data) {
+        switch (reqCode) {
 
+            case STATUS_REG:
+                Log.w(LOG, "### setting ui has returned with data?");
+                if (resultCode == RESULT_OK) {
+
+                }
+                break;
+        }
+    }
+    static final int STATUS_REG = 500;
     @Override
     public void onConnected(Bundle bundle) {
 

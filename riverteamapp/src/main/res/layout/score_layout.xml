@@ -19,7 +19,7 @@
             android:id="@+id/SL_show_insect"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/xsquare_blue"
+            android:background="@drawable/xsquare_animal_colors"
             android:backgroundTint="@color/white"
             android:drawableRight="@drawable/ic_insect"
             android:text="Select insect group"
@@ -105,7 +105,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentTop="true"
                 android:layout_marginRight="5dp"
-                android:src="@android:drawable/btn_star_big_on" />
+                android:src="@drawable/ic_insect" />
 
             <TextView
                 android:id="@+id/TV_score_status"

@@ -16,7 +16,7 @@ public class EvaluationDTO implements Serializable {
     private static final long serialVersionUID = 1L;
     private Integer evaluationID, teamMemberID, conditionsID, evaluationSiteID;
     private long evaluationDate;
-    private String comment;
+    private String comment,conditionName,teamName;
     private Double score;
     private Double pH;
     private String remarks;
@@ -32,6 +32,22 @@ public class EvaluationDTO implements Serializable {
     private ConditionsDTO conditions;
     private List<EvaluationInsectDTO> evaluationInsectList;
     private List<EvaluationCommentDTO> evaluationCommentList;
+
+    public String getConditionName() {
+        return conditionName;
+    }
+
+    public void setConditionName(String conditionName) {
+        this.conditionName = conditionName;
+    }
+
+    public String getTeamName() {
+        return teamName;
+    }
+
+    public void setTeamName(String teamName) {
+        this.teamName = teamName;
+    }
 
     public EvaluationDTO() {
     }
