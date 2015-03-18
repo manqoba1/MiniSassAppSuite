@@ -182,18 +182,18 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
 
     private void setFields() {
         activity = this;
-       // gpsStatus = findViewById(R.id.CAM_gpsStatus);
-        //chrono = (Chronometer) findViewById(R.id.CAM_chrono);
-      //  txtMsg = (TextView) findViewById(R.id.CAM_message);
-      //  progressBar = (ProgressBar) findViewById(R.id.CAM_progressBar);
+        gpsStatus = findViewById(R.id.CAM_gpsStatus);
+        chrono = (Chronometer) findViewById(R.id.CAM_chrono);
+        txtMsg = (TextView) findViewById(R.id.CAM_message);
+        progressBar = (ProgressBar) findViewById(R.id.CAM_progressBar);
         imageContainerLayout = (LinearLayout) findViewById(R.id.CAM_imageContainer);
-        //txtAccuracy = (TextView) findViewById(R.id.CAM_accuracy);
+        txtAccuracy = (TextView) findViewById(R.id.CAM_accuracy);
         btnStart = (Button) findViewById(R.id.CAM_btnStart);
         topLayout =  findViewById(R.id.CAM_topLayout);
         imgCamera = (ImageView) findViewById(R.id.CAM_imgCamera);
         imgCamera.setVisibility(View.GONE);
         topLayout.setVisibility(View.GONE);
-//        gpsStatus.setVisibility(View.GONE);
+        gpsStatus.setVisibility(View.GONE);
 
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -217,7 +217,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
                     @Override
                     public void onAnimationEnded() {
                         topLayout.setVisibility(View.GONE);
-                   //     gpsStatus.setVisibility(View.GONE);
+                        gpsStatus.setVisibility(View.GONE);
                         dispatchTakePictureIntent();
                     }
                 });
@@ -225,6 +225,8 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
             }
         });
     }
+
+
 
     private File createImageFile() throws IOException {
         //creating image file names
@@ -253,7 +255,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
             Log.i(LOG, "fetch file from getDataDirectory");
             root = Environment.getDataDirectory();
         }
-        File pics = new File(root, "Minisass_app");
+        File pics = new File(root, "minisass_app");
         if (!pics.exists()) {
             pics.mkdir();
         }
@@ -722,7 +724,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
               googleApiClient.connect();
             }
         }
-        Log.i(LOG, "onStart Binding to PhotoUploadService");
+        Log.i(LOG, "onStart Bind to PhotoUploadService");
         Intent intent = new Intent(this, PhotoUploadService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
         super.onStart();
@@ -734,7 +736,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
 
         if (googleApiClient != null) {
             googleApiClient.disconnect();
-            Log.e(LOG, "onStop FIRED - GoogleApiClient disconnecting");
+            Log.e(LOG, "onStop fired - GoogleApiClient disconnecting");
         }
         Log.e(LOG, "onStop unBind from PhotoUploadService");
         if (mBound) {
@@ -773,7 +775,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
        if (item.getItemId() == R.id.menu_gallery) {
            Intent i = new Intent(this, PictureRecyclerGridActivity.class);
            startActivity(i);
-            //Util.showToast(ctx, "Still constructing");
+           // Util.showToast(ctx, "Still constructing");
             return true;
         }
 
@@ -794,7 +796,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
         if (location != null) {
             Log.w(LOG,"## Good location spot");
             topLayout.setVisibility(View.GONE);
-//            gpsStatus.setVisibility(View.GONE);
+            gpsStatus.setVisibility(View.GONE);
             imgCamera.setVisibility(View.VISIBLE);
             btnStart.setVisibility(View.GONE);
             dispatchTakePictureIntent();
@@ -833,10 +835,10 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
         }
     }
 
-   @Override
+ //   @Override
     public void onConnectionSuspended (int i) {
         Log.i(LOG,
-                "FIRED onConnectionSuspended");
+                "ConnectionSuspended");
     }
 
 

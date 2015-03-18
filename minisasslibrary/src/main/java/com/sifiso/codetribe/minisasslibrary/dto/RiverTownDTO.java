@@ -15,10 +15,27 @@ public class RiverTownDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
     private Integer riverTownID, riverID, townID;
+    private TownDTO town;
+    private RiverDTO river;
 
     public RiverTownDTO() {
     }
 
+    public RiverDTO getRiver() {
+        return river;
+    }
+
+    public void setRiver(RiverDTO river) {
+        this.river = river;
+    }
+
+    public TownDTO getTown() {
+        return town;
+    }
+
+    public void setTown(TownDTO town) {
+        this.town = town;
+    }
 
     public Integer getRiverID() {
         return riverID;

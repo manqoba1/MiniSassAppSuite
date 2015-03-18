@@ -176,6 +176,7 @@ public class WebSocketUtil {
 
             if (content != null) {
                 ResponseDTO response = gson.fromJson(content, ResponseDTO.class);
+                Log.e(LOG,"status code "+ response.getStatusCode()+"");
                 if (response.getStatusCode() == 0) {
                     Log.w(LOG, "### response status code is 0 - OK");
                     webSocketListener.onMessage(response);

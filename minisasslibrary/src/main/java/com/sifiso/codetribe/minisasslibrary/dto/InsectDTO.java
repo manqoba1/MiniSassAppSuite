@@ -15,6 +15,7 @@ import java.util.List;
 public class InsectDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    public boolean selected;
     private Integer insectID;
     private String groupName;
     private int sensitivityScore;
@@ -24,6 +25,13 @@ public class InsectDTO implements Serializable {
     public InsectDTO() {
     }
 
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
 
     public Integer getInsectID() {
         return insectID;

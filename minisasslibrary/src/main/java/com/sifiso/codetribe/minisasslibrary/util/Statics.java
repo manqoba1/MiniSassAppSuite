@@ -11,14 +11,11 @@ import com.sifiso.codetribe.minisasslibrary.R;
 public class Statics {
 
 
-    public static final String WEBSOCKET_URL = "ws://192.168.1.116:8080/ms/";
-    public static final String URL = "http://192.168.1.116:8080/ms/";
-    public static final String IMAGE_URL = "http://192.168.1.116:8080/";
-
-
-    public static final String UPLOAD_URL_REQUEST = "uploadUrl?";
+    public static final String WEBSOCKET_URL = "ws://192.168.1.119:8080/ms/";
+    public static final String URL = "http://192.168.1.119:8080/ms/";
     public static final String CRASH_REPORTS_URL = URL + "crash?";
-
+    public static final String IMAGE_URL = "http://192.168.1.119:8080/";
+    public static final String UPLOAD_URL_REQUEST = "uploadUrl?";
     public static final String
             REQUEST_ENDPOINT = "wsrequest",
             MINI_SASS_ENDPOINT = "wsmini";

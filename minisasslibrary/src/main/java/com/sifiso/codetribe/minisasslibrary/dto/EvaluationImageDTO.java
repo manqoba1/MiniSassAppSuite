@@ -7,6 +7,7 @@ package com.sifiso.codetribe.minisasslibrary.dto;
 
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author aubreyM
@@ -18,10 +19,37 @@ public class EvaluationImageDTO implements Serializable {
     private long dateTaken;
     private String fileName;
     private Integer evaluationID, index;
+ 
+    private Double latitude;
+    private Double longitude;
+    private Float accuracy;
 
     public EvaluationImageDTO() {
     }
 
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
+
+    public Float getAccuracy() {
+        return accuracy;
+    }
+
+    public void setAccuracy(Float accuracy) {
+        this.accuracy = accuracy;
+    }
 
     public Integer getEvaluationID() {
         return evaluationID;

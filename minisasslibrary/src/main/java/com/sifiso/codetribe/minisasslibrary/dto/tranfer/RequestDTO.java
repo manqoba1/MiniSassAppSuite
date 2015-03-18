@@ -21,18 +21,14 @@ import com.sifiso.codetribe.minisasslibrary.dto.TeamDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.TeamMemberDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.TownDTO;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author aubreyM
  */
-public class RequestDTO {
-
-    private int requestType;
-    private String email, password;
-    private Integer countryID, categoryID, commentID, conditionsID, evaluationID, evaluationInsectID,
-            evaluationCommentID, evaluationSiteID, insectID, provinceID, riverID, teamID, townID, teamMemberID,
-            evaluationImageID;
+public class RequestDTO implements Serializable{
 
     public static final int REGISTER_TEAM = 1,
             GENERATE_TEAM = 100,
@@ -40,8 +36,6 @@ public class RequestDTO {
             REGISTER_TEAM_MEMBER = 2,
             SIGN_IN_MEMBER = 3,
             IMPORT_MEMBERS = 4;
-
-
     public static final int
             ADD_RIVER = 10,
             ADD_RIVER_TOWN = 11,
@@ -52,27 +46,22 @@ public class RequestDTO {
             ADD_COMMENT = 16,
 
     ADD_EVALUATION_INSECT = 17;
-
-
     public static final int ADD_COUNTRY = 21,
             ADD_PROVINCE = 22,
             ADD_TOWN = 23;
-
     public static final int
             UPDATE_RIVER = 30,
             UPDATE_RIVER_TOWN = 31,
             UPDATE_EVALUATION_SITE = 32,
             UPDATE_INSECT = 33,
             UPDATE_INSECT_IMAGE = 34,
-
-    UPDATE_TOWN = 35,
+            UPDATE_TOWN = 35,
             UPDATE_TEAM = 36,
             UPDATE_TEAM_MEMBER = 37,
             UPDATE_COMMENT = 38,
             UPDATE_CATEGORY = 39,
             UPDATE_CONDITIONS = 55,
             UPDATE_EVALUATION_IMAGE = 56;
-
     public static final int
             LIST_RIVERS_IN_COUNTRY = 40,
             LIST_RIVER_TOWNS = 41,
@@ -95,9 +84,20 @@ public class RequestDTO {
             LIST_COUNTRYS = 69,
             LIST_EVALUATIONS = 70,
             LIST_RIVERS = 71,
-            GET_DATA = 72;
-
-
+            GET_DATA = 72,
+            CONFIRM_LOCATION = 73;
+    public static final String SAMPLE_DIR = "company";
+    public static final String EVALUATION_DIR = "evaluation";
+    public static final String INSECTS_DIR = "insert";
+    public static final String TEAM_DIR = "team";
+    public static final String TEAM_MEMBER_DIR = "teamMember";
+    private int requestType;
+    private String email, password;
+    private Integer countryID, categoryID, commentID, conditionsID, evaluationID, evaluationInsectID,
+            evaluationCommentID, evaluationSiteID, insectID, provinceID, riverID, teamID, townID, teamMemberID,
+            evaluationImageID;
+    private Double latitude, longitude;
+    private Float accuracy;
     private EvaluationDTO evaluation;
     private ImagesDTO images;
     private CategoryDTO category;
@@ -118,16 +118,48 @@ public class RequestDTO {
     private CountryDTO country;
     private TownDTO town;
     private ProvinceDTO province;
-
-
-    public static final String SAMPLE_DIR = "company";
-
     private List<TeamMemberDTO> members;
+    private List<InsectImageDTO> insectImages = new ArrayList<>();
 
-    public static final String EVALUATION_DIR = "evaluation";
-    public static final String INSECTS_DIR = "insert";
-    public static final String TEAM_DIR = "team";
-    public static final String TEAM_MEMBER_DIR = "teamMember";
+    public List<InsectImageDTO> getInsectImages() {
+        return insectImages;
+    }
+
+    public void setInsectImages(List<InsectImageDTO> insectImages) {
+        this.insectImages = insectImages;
+    }
+
+    public RequestDTO(Integer requestType) {
+        this.requestType = requestType;
+    }
+
+    public RequestDTO() {
+
+    }
+
+    public Float getAccuracy() {
+        return accuracy;
+    }
+
+    public void setAccuracy(Float accuracy) {
+        this.accuracy = accuracy;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
 
     public ImagesDTO getImages() {
         return images;
@@ -253,6 +285,10 @@ public class RequestDTO {
         return email;
     }
 
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public CommentDTO getComment() {
         return comment;
     }
@@ -275,10 +311,6 @@ public class RequestDTO {
 
     public void setInsectImage(InsectImageDTO insectImage) {
         this.insectImage = insectImage;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public String getPassword() {

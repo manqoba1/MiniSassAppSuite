@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/MiniSassAppSuite.iml" filepath="$PROJECT_DIR$/MiniSassAppSuite.iml" />
+      <module fileurl="file://$PROJECT_DIR$/MiniSassAppSuite2.iml" filepath="$PROJECT_DIR$/MiniSassAppSuite2.iml" />
       <module fileurl="file://$PROJECT_DIR$/minisasslibrary/minisasslibrary.iml" filepath="$PROJECT_DIR$/minisasslibrary/minisasslibrary.iml" />
       <module fileurl="file://$PROJECT_DIR$/officialsapp/officialsapp.iml" filepath="$PROJECT_DIR$/officialsapp/officialsapp.iml" />
       <module fileurl="file://$PROJECT_DIR$/riverteamapp/riverteamapp.iml" filepath="$PROJECT_DIR$/riverteamapp/riverteamapp.iml" />

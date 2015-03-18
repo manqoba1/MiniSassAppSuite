@@ -129,16 +129,18 @@ public class ImagesDTO implements Serializable {
         this.imageFilePath = imageFilePath;
     }
 
+
+
+    public static int getTeamMemberImage() {
+        return TEAM_MEMBER_IMAGE;
+    }
+
     public Date getDateTaken() {
         return dateTaken;
     }
 
     public void setDateTaken(Date dateTaken) {
         this.dateTaken = dateTaken;
-    }
-
-    public static int getTeamMemberImage() {
-        return TEAM_MEMBER_IMAGE;
     }
 
     public static int getTeamImage() {

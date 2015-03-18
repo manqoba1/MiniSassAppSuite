@@ -4,7 +4,7 @@
 
     <item android:drawable="@color/white"
         android:state_pressed="true"/>
-    <item android:drawable="@drawable/xroundedbutton"
+    <item android:drawable="@drawable/xgreen_button"
         />
 
 </selector>

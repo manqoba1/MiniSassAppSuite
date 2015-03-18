@@ -1,6 +1,7 @@
 package com.sifiso.codetribe.minisasslibrary.activities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -44,12 +45,14 @@ public class SplashActivity extends ActionBarActivity {
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+               finish();
             }
         });
         flashImages();
 
     }
+
+    static final int STATUS_REG = 500;
 
     private void flashImages() {
         TimerUtil.startFlashTime(new TimerUtil.TimerFlashListener() {
@@ -78,6 +81,8 @@ public class SplashActivity extends ActionBarActivity {
         return true;
     }
 
+    private ResponseDTO response;
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -96,16 +101,14 @@ public class SplashActivity extends ActionBarActivity {
 
     @Override
     protected void onDestroy() {
-
-
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
         TimerUtil.killFlashTimer();
         super.onDestroy();
     }
 
+
     @Override
     protected void onPause() {
-
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
         TimerUtil.killFlashTimer();
         super.onPause();
@@ -129,16 +132,16 @@ public class SplashActivity extends ActionBarActivity {
                             if (!ErrorUtil.checkServerError(ctx, r)) {
                                 return;
                             }
-
+                            response = r;
                             CacheUtil.cacheData(ctx, r, CacheUtil.CACHE_DATA, new CacheUtil.CacheUtilListener() {
                                 @Override
                                 public void onFileDataDeserialized(ResponseDTO response) {
-                                    finish();
+
                                 }
 
                                 @Override
                                 public void onDataCached() {
-                                    finish();
+
                                 }
 
                                 @Override

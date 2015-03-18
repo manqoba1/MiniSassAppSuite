@@ -17,11 +17,6 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.utils.L;
 import com.nostra13.universalimageloader.utils.StorageUtils;
 import com.sifiso.codetribe.minisasslibrary.toolbox.BitmapLruCache;
-import com.sifiso.codetribe.minisasslibrary.util.Statics;
-
-import org.acra.ACRA;
-import org.acra.ReportField;
-import org.acra.annotation.ReportsCrashes;
 
 import java.io.File;
 import java.util.HashMap;
@@ -29,7 +24,7 @@ import java.util.HashMap;
 /**
  * Created by CodeTribe1 on 2015-02-16.
  */
-@ReportsCrashes(
+/*@ReportsCrashes(
         formKey = "",
         formUri = Statics.CRASH_REPORTS_URL,
         customReportContent = {ReportField.APP_VERSION_NAME, ReportField.APP_VERSION_CODE,
@@ -38,8 +33,12 @@ import java.util.HashMap;
                 ReportField.CUSTOM_DATA,
                 ReportField.LOGCAT},
         socketTimeout = 10000
-)
+)*/
 public class MiniSassApp extends Application {
+
+    static String LOG = MiniSassApp.class.getSimpleName();
+    RequestQueue requestQueue;
+    BitmapLruCache bitmapLruCache;
 
     @Override
     public void onCreate() {
@@ -54,7 +53,7 @@ public class MiniSassApp extends Application {
 
         Log.d(LOG, sb.toString());
 //
-        ACRA.init(this);
+        //  ACRA.init(this);
         /*RiverDTO river = SharedUtil.getCompany(getApplicationContext());
         if (company != null) {
             ACRA.getErrorReporter().putCustomData("companyID", "" + company.getCompanyID());
@@ -140,6 +139,7 @@ public class MiniSassApp extends Application {
 
         ImageLoader.getInstance().init(config);
     }
+
     public RequestQueue getRequestQueue() {
         return requestQueue;
     }
@@ -147,8 +147,4 @@ public class MiniSassApp extends Application {
     public BitmapLruCache getBitmapLruCache() {
         return bitmapLruCache;
     }
-
-    RequestQueue requestQueue;
-    BitmapLruCache bitmapLruCache;
-    static String LOG = MiniSassApp.class.getSimpleName();
 }

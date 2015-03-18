@@ -18,6 +18,7 @@ import com.sifiso.codetribe.minisasslibrary.dto.EvaluationInsectDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationSiteDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.GcmDeviceDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.InsectDTO;
+import com.sifiso.codetribe.minisasslibrary.dto.InsectImageDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.ProvinceDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverTownDTO;
@@ -33,7 +34,7 @@ import java.util.List;
 /**
  * @author aubreyM
  */
-public class ResponseDTO implements Serializable{
+public class ResponseDTO implements Serializable {
 
     private Integer statusCode;
     private String message;
@@ -62,10 +63,19 @@ public class ResponseDTO implements Serializable{
     private List<TownDTO> townList = new ArrayList<>();
     private List<EvaluationInsectDTO> evaluationInsectList = new ArrayList<>();
     private List<ConditionsDTO> conditionsList;
+    private List<InsectImageDTO> insectImageList = new ArrayList<>();
     private List<String> evaluationImageFileName;
     private List<ErrorStoreDTO> errorStoreList = new ArrayList<>();
     private List<ErrorStoreAndroidDTO> errorStoreAndroidList = new ArrayList<>();
 
+
+    public List<InsectImageDTO> getInsectImageList() {
+        return insectImageList;
+    }
+
+    public void setInsectImageList(List<InsectImageDTO> insectImageList) {
+        this.insectImageList = insectImageList;
+    }
 
     public List<String> getEvaluationImageFileName() {
         return evaluationImageFileName;
@@ -207,17 +217,16 @@ public class ResponseDTO implements Serializable{
         return insectList;
     }
 
+    public void setInsectList(List<InsectDTO> insectList) {
+        this.insectList = insectList;
+    }
+
     public List<EvaluationInsectDTO> getEvaluationInsectList() {
         return evaluationInsectList;
     }
 
     public void setEvaluationInsectList(List<EvaluationInsectDTO> evaluationInsectList) {
         this.evaluationInsectList = evaluationInsectList;
-    }
-
-
-    public void setInsectList(List<InsectDTO> insectList) {
-        this.insectList = insectList;
     }
 
     public List<CommentDTO> getCommentList() {

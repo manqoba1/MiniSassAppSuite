@@ -26,8 +26,17 @@ public class TeamMemberDTO implements Serializable {
     private Integer teamID;
     private String teamMemberImage;
     private List<GcmDeviceDTO> gcmdeviceList;
+    private TeamDTO team;
 
     public TeamMemberDTO() {
+    }
+
+    public TeamDTO getTeam() {
+        return team;
+    }
+
+    public void setTeam(TeamDTO team) {
+        this.team = team;
     }
 
     public String getTeamMemberImage() {
