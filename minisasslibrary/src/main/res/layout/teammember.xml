@@ -23,10 +23,10 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/zero"
+        android:text="0"
         android:id="@+id/PSN_txtNum"
         android:layout_marginTop="10dp"
-        style="@style/GreyCircleSmall"
+        style="@style/RedCircleLarge"
         android:layout_marginLeft="50dp"
         android:layout_below="@+id/PSN_imagex" />
 
@@ -35,7 +35,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/txt"
+        android:text="name"
         android:id="@+id/PSN_txtName"
         style="@style/Title3TextStyleBlue"
         android:layout_marginLeft="5dp"
@@ -92,8 +92,8 @@
 
         <TextView
             android:id="@+id/PSN_txtCounter"
-            android:text="@string/zero"
-            style="@style/RedCircle"
+            android:text="0"
+            style="@style/BlueCircle"
             android:layout_alignParentRight="true"
             android:layout_width="wrap_content"
             android:layout_marginRight="5dp"

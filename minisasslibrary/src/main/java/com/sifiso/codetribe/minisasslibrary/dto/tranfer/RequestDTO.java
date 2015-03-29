@@ -48,7 +48,8 @@ public class RequestDTO implements Serializable{
     ADD_EVALUATION_INSECT = 17;
     public static final int ADD_COUNTRY = 21,
             ADD_PROVINCE = 22,
-            ADD_TOWN = 23;
+            ADD_TOWN = 23,
+            ADD_GCM_DEVICE = 75;
     public static final int
             UPDATE_RIVER = 30,
             UPDATE_RIVER_TOWN = 31,
@@ -85,7 +86,9 @@ public class RequestDTO implements Serializable{
             LIST_EVALUATIONS = 70,
             LIST_RIVERS = 71,
             GET_DATA = 72,
-            CONFIRM_LOCATION = 73;
+            CONFIRM_LOCATION = 73,
+            LIST_ALL_TOWNS_BY_COUNTRY =74;;
+
     public static final String SAMPLE_DIR = "company";
     public static final String EVALUATION_DIR = "evaluation";
     public static final String INSECTS_DIR = "insert";
@@ -93,6 +96,7 @@ public class RequestDTO implements Serializable{
     public static final String TEAM_MEMBER_DIR = "teamMember";
     private int requestType;
     private String email, password;
+    private String countryCode;
     private Integer countryID, categoryID, commentID, conditionsID, evaluationID, evaluationInsectID,
             evaluationCommentID, evaluationSiteID, insectID, provinceID, riverID, teamID, townID, teamMemberID,
             evaluationImageID;
@@ -119,6 +123,15 @@ public class RequestDTO implements Serializable{
     private TownDTO town;
     private ProvinceDTO province;
     private List<TeamMemberDTO> members;
+
+    public String getCountryCode() {
+        return countryCode;
+    }
+
+    public void setCountryCode(String countryCode) {
+        this.countryCode = countryCode;
+    }
+
     private List<InsectImageDTO> insectImages = new ArrayList<>();
 
     public List<InsectImageDTO> getInsectImages() {

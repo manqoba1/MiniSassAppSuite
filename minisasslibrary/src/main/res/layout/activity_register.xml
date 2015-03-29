@@ -1,121 +1,33 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_weight="1"
-    android:padding="8dp">
+    tools:context=".MainActivity">
 
-    <RelativeLayout
+    <android.support.v4.view.ViewPager
+        android:id="@+id/SITE_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <RelativeLayout
-            android:id="@+id/fieldsLayout"
+
+        <android.support.v4.view.PagerTitleStrip
+            android:id="@+id/pager_title_strip"
+            style="@style/PagerSmall"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:background="@color/blue_dark2"
+            android:paddingBottom="8dp"
+            android:paddingTop="8dp"
+            android:textColor="#fff"
+            android:visibility="gone" />
+    </android.support.v4.view.ViewPager>
 
-            <ImageView
-                android:id="@+id/imgTopLgo"
-                android:scaleType="fitXY"
-                android:src="@drawable/mini_sass_logo"
-                android:layout_width="match_parent"
-                android:layout_height="160dp" />
-            <EditText
-                android:layout_marginTop="10dp"
-                android:layout_below="@+id/imgTopLgo"
-                android:background="@drawable/xborder_white"
-                android:hint="Team Name"
-                android:id="@+id/edtRegTeamName"
-                android:layout_width="match_parent"
-                android:layout_height="50dp" />
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:padding="@dimen/mon_wide"
+        android:visibility="gone" />
 
-            <EditText
-                android:focusable="false"
-                android:layout_below="@+id/edtRegTeamName"
-                android:id="@+id/edtTown"
-                android:hint="Select Town"
-                android:background="@drawable/xborder_white"
-                android:layout_marginTop="10dp"
-                android:layout_width="match_parent"
-                android:layout_height="50dp" />
-            <ImageView
-                android:layout_below="@+id/edtRegTeamName"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:visibility="visible"
-                android:tint="@color/grey2"
-                android:src="@drawable/acd_down_arrow"
-                android:layout_width="40dp"
-                android:id="@+id/imgArrow"
-                android:layout_height="80dp" />
-
-            <EditText
-                android:layout_marginTop="10dp"
-                android:id="@+id/edtMemberName"
-                android:layout_below="@+id/edtTown"
-                android:hint="First Name"
-                android:background="@drawable/xborder_white"
-                android:layout_width="match_parent"
-                android:layout_height="50dp" />
-
-            <EditText
-                android:id="@+id/edtMemberLastNAme"
-                android:layout_width="match_parent"
-                android:layout_below="@+id/edtMemberName"
-                android:layout_marginTop="10dp"
-                android:hint="Last Name"
-                android:background="@drawable/xborder_white"
-                android:layout_height="50dp" />
-
-            <AutoCompleteTextView
-                android:id="@+id/edtMemberEmail"
-                android:layout_marginTop="10dp"
-                android:layout_below="@+id/edtMemberLastNAme"
-                android:hint="Email Address"
-                android:inputType="textEmailAddress"
-                android:background="@drawable/xborder_white"
-                android:layout_width="match_parent"
-                android:layout_height="50dp" />
-
-            <EditText
-                android:id="@+id/edtMemberPhone"
-                android:layout_marginTop="10dp"
-                android:layout_below="@+id/edtMemberEmail"
-                android:background="@drawable/xborder_white"
-                android:hint="Cellphone Number"
-                android:inputType="number"
-                android:layout_width="match_parent"
-                android:layout_height="50dp" />
-            <ViewStub
-                android:id="@+id/vTub"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-
-        </RelativeLayout>
-
-        <LinearLayout
-            android:layout_marginTop="10dp"
-            android:layout_below="@+id/fieldsLayout"
-            android:id="@+id/btnLayout"
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <Button
-                android:textStyle="bold"
-                android:textColor="@color/white"
-                android:layout_weight="1"
-                android:text="Register"
-                android:id="@+id/btnReg"
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                android:background="@drawable/register"/>
-        </LinearLayout>
-
-
-
-    </RelativeLayout>
-
-
-
-</ScrollView>
-
+</RelativeLayout>

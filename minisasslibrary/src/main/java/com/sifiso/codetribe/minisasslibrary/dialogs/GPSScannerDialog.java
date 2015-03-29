@@ -32,7 +32,7 @@ public class GPSScannerDialog extends DialogFragment {
     static final DecimalFormat df = new DecimalFormat("###,###,###,##0.00");
     static final String LOG = GPSScannerDialog.class.getSimpleName();
     TextView desiredAccuracy, txtLat, txtLng, txtAccuracy;
-    Button btnScan, btnSave;
+
     View view;
     SeekBar seekBar;
     boolean isScanning;
@@ -77,8 +77,6 @@ public class GPSScannerDialog extends DialogFragment {
         txtAccuracy = (TextView) view.findViewById(R.id.GPS_accuracy);
         txtLat = (TextView) view.findViewById(R.id.GPS_latitude);
         txtLng = (TextView) view.findViewById(R.id.GPS_longitude);
-        btnSave = (Button) view.findViewById(R.id.GPS_btnSave);
-        btnScan = (Button) view.findViewById(R.id.GPS_btnStop);
         seekBar = (SeekBar) view.findViewById(R.id.GPS_seekBar);
         imgLogo = (ImageView) view.findViewById(R.id.GPS_imgLogo);
         hero = (ImageView) view.findViewById(R.id.GPS_hero);
@@ -128,48 +126,9 @@ public class GPSScannerDialog extends DialogFragment {
 
             }
         });
-        btnScan.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Util.flashOnce(btnScan, 100, new Util.UtilAnimationListener() {
-                    @Override
-                    public void onAnimationEnded() {
-                        if (isScanning) {
-                            listener.onEndScanRequested();
-                            isScanning = false;
-                            btnScan.setText(ctx.getString(R.string.start_scan));
-                            chronometer.stop();
-                            btnSave.setVisibility(View.VISIBLE);
-                        } else {
-                            listener.onStartScanRequested();
-                            isScanning = true;
-                            btnScan.setText(ctx.getString(R.string.stop_scan));
-                            chronometer.setBase(SystemClock.elapsedRealtime());
-                            chronometer.start();
-                            btnSave.setVisibility(View.GONE);
-                            //Util.collapse(btnSave, 300, null);
-                        }
-                    }
-                });
 
-            }
-        });
-        btnSave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Util.flashOnce(btnSave, 100, new Util.UtilAnimationListener() {
-                    @Override
-                    public void onAnimationEnded() {
-                        if (evaluationSite != null) {
-                            listener.onLocationConfirmed(evaluationSite);
-                            btnSave.setVisibility(View.GONE);
-                        }
 
-                    }
-                });
 
-            }
-        });
     }
 
     public void startScan() {
@@ -179,7 +138,7 @@ public class GPSScannerDialog extends DialogFragment {
             chronometer.setBase(SystemClock.elapsedRealtime());
             chronometer.start();
             isScanning = true;
-            btnScan.setText(ctx.getString(R.string.stop_scan));
+
             isFirst = false;
         }
     }
@@ -199,8 +158,7 @@ public class GPSScannerDialog extends DialogFragment {
 
             isScanning = false;
             chronometer.stop();
-            btnSave.setVisibility(View.VISIBLE);
-            btnScan.setText(ctx.getString(R.string.start_scan));
+
             //remove the initialisation when code combined
 
             evaluationSite.setLatitude(location.getLatitude());
@@ -216,9 +174,9 @@ public class GPSScannerDialog extends DialogFragment {
     public void stopScan() {
         listener.onEndScanRequested();
         // listener.onLocationConfirmed(evaluationSite);
-        btnSave.setVisibility(View.VISIBLE);
+
         isScanning = false;
-        btnScan.setText(ctx.getString(R.string.start_scan));
+
         chronometer.stop();
     }
 

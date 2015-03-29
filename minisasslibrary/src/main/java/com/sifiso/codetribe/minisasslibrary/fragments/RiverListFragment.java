@@ -40,7 +40,7 @@ public class RiverListFragment extends Fragment implements PageFragment {
     RiverListFragmentListener mListener;
     private Context ctx;
     private EditText SLT_editSearch;
-    private ImageView SLT_imgSearch2;
+    private ImageView SLT_imgSearch2,SLT_hero;
     private ListView RL_riverList;
     private TextView RL_add;
 
@@ -66,7 +66,11 @@ public class RiverListFragment extends Fragment implements PageFragment {
         getActivity().setTitle("MiniSASS Rivers");
         SLT_editSearch = (EditText) v.findViewById(R.id.SLT_editSearch);
 
+        SLT_hero = (ImageView) v.findViewById(R.id.SLT_hero);
+        SLT_hero.setImageDrawable(Util.getRandomHeroImage(ctx));
         SLT_imgSearch2 = (ImageView) v.findViewById(R.id.SLT_imgSearch2);
+       // SLT_imgSearch2.setVisibility(View.GONE);
+       // SLT_editSearch.setVisibility(View.GONE);
         SLT_imgSearch2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -140,7 +144,7 @@ public class RiverListFragment extends Fragment implements PageFragment {
         });
         LayoutInflater inf = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View v = inf.inflate(R.layout.hero_layout, null);
-        RL_riverList.addHeaderView(v);
+       // RL_riverList.addHeaderView(v);
         RL_riverList.setAdapter(riverAdapter);
         RL_riverList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override

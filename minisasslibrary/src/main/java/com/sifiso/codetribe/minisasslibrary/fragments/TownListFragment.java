@@ -61,7 +61,9 @@ public class TownListFragment extends Fragment implements PageFragment {
         setField();
         return v;
     }
-
+public String getTownName(){
+    return riverTownList.get(0).getRiver().getRiverName();
+}
     private List<RiverTownDTO> riverTownList;
     private List<TownDTO> townList;
     private TownAdapter adapter;

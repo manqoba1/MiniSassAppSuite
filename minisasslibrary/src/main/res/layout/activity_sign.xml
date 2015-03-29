@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     android:layout_weight="1"
     android:padding="8dp"
+    android:background="@color/grey"
     tools:context="com.sifiso.codetribe.riverteamapp.Signin">
 
 
@@ -16,7 +17,7 @@
             android:id="@+id/topLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/WhiteSmoke">
+            android:background="@color/white">
 
             <ImageView
                 android:id="@+id/hero_top"

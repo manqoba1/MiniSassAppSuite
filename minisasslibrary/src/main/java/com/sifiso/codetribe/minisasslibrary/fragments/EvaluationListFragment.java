@@ -21,6 +21,7 @@ import com.sifiso.codetribe.minisasslibrary.adapters.EvaluationAdapter;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationSiteDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ResponseDTO;
+import com.sifiso.codetribe.minisasslibrary.util.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,11 +57,11 @@ public class EvaluationListFragment extends Fragment implements PageFragment {
         FEL_list = (ListView) v.findViewById(R.id.FEL_list);
         FEL_search = (LinearLayout) v.findViewById(R.id.FEL_search);
         SLT_editSearch = (EditText) v.findViewById(R.id.SLT_editSearch);
+        SLT_editSearch.setVisibility(View.GONE);
         SLT_hero = (ImageView) v.findViewById(R.id.SLT_hero);
         SLT_imgSearch2 = (ImageView) v.findViewById(R.id.SLT_imgSearch2);
-        FEL_add = (TextView) v.findViewById(R.id.FEL_add);
-
-
+        SLT_imgSearch2.setVisibility(View.GONE);
+        SLT_hero.setImageDrawable(Util.getRandomHeroImage(ctx));
         setList();
     }
 
@@ -68,7 +69,7 @@ public class EvaluationListFragment extends Fragment implements PageFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getActivity().setTheme(R.style.EvalListTheme);
+        // getActivity().setTheme(R.style.EvalListTheme);
     }
 
     View v;
@@ -85,7 +86,7 @@ public class EvaluationListFragment extends Fragment implements PageFragment {
         v = inflater.inflate(R.layout.fragment_evaluation_list, container, false);
         Bundle b = getArguments();
         //setHasOptionsMenu(true);
-        getActivity().setTheme(R.style.EvalListTheme);
+        //  getActivity().setTheme(R.style.EvalListTheme);
         ctx = getActivity().getApplicationContext();
         if (b != null) {
             evaluationSiteList = (List<EvaluationSiteDTO>) b.getSerializable("evaluationSite");
@@ -106,6 +107,10 @@ public class EvaluationListFragment extends Fragment implements PageFragment {
         return v;
     }
 
+    public String getRiverName() {
+        return evaluationSiteList.get(0).getRiverName();
+    }
+
     public void setEvaluation(List<EvaluationDTO> evaluationList) {
         this.evaluationList = evaluationList;
         if (!evaluationList.isEmpty()) {
@@ -119,8 +124,8 @@ public class EvaluationListFragment extends Fragment implements PageFragment {
         if (evaluationList == null) evaluationList = new ArrayList<>();
         LayoutInflater inf = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View v = inf.inflate(R.layout.hero_layout, null);
-        FEL_list.addHeaderView(v);
-       // FEL_list.addFooterView(v);
+        // FEL_list.addHeaderView(v);
+        // FEL_list.addFooterView(v);
         adapter = new EvaluationAdapter(ctx, evaluationList, new EvaluationAdapter.EvaluationAdapterListener() {
             @Override
             public void onMapSiteRequest(List<EvaluationSiteDTO> siteList) {

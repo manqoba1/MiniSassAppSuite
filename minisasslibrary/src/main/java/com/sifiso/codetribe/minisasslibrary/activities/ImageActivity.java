@@ -154,7 +154,7 @@ public class ImageActivity extends ActionBarActivity {
     }
 
     private void startMap() {
-        Intent i = new Intent(this, MinisassMapsActivity.class);
+        Intent i = new Intent(this, MapsActivity.class);
         i.putExtra("evaluationSite", evaluationSite);
         i.putExtra("index", index);
         startActivity(i);

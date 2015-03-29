@@ -182,12 +182,12 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
 
     private void setFields() {
         activity = this;
-        gpsStatus = findViewById(R.id.CAM_gpsStatus);
+        /*gpsStatus = findViewById(R.id.CAM_gpsStatus);
         chrono = (Chronometer) findViewById(R.id.CAM_chrono);
         txtMsg = (TextView) findViewById(R.id.CAM_message);
         progressBar = (ProgressBar) findViewById(R.id.CAM_progressBar);
         imageContainerLayout = (LinearLayout) findViewById(R.id.CAM_imageContainer);
-        txtAccuracy = (TextView) findViewById(R.id.CAM_accuracy);
+        txtAccuracy = (TextView) findViewById(R.id.CAM_accuracy);*/
         btnStart = (Button) findViewById(R.id.CAM_btnStart);
         topLayout =  findViewById(R.id.CAM_topLayout);
         imgCamera = (ImageView) findViewById(R.id.CAM_imgCamera);

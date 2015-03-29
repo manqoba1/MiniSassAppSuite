@@ -44,15 +44,15 @@ public class CacheUtil implements Serializable {
 
     static CacheUtilListener utilListener;
     static CacheRequestListener cacheListener;
-    public static final int CACHE_DATA = 1, CACHE_TEAM_MEMBER = 2, CACHE_COUNTRIES = 3, CACHE_EVALUATION = 4, CACHE_REQUEST = 5;
+    public static final int CACHE_DATA = 1, CACHE_TOWN_DATA = 2, CACHE_COUNTRIES = 3, CACHE_EVALUATION = 4, CACHE_REQUEST = 5;
     static int dataType;
     static Integer projectID;
     static ResponseDTO response;
-
+    static String countryCode;
     static Context ctx;
     static RequestCache requestCache;
     static final String JSON_DATA = "data.json", JSON_COUNTRIES = "countries.json",
-            JSON_EVALUATION_DATA = "evaluation_data", JSON_TEAM_MEMBER_DATA = "team_member_data",
+            JSON_EVALUATION_DATA = "evaluation_data", JSON_TOWN_DATA = "town_data",
             JSON_REQUEST = "requestCache.json";
 
 
@@ -62,6 +62,24 @@ public class CacheUtil implements Serializable {
         cacheListener = listener;
         ctx = context;
         new CacheTask().execute();
+    }
+
+    public static void cacheTownData(Context context, ResponseDTO r, String id, int type, CacheUtilListener cacheUtilListener) {
+        dataType = type;
+        response = r;
+        countryCode= id;
+        response.setLastCacheDate(new Date());
+        utilListener = cacheUtilListener;
+        ctx = context;
+        new CacheTask().execute();
+    }
+
+    public static void getCachedTownData(Context context, String id, int type, CacheUtilListener cacheUtilListener) {
+        dataType = type;
+        utilListener = cacheUtilListener;
+        ctx = context;
+        countryCode = id;
+        new CacheRetrieveTask().execute();
     }
 
     public static void cacheData(Context context, ResponseDTO r, int type, CacheUtilListener cacheUtilListener) {
@@ -114,9 +132,15 @@ public class CacheUtil implements Serializable {
                         json = gson.toJson(response);
 
                         break;
-                    case CACHE_TEAM_MEMBER:
+                    case CACHE_TOWN_DATA:
                         json = gson.toJson(response);
-
+                        outputStream = ctx.openFileOutput(JSON_TOWN_DATA + countryCode + ".json", Context.MODE_PRIVATE);
+                        write(outputStream, json);
+                        file = ctx.getFileStreamPath(JSON_TOWN_DATA + countryCode + ".json");
+                        if (file != null) {
+                            Log.e(LOG, "Data cache written, path: " + file.getAbsolutePath() +
+                                    " - length: " + file.length());
+                        }
                         break;
                     case CACHE_DATA:
                         json = gson.toJson(response);
@@ -172,11 +196,6 @@ public class CacheUtil implements Serializable {
             }
 
 
-
-
-
-
-
         }
     }
 
@@ -198,8 +217,10 @@ public class CacheUtil implements Serializable {
                     case CACHE_EVALUATION:
 
                         break;
-                    case CACHE_TEAM_MEMBER:
-
+                    case CACHE_TOWN_DATA:
+                        stream = ctx.openFileInput(JSON_TOWN_DATA + countryCode + ".json");
+                        response = getData(stream);
+                        Log.i(LOG, "++ company data cache retrieved");
                         break;
                     case CACHE_REQUEST:
                         stream = ctx.openFileInput(JSON_REQUEST);
@@ -239,7 +260,6 @@ public class CacheUtil implements Serializable {
 
         }
     }
-
 
 
     static class CacheRetrieveRequestTask extends AsyncTask<Void, Void, RequestCache> {

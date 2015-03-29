@@ -1,7 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.sifiso.codetribe.minisasslibrary.activities.Welcome">
+    tools:context="com.sifiso.codetribe.riverteamapp.Welcome">
     <RelativeLayout
 
         android:layout_width="match_parent"
@@ -51,6 +51,7 @@
                     android:layout_marginTop="20dp"
                     android:textColor="@color/white"
                     android:textSize="20dp"
+                    android:gravity="center"
                     android:id="@+id/txtifAccount"
                     android:layout_below="@+id/txtWelcome"
                     android:layout_width="wrap_content"

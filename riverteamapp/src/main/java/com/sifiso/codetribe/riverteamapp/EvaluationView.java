@@ -1,8 +1,10 @@
-package com.sifiso.codetribe.minisasslibrary.activities;
+package com.sifiso.codetribe.riverteamapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
@@ -13,6 +15,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.sifiso.codetribe.minisasslibrary.activities.Evaluation;
+import com.sifiso.codetribe.minisasslibrary.activities.MapsActivity;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationSiteDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverTownDTO;
@@ -27,11 +31,12 @@ import com.sifiso.codetribe.minisasslibrary.util.CacheUtil;
 import com.sifiso.codetribe.minisasslibrary.util.ErrorUtil;
 import com.sifiso.codetribe.minisasslibrary.util.Statics;
 import com.sifiso.codetribe.minisasslibrary.util.WebSocketUtil;
+import com.sifiso.codetribe.minisasslibrary.R;
 
 import java.util.List;
 
 
-public class EvaluationView extends ActionBarActivity implements RiverListFragment.RiverListFragmentListener, EvaluationListFragment.EvaluationListFragmentListener {
+public class EvaluationView extends ActionBarActivity implements  RiverListFragment.RiverListFragmentListener, EvaluationListFragment.EvaluationListFragmentListener {
 
     Menu mMenu;
     Context ctx;
@@ -43,12 +48,14 @@ public class EvaluationView extends ActionBarActivity implements RiverListFragme
     TownListFragment townListFragment;
     private TextView RL_add;
     ImageView ELI_camera;
+    String countryCode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_evaluation_view);
         ctx = getApplicationContext();
+        countryCode = "ZA";
         RL_add = (TextView) findViewById(R.id.RL_add);
         RL_add.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -154,17 +161,40 @@ public class EvaluationView extends ActionBarActivity implements RiverListFragme
     static final int CREATE_EVALUATION = 108;
     static final int RIVER_VIEW = 13;
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putSerializable("response", response);
+        super.onSaveInstanceState(outState);
+    }
+
     private void build() {
-        FragmentManager fm = getSupportFragmentManager();
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+
+            }
+        });
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                FragmentManager fm = getSupportFragmentManager();
 
 // add
-        FragmentTransaction ft = fm.beginTransaction();
-        riverListFragment = new RiverListFragment();
-        Bundle b = new Bundle();
-        b.putSerializable("response", response);
-        riverListFragment.setArguments(b);
-        ft.add(R.id.listcontainer, riverListFragment);
-        ft.commit();
+                FragmentTransaction ft = fm.beginTransaction();
+                riverListFragment = new RiverListFragment();
+                Bundle b = new Bundle();
+                b.putSerializable("response", response);
+                riverListFragment.setArguments(b);
+                ft.replace(R.id.listcontainer, riverListFragment);
+                ft.commit();
+            }
+        });
     }
 
     private void getLocalData() {
@@ -200,7 +230,7 @@ public class EvaluationView extends ActionBarActivity implements RiverListFragme
     public void getData() {
         RequestDTO req = new RequestDTO();
         req.setRequestType(RequestDTO.GET_DATA);
-
+        req.setCountryCode(countryCode);
         try {
 
             WebSocketUtil.sendRequest(ctx, Statics.MINI_SASS_ENDPOINT, req, new WebSocketUtil.WebSocketListener() {

@@ -39,14 +39,12 @@ public class TeamMemberFragment extends Fragment {
         }
     }
     View view;
-    EditText editFirst, editLast, editCell, editEmail;
+    EditText editFirst, editLast, editCell;
     ImageView imgDelete;
     Button btnSave;
     TeamMemberDTO teamMember;
     Context ctx;
     ProgressBar progressBar;
-    RadioButton radioActive, radioInactive;
-    RadioButton radioExec, radioOps, radioProj, radioSite;
 
 
     @Override
@@ -79,26 +77,17 @@ public class TeamMemberFragment extends Fragment {
             return;
         }
 
-        if (editEmail.getText().toString().isEmpty()) {
-            Util.showToast(ctx, ctx.getResources().getString(R.string.enter_email));
-            return;
-        }
 
         if (editCell.getText().toString().isEmpty()) {
             Util.showToast(ctx, ctx.getResources().getString(R.string.enter_cell));
             return;
         }
 
-        if (radioActive.isChecked()) {
-            teamMember.setActiveFlag(1);
-        }
-        if (radioInactive.isChecked()) {
-            teamMember.setActiveFlag(0);
-        }
+
         teamMember.setFirstName(editFirst.getText().toString());
         teamMember.setLastName(editLast.getText().toString());
         teamMember.setCellphone(editCell.getText().toString());
-        teamMember.setEmail(editEmail.getText().toString());
+
 
         w.setTeamMember(teamMember);
 
@@ -163,7 +152,7 @@ public class TeamMemberFragment extends Fragment {
         editFirst.setText(teamMember.getFirstName());
         editLast.setText(teamMember.getLastName());
         editCell.setText(teamMember.getCellphone());
-        editEmail.setText(teamMember.getEmail());
+
         imgDelete.setVisibility(View.VISIBLE);
     }
 
@@ -171,15 +160,8 @@ public class TeamMemberFragment extends Fragment {
         editFirst = (EditText) view.findViewById(R.id.ED_PSN_firstName);
         editLast = (EditText) view.findViewById(R.id.ED_PSN_lastName);
         editCell = (EditText) view.findViewById(R.id.ED_PSN_cellphone);
-        editEmail = (EditText) view.findViewById(R.id.ED_PSN_email);
         btnSave = (Button) view.findViewById(R.id.ED_PSN_btnSave);
 
-        radioActive = (RadioButton) view.findViewById(R.id.ED_PSN_radioActive);
-        radioInactive = (RadioButton) view.findViewById(R.id.ED_PSN_radioInactive);
-
-        radioExec = (RadioButton) view.findViewById(R.id.ED_PSN_chkExec);
-        radioOps = (RadioButton) view.findViewById(R.id.ED_PSN_chkOps);
-        radioProj = (RadioButton) view.findViewById(R.id.ED_PSN_chkProj);
 
         imgDelete = (ImageView) view.findViewById(R.id.ED_PSN_imgDelete);
         imgDelete.setVisibility(View.GONE);

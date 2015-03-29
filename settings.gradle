@@ -1,1 +1,2 @@
-include ':minisasslibrary', ':riverteamapp', ':officialsapp'
+include ':minisasslibrary', ':riverteamapp', ':officialsapp', ':facebook'
+project(':facebook').projectDir = new File('sdk/facebook')

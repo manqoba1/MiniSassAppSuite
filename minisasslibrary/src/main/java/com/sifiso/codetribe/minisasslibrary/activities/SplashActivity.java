@@ -45,7 +45,7 @@ public class SplashActivity extends ActionBarActivity {
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               finish();
+                finish();
             }
         });
         flashImages();
@@ -77,7 +77,6 @@ public class SplashActivity extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_splash, menu);
-        cacheData();
         return true;
     }
 
@@ -114,61 +113,21 @@ public class SplashActivity extends ActionBarActivity {
         super.onPause();
     }
 
-    public void cacheData() {
-        RequestDTO req = new RequestDTO();
-        req.setRequestType(RequestDTO.GET_DATA);
+    @Override
+    protected void onStart() {
+        super.onStart();
+        flashImages();
+    }
 
-        try {
+    @Override
+    protected void onStop() {
+        TimerUtil.killFlashTimer();
+        super.onStop();
+    }
 
-            WebSocketUtil.sendRequest(ctx, Statics.MINI_SASS_ENDPOINT, req, new WebSocketUtil.WebSocketListener() {
-                @Override
-                public void onMessage(final ResponseDTO r) {
-
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-
-                            Log.e(LOG, "## getStarterData responded...statusCode: " + r.getStatusCode());
-                            if (!ErrorUtil.checkServerError(ctx, r)) {
-                                return;
-                            }
-                            response = r;
-                            CacheUtil.cacheData(ctx, r, CacheUtil.CACHE_DATA, new CacheUtil.CacheUtilListener() {
-                                @Override
-                                public void onFileDataDeserialized(ResponseDTO response) {
-
-                                }
-
-                                @Override
-                                public void onDataCached() {
-
-                                }
-
-                                @Override
-                                public void onError() {
-
-                                }
-                            });
-
-
-                        }
-                    });
-
-                }
-
-                @Override
-                public void onClose() {
-
-                }
-
-                @Override
-                public void onError(final String message) {
-
-                }
-            });
-        } catch (Exception e) {
-
-        }
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     static final String LOG = SplashActivity.class.getSimpleName();

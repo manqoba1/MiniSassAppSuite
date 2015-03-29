@@ -63,7 +63,7 @@
 
                 <TextView
                     android:id="@+id/PSN_txtCounter"
-                    android:text="@string/zero"
+                    android:text="0"
                     style="@style/RedCircleSmall"
                     android:layout_alignParentRight="true"
                     android:layout_width="wrap_content"

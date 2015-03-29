@@ -716,7 +716,7 @@ public class Util {
         ImageView img = (ImageView) v.findViewById(R.id.HERO_image);
         // img.setImageDrawable(getRandomHeroImage(ctx));
 
-        //pop.setPromptView(v);
+        pop.setPromptView(v);
 
         pop.setPromptPosition(ListPopupWindow.POSITION_PROMPT_ABOVE);
         pop.setAdapter(new PopupRiverAdapter(ctx, R.layout.xxsimple_spinner_item,

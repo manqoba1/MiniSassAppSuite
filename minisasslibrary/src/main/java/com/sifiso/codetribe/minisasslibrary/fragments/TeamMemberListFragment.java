@@ -121,14 +121,14 @@ public class TeamMemberListFragment extends Fragment
                     TeamMemberDTO teamMemeber = teamMemberList.get(position);
                     mListener.onTeamMemberClicked(teamMemeber);
                     list = new ArrayList<>();
-                    list.add(ctx.getString(R.string.get_status));
+                    /*list.add(ctx.getString(R.string.get_status));
                     list.add(ctx.getString(R.string.take_picture));
-                    list.add(ctx.getString(R.string.send_app_link));
+                    list.add(ctx.getString(R.string.send_app_link));*/
                     list.add(ctx.getString(R.string.edit_staff));
                     View v = Util.getHeroView(ctx, "Select Action");
 
                     //Util.showPopupRiverWithHeroImage(ctx,);
-                    Util.showPopupWithHeroImage(ctx, getActivity(), list, txtName, ctx.getString(R.string.select_action), new Util.UtilPopupListener() {
+                    Util.showPopupWithHeroImage(ctx, getActivity(), list, txtName, "select ", new Util.UtilPopupListener() {
                         TeamMemberDTO team;
 
                         @Override

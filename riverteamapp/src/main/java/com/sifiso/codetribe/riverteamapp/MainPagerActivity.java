@@ -16,8 +16,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.internal.pa;
+import com.sifiso.codetribe.minisasslibrary.activities.Evaluation;
 import com.sifiso.codetribe.minisasslibrary.activities.MapsActivity;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationSiteDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverDTO;
@@ -27,12 +30,16 @@ import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ResponseDTO;
 import com.sifiso.codetribe.minisasslibrary.fragments.EvaluationListFragment;
 import com.sifiso.codetribe.minisasslibrary.fragments.PageFragment;
 import com.sifiso.codetribe.minisasslibrary.fragments.RiverListFragment;
+import com.sifiso.codetribe.minisasslibrary.fragments.TownListFragment;
 import com.sifiso.codetribe.minisasslibrary.toolbox.WebCheck;
 import com.sifiso.codetribe.minisasslibrary.toolbox.WebCheckResult;
 import com.sifiso.codetribe.minisasslibrary.util.CacheUtil;
 import com.sifiso.codetribe.minisasslibrary.util.ErrorUtil;
 import com.sifiso.codetribe.minisasslibrary.util.Statics;
 import com.sifiso.codetribe.minisasslibrary.util.WebSocketUtil;
+import com.sifiso.codetribe.minisasslibrary.R;
+import com.sifiso.codetribe.minisasslibrary.viewsUtil.ZoomOutPageTransformer;
+import com.sifiso.codetribe.minisasslibrary.viewsUtil.ZoomOutPageTransformerImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,8 +52,10 @@ public class MainPagerActivity extends ActionBarActivity implements EvaluationLi
     ProgressBar progressBar;
     RiverListFragment riverListFragment;
     EvaluationListFragment evaluationListFragment;
+    TownListFragment townListFragment;
     List<PageFragment> pageFragmentList;
     ViewPager mPager;
+    TextView RL_add;
     Menu mMenu;
     PagerAdapter adapter;
     Location mCurrentLocation;
@@ -59,7 +68,15 @@ public class MainPagerActivity extends ActionBarActivity implements EvaluationLi
         setContentView(R.layout.activity_main);
         ctx = getApplicationContext();
         mPager = (ViewPager) findViewById(R.id.SITE_pager);
-
+        RL_add = (TextView) findViewById(R.id.RL_add);
+        RL_add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent evaluateIntent = new Intent(MainPagerActivity.this, Evaluation.class);
+                evaluateIntent.putExtra("response", response);
+                startActivityForResult(evaluateIntent, STATUS_CODE);
+            }
+        });
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         // mPager.setOffscreenPageLimit(NUM_ITEMS - 1);
 
@@ -68,6 +85,8 @@ public class MainPagerActivity extends ActionBarActivity implements EvaluationLi
 
 
     }
+
+    static final int STATUS_CODE = 220;
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -89,12 +108,10 @@ public class MainPagerActivity extends ActionBarActivity implements EvaluationLi
         data.putSerializable("evaluationSite", (java.io.Serializable) evaluationSite);
 
         riverListFragment.setArguments(data);
-        evaluationListFragment = new EvaluationListFragment();
-        evaluationListFragment.setArguments(data);
 
 
         pageFragmentList.add(riverListFragment);
-        pageFragmentList.add(evaluationListFragment);
+        // pageFragmentList.add(evaluationListFragment);
         initializeAdapter();
 
     }
@@ -106,10 +123,40 @@ public class MainPagerActivity extends ActionBarActivity implements EvaluationLi
             mPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                 @Override
                 public void onPageSelected(int arg0) {
-                    if (currentView == 1) {
-                        mPager.setCurrentItem(1);
-                    } else {
-                        mPager.setCurrentItem(0);
+                    PageFragment pf = pageFragmentList.get(arg0);
+                    if (pf instanceof EvaluationListFragment) {
+                        if (pf.equals(townListFragment)) {
+                            pageFragmentList.remove(evaluationListFragment);
+                            adapter.notifyDataSetChanged();
+                        }
+                        if (pf.equals(riverListFragment)) {
+                            pageFragmentList.remove(riverListFragment);
+                            adapter.notifyDataSetChanged();
+                        }
+                        getSupportActionBar().setTitle(evaluationListFragment.getRiverName());
+                        isBack = false;
+                    } else if (pf instanceof RiverListFragment) {
+                        getSupportActionBar().setTitle("MiniSASS ");
+                        if (pf.equals(evaluationListFragment)) {
+                            pageFragmentList.remove(evaluationListFragment);
+                            adapter.notifyDataSetChanged();
+                        }
+                        if (pf.equals(townListFragment)) {
+                            pageFragmentList.remove(townListFragment);
+                            adapter.notifyDataSetChanged();
+                        }
+                        isBack = false;
+                    } else if (pf instanceof TownListFragment) {
+                        if (pf.equals(evaluationListFragment)) {
+                            pageFragmentList.remove(riverListFragment);
+                            adapter.notifyDataSetChanged();
+                        }
+                        if (pf.equals(evaluationListFragment)) {
+                            pageFragmentList.remove(evaluationListFragment);
+                            adapter.notifyDataSetChanged();
+                        }
+                        getSupportActionBar().setTitle(townListFragment.getTownName() + " Towns");
+                        isBack = false;
                     }
 
                 }
@@ -123,6 +170,8 @@ public class MainPagerActivity extends ActionBarActivity implements EvaluationLi
                 public void onPageScrollStateChanged(int arg0) {
                 }
             });
+            ZoomOutPageTransformerImpl z = new ZoomOutPageTransformerImpl();
+            mPager.setPageTransformer(true, z);
         } catch (Exception e) {
             Log.e(LOG, "-- Some shit happened, probably IllegalState of some kind ...");
         }
@@ -163,6 +212,120 @@ public class MainPagerActivity extends ActionBarActivity implements EvaluationLi
     @Override
     protected void onResume() {
         super.onResume();
+    }
+
+
+    private List<EvaluationSiteDTO> evaluationSite;
+
+    @Override
+    public void onRefreshEvaluation(List<EvaluationSiteDTO> siteList, int index) {
+        Log.d(LOG, "onclick" + siteList.toString());
+        if (siteList.size() == 0) {
+            return;
+        }
+        if (pageFragmentList.size() > 1) {
+            pageFragmentList.remove(pageFragmentList.size() - 1);
+            adapter.notifyDataSetChanged();
+        }
+        Bundle b = new Bundle();
+
+        b.putSerializable("evaluationSite", (java.io.Serializable) siteList);
+        b.putSerializable("response", response);
+        evaluationListFragment = new EvaluationListFragment();
+        evaluationListFragment.setArguments(b);
+        currentView = 1;
+        pageFragmentList.add(evaluationListFragment);
+        initializeAdapter();
+        adapter.notifyDataSetChanged();
+        mPager.setCurrentItem(currentView);
+        // mPager.
+        //  evaluationListFragment.setEvaluation(siteList);
+    }
+
+    @Override
+    public void onRefreshTown(List<RiverTownDTO> riverTownList, int index) {
+        if (riverTownList.size() == 0) {
+            return;
+        }
+        if (pageFragmentList.size() > 1) {
+            pageFragmentList.remove(pageFragmentList.size() - 1);
+            adapter.notifyDataSetChanged();
+        }
+        townListFragment = new TownListFragment();
+        Bundle b = new Bundle();
+        b.putSerializable("riverTown", (java.io.Serializable) riverTownList);
+        b.putSerializable("response", response);
+        currentView = 1;
+        townListFragment.setArguments(b);
+        pageFragmentList.add(townListFragment);
+        initializeAdapter();
+        adapter.notifyDataSetChanged();
+        mPager.setCurrentItem(currentView);
+    }
+
+    @Override
+    public void onRefreshMap(RiverDTO river, int result) {
+        Intent intent = new Intent(MainPagerActivity.this, MapsActivity.class);
+        intent.putExtra("river", river);
+        intent.putExtra("displayType", result);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onCreateEvaluationRL(RiverDTO river) {
+        Intent createEva = new Intent(MainPagerActivity.this, Evaluation.class);
+        createEva.putExtra("riverCreate", river);
+        createEva.putExtra("response", response);
+        createEva.putExtra("statusCode", CREATE_EVALUATION);
+        startActivityForResult(createEva, CREATE_EVALUATION);
+    }
+
+    static final int CREATE_EVALUATION = 108;
+    static final int RIVER_VIEW = 13;
+    private int currentView;
+
+    @Override
+    public void onCreateEvaluation(ResponseDTO response) {
+
+    }
+
+    private class PagerAdapter extends FragmentStatePagerAdapter implements PageFragment {
+
+        public PagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int i) {
+
+            return (Fragment) pageFragmentList.get(i);
+        }
+
+        @Override
+        public int getCount() {
+            return pageFragmentList.size();
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            String title = "Title";
+
+            switch (position) {
+                case 0:
+
+                    break;
+
+
+                default:
+                    break;
+            }
+            return title;
+        }
+
+        @Override
+        public void animateCounts() {
+
+        }
     }
 
     private void getLocalData() {
@@ -247,78 +410,15 @@ public class MainPagerActivity extends ActionBarActivity implements EvaluationLi
         }
     }
 
-
-    private List<EvaluationSiteDTO> evaluationSite;
+    boolean isBack = false;
 
     @Override
-    public void onRefreshEvaluation(List<EvaluationSiteDTO> siteList, int index) {
-        Log.d(LOG, "onclick" + siteList.toString());
-        evaluationSite = siteList;
-
+    public void onBackPressed() {
         currentView = 0;
-        initializeAdapter();
-        // mPager.setCurrentItem(1);
-        //  evaluationListFragment.setEvaluation(siteList);
-    }
-
-    @Override
-    public void onRefreshTown(List<RiverTownDTO> riverTownList, int index) {
-
-    }
-
-    @Override
-    public void onRefreshMap(RiverDTO river,int result) {
-        startActivity(new Intent(MainPagerActivity.this, MapsActivity.class).putExtra("river",river));
-    }
-
-    @Override
-    public void onCreateEvaluationRL(RiverDTO river) {
-
-    }
-
-    private int currentView;
-
-    @Override
-    public void onCreateEvaluation(ResponseDTO response) {
-
-    }
-
-    private class PagerAdapter extends FragmentStatePagerAdapter implements PageFragment {
-
-        public PagerAdapter(FragmentManager fm) {
-            super(fm);
+        mPager.setCurrentItem(currentView, true);
+        if (isBack) {
+            super.onBackPressed();
         }
-
-        @Override
-        public Fragment getItem(int i) {
-
-            return (Fragment) pageFragmentList.get(i);
-        }
-
-        @Override
-        public int getCount() {
-            return pageFragmentList.size();
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            String title = "Title";
-
-            switch (position) {
-                case 0:
-
-                    break;
-
-
-                default:
-                    break;
-            }
-            return title;
-        }
-
-        @Override
-        public void animateCounts() {
-
-        }
+        isBack = true;
     }
 }

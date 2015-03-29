@@ -30,4 +30,16 @@
         android:padding="@dimen/mon_wide"
         android:visibility="gone" />
 
+    <TextView
+        android:id="@+id/RL_add"
+        style="@style/RedCircleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="20dp"
+        android:elevation="10dp"
+        android:text="+"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
 </RelativeLayout>

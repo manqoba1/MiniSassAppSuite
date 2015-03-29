@@ -3,22 +3,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <EditText
+    <TextView
         android:id="@+id/WT_sp_river"
+        style="@style/Title2TextStyleBlue"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/xborder"
-        android:editable="false"
         android:focusable="false"
         android:hint="Select river"
-        android:padding="10dp" />
+        android:padding="10dp"
+        android:layout_below="@+id/WT_sp_category"
+        android:textColor="@color/navy_blue"
+        android:textColorHint="@color/navy_blue" />
 
     <Spinner
         android:id="@+id/WT_sp_category"
+        style="@style/Title2TextStyleBlue"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:layout_below="@+id/WT_sp_river"
+
         android:layout_marginTop="10dp"
         android:background="@drawable/xborder"
         android:focusable="false" />
@@ -28,7 +30,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/WT_sp_category"
+        android:layout_below="@+id/WT_sp_river"
         android:layout_marginTop="10dp"
         android:background="@drawable/xsquare_red"
         android:text="Site GSP location"

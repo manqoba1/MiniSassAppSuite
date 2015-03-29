@@ -9,6 +9,11 @@ import android.graphics.PorterDuff;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.PagerTitleStrip;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -20,6 +25,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -31,6 +37,7 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.gson.Gson;
+import com.sifiso.codetribe.minisasslibrary.R;
 import com.sifiso.codetribe.minisasslibrary.dialogs.GPSScannerDialog;
 import com.sifiso.codetribe.minisasslibrary.dialogs.InsectSelectionDialog;
 import com.sifiso.codetribe.minisasslibrary.dto.CategoryDTO;
@@ -42,6 +49,10 @@ import com.sifiso.codetribe.minisasslibrary.dto.InsectImageDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.RequestDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ResponseDTO;
+import com.sifiso.codetribe.minisasslibrary.fragments.EvaluationFragment;
+import com.sifiso.codetribe.minisasslibrary.fragments.GPSScanFragment;
+import com.sifiso.codetribe.minisasslibrary.fragments.InsectSelectorFragment;
+import com.sifiso.codetribe.minisasslibrary.fragments.PageFragment;
 import com.sifiso.codetribe.minisasslibrary.services.CachedSyncService;
 import com.sifiso.codetribe.minisasslibrary.services.RequestCache;
 import com.sifiso.codetribe.minisasslibrary.toolbox.WebCheck;
@@ -61,32 +72,26 @@ import java.util.List;
 
 public class Evaluation extends ActionBarActivity implements LocationListener,
         GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener,
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, GPSScannerDialog.GPSScannerDialogListener {
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, GPSScanFragment.GPSScanFragmentListener, EvaluationFragment.EvaluationFragmentListener, InsectSelectorFragment.InsectSelectorFragmentListener {
     static final String LOG = Evaluation.class.getSimpleName();
     static final int ACCURACY_THRESHOLD = 5;
     static final int MAP_REQUESTED = 9007;
     static final int STATUS_CODE = 220;
     Location mCurrentLocation;
     GoogleApiClient mLocationClient;
-    List<String> categoryStr;
-    String catType = "Select category";
-    double wc = 0.0, wt = 0.0, we = 0.0, wp = 0.0, wo = 0.0;
+    ViewPager mPager;
+    Menu mMenu;
+    PagerAdapter adapter;
+    List<PageFragment> pageFragmentList;
     ResponseDTO response;
-    GPSScannerDialog gpsScannerDialog;
     Location location;
     LocationRequest mLocationRequest;
-    InsectSelectionDialog insectSelectionDialog;
     boolean mBound;
     CachedSyncService mService;
-    EvaluationDTO evaluationDTO;
-    Integer teamMemberID, conditionID;
-    private TextView WC_minus, WC_add, WT_minus, WT_add,
-            WP_minus, WP_add, WO_minus, WO_add, WE_minus, WE_add;
-    private EditText WC_score, WP_score, WT_score, WO_score, WE_score;
-    private TextView TV_total_score, TV_average_score, TV_avg_score, TV_score_status;
-    private ImageView IMG_score_icon, AE_pin_point;
-    private EditText WT_sp_river, EDT_comment;
-    private Button WT_gps_picker, SL_show_insect, AE_create;
+    EvaluationFragment evaluationFragment;
+    GPSScanFragment gpsScanFragment;
+    InsectSelectorFragment insectSelectorFragment;
+
     private Context ctx;
     private ServiceConnection mConnection = new ServiceConnection() {
 
@@ -127,23 +132,21 @@ public class Evaluation extends ActionBarActivity implements LocationListener,
             mBound = false;
         }
     };
-    private Spinner WT_sp_category;
-    private ViewStub viewStub;
-    private Integer categoryID;
-    private Integer riverID;
-    private List<InsectImageDTO> insectImageList;
-    private EvaluationSiteDTO evaluationSite;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-      //  setTheme(R.style.EvalListTheme);
+        //  setTheme(R.style.EvalListTheme);
         setContentView(R.layout.activity_evaluation);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         ctx = getApplicationContext();
         setTitle("Create Evaluations");
+        mPager = (ViewPager) findViewById(R.id.SITE_pager);
+        PagerTitleStrip strip = (PagerTitleStrip) findViewById(R.id.pager_title_strip);
+        strip.setVisibility(View.GONE);
         mLocationClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -156,289 +159,65 @@ public class Evaluation extends ActionBarActivity implements LocationListener,
             response = (ResponseDTO) getIntent().getSerializableExtra("response");
         }
         codeStatus = getIntent().getIntExtra("statusCode", 0);
+        buildPages();
+    }
 
+    private void buildPages() {
 
-        setField();
+        pageFragmentList = new ArrayList<>();
 
+        Bundle data = new Bundle();
+        data.putSerializable("response", response);
+
+        //gpsScanFragment.setArguments(data);
+        evaluationFragment = new EvaluationFragment();
+        evaluationFragment.setArguments(data);
+
+        //  insectSelectorFragment = new InsectSelectorFragment();
+        // insectSelectorFragment.setmSites(response.getInsectImageList());
+
+        pageFragmentList.add(evaluationFragment);
+        // pageFragmentList.add(insectSelectorFragment);
+        // pageFragmentList.add(gpsScanFragment);
+        //pageFragmentList.notify();
+        initializeAdapter();
+
+    }
+
+    private int currentView;
+
+    private void initializeAdapter() {
+        try {
+            adapter = new PagerAdapter(getSupportFragmentManager());
+            mPager.setAdapter(adapter);
+            mPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                @Override
+                public void onPageSelected(int arg0) {
+                    if (currentView == 1) {
+                        mPager.setCurrentItem(1);
+                    } else {
+                        mPager.setCurrentItem(0);
+                    }
+
+                }
+
+                @Override
+                public void onPageScrolled(int arg0, float arg1, int arg2) {
+
+                }
+
+                @Override
+                public void onPageScrollStateChanged(int arg0) {
+                }
+            });
+        } catch (Exception e) {
+            Log.e(LOG, "-- Some shit happened, probably IllegalState of some kind ...");
+        }
     }
 
     int codeStatus;
     RiverDTO river;
 
-    private void setSpinner(final ResponseDTO resp) {
-        if (resp.getCategoryList().isEmpty()) {
-            Log.d(LOG, "******* getting cached data");
-            return;
-        }
-        if (categoryStr == null) {
-            categoryStr = new ArrayList<>();
-        }
-        categoryStr.add("Select category");
-        for (int i = 0; i < resp.getCategoryList().size(); i++) {
-            categoryStr.add(resp.getCategoryList().get(i).getCategoryName());
-        }
-        String[] cat = {"Select category", "Rocky", "Sandy"};
-        ArrayAdapter<String> categoryAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.xsimple_spinner_item, categoryStr);
-        WT_sp_category.setAdapter(categoryAdapter);
-        WT_sp_category.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                if (position > 0) {
-                    categoryID = resp.getCategoryList().get(position - 1).getCategoryID();
-                }
-                catType = (String) parent.getItemAtPosition(position);
-                Log.e(LOG, catType);
-                //    Log.e(LOG, response.getCategoryList().get(position - 1).getCategoryID() + "");
-
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-
-        WT_sp_river.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(LOG, "river size " + resp.getRiverList().size());
-                Util.showPopupRiverWithHeroImage(ctx, Evaluation.this, resp.getRiverList(), WT_sp_river, "", new Util.UtilPopupListener() {
-                    @Override
-                    public void onItemSelected(int index) {
-                        WT_sp_river.setTextColor(getResources().getColor(R.color.gray));
-                        WT_sp_river.setText(resp.getRiverList().get(index).getRiverName());
-                        riverID = response.getRiverList().get(index).getRiverID();
-                    }
-                });
-            }
-        });
-
-
-    }
-
-    private void setField() {
-        WC_minus = (TextView) findViewById(R.id.WC_minus);
-        WC_score = (EditText) findViewById(R.id.WC_score);
-        WC_add = (TextView) findViewById(R.id.WC_add);
-        WT_minus = (TextView) findViewById(R.id.WT_minus);
-        WT_score = (EditText) findViewById(R.id.WT_score);
-        WT_add = (TextView) findViewById(R.id.WT_add);
-        WP_minus = (TextView) findViewById(R.id.WP_minus);
-        WP_score = (EditText) findViewById(R.id.WP_score);
-        WP_add = (TextView) findViewById(R.id.WP_add);
-        WO_minus = (TextView) findViewById(R.id.WO_minus);
-        WO_score = (EditText) findViewById(R.id.WO_score);
-        WO_add = (TextView) findViewById(R.id.WO_add);
-        WE_minus = (TextView) findViewById(R.id.WE_minus);
-        WE_score = (EditText) findViewById(R.id.WE_score);
-        WE_add = (TextView) findViewById(R.id.WE_add);
-
-        TV_total_score = (TextView) findViewById(R.id.TV_total_score);
-        TV_average_score = (TextView) findViewById(R.id.TV_average_score);
-        TV_avg_score = (TextView) findViewById(R.id.TV_avg_score);
-        TV_score_status = (TextView) findViewById(R.id.TV_score_status);
-        IMG_score_icon = (ImageView) findViewById(R.id.IMG_score_icon);
-        WT_sp_river = (EditText) findViewById(R.id.WT_sp_river);
-        WT_sp_category = (Spinner) findViewById(R.id.WT_sp_category);
-        EDT_comment = (EditText) findViewById(R.id.EDT_comment);
-        AE_pin_point = (ImageView) findViewById(R.id.AE_pin_point);
-        WT_gps_picker = (Button) findViewById(R.id.WT_gps_picker);
-        SL_show_insect = (Button) findViewById(R.id.SL_show_insect);
-        AE_create = (Button) findViewById(R.id.AE_create);
-
-        viewStub = (ViewStub) findViewById(R.id.viewStub);
-        if (codeStatus == CREATE_EVALUATION) {
-            river = (RiverDTO) getIntent().getSerializableExtra("riverCreate");
-            WT_sp_river.setTextColor(getResources().getColor(R.color.gray));
-            WT_sp_river.setText(river.getRiverName());
-            riverID = river.getRiverID();
-        }
-        buildUI();
-    }
-
-    private void cleanForm() {
-        TV_total_score.setText("");
-        TV_average_score.setText("");
-        TV_avg_score.setText("");
-        IMG_score_icon.setImageDrawable(getResources().getDrawable(android.R.drawable.star_big_off));
-        WT_sp_river.setText("");
-        WT_sp_category.refreshDrawableState();
-        EDT_comment.setText("");
-        AE_pin_point.setVisibility(View.GONE);
-        evaluationSite = new EvaluationSiteDTO();
-
-        TV_score_status.setText("not specified");
-        TV_score_status.setTextColor(getResources().getColor(R.color.gray));
-        WE_score.setText("");
-        WO_score.setText("");
-        WC_score.setText("");
-        WP_score.setText("");
-        WT_score.setText("");
-    }
-
-    private void addMinus() {
-        WO_add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                wo = Double.parseDouble(WO_score.getText().toString()) + 0.5;
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        WO_score.setText(wo + "");
-                    }
-                });
-            }
-        });
-        WO_minus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                wo = Double.parseDouble(WO_score.getText().toString());
-                if (wo <= 0.0) {
-
-                } else {
-                    wo = wo - 0.5;
-                    if (wo < -0.0) {
-                        wo = 0.0;
-                    }
-                }
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        WO_score.setText(wo + "");
-                    }
-                });
-            }
-        });
-        WP_add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                wp = Double.parseDouble(WP_score.getText().toString()) + 0.5;
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        WP_score.setText(wp + "");
-                    }
-                });
-            }
-        });
-        WP_minus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                wp = Double.parseDouble(WP_score.getText().toString());
-                if (wp <= 0.0) {
-
-                } else {
-                    wp = wp - 0.5;
-                    if (wp < -0.0) {
-                        wp = 0.0;
-                    }
-                }
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        WP_score.setText(wp + "");
-                    }
-                });
-            }
-        });
-        WT_add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                wt = Double.parseDouble(WT_score.getText().toString()) + 0.5;
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        WT_score.setText(wt + "");
-                    }
-                });
-            }
-        });
-        WT_minus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                wt = Double.parseDouble(WT_score.getText().toString());
-                if (wt <= 0.0) {
-
-                } else {
-                    wt = wt - 0.5;
-                    if (wt < -0.0) {
-                        wt = 0.0;
-                    }
-                }
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        WT_score.setText(wt + "");
-                    }
-                });
-            }
-        });
-        WE_add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                we = Double.parseDouble(WE_score.getText().toString()) + 0.5;
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        WE_score.setText(we + "");
-                    }
-                });
-            }
-        });
-        WE_minus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                we = Double.parseDouble(WE_score.getText().toString());
-
-                we = we - 0.5;
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        WE_score.setText(we + "");
-                    }
-                });
-            }
-        });
-        WC_add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                wc = Double.parseDouble(WC_score.getText().toString()) + 0.5;
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        WC_score.setText(wc + "");
-                    }
-                });
-            }
-        });
-        WC_minus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                wc = Double.parseDouble(WC_score.getText().toString());
-                if (wc <= 0.0) {
-
-                } else {
-                    wc = wc - 0.5;
-                    if (wc < -0.0) {
-                        wc = 0.0;
-                    }
-                }
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        WC_score.setText(wc + "");
-                    }
-                });
-            }
-        });
-
-
-    }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -484,13 +263,14 @@ public class Evaluation extends ActionBarActivity implements LocationListener,
                 if (resultCode == RESULT_OK) {
                     // evaluationSite = (EvaluationSiteDTO) data.getSerializableExtra("evaluationSite");
                     // projectSiteListFragment.updateSiteLocation(projectSite);
+                    evaluationFragment.setResponse(response);
                 }
                 break;
             case STATUS_CODE:
                 Log.w(LOG, "### setting ui has returned with data?");
                 if (resultCode == RESULT_OK) {
                     response = (ResponseDTO) data.getSerializableExtra("response");
-                    buildUI();
+                    evaluationFragment.setResponse(response);
                 }
                 break;
             case CREATE_EVALUATION:
@@ -498,9 +278,8 @@ public class Evaluation extends ActionBarActivity implements LocationListener,
                 if (resultCode == RESULT_OK) {
                     RiverDTO riv = (RiverDTO) data.getSerializableExtra("riverCreate");
                     //response = (ResponseDTO) data.getSerializableExtra("response");
-                    riverID = riv.getRiverID();
-                    WT_sp_river.setText(riv.getRiverName());
-                    buildUI();
+                    evaluationFragment.setRiverField(riv);
+                    evaluationFragment.setResponse(response);
                 }
                 break;
         }
@@ -508,82 +287,6 @@ public class Evaluation extends ActionBarActivity implements LocationListener,
 
     static final int CREATE_EVALUATION = 108;
 
-    private void startGPSDialog() {
-        gpsScannerDialog = new GPSScannerDialog();
-
-
-        WT_gps_picker.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (riverID != null) {
-                    AE_pin_point.setVisibility(View.GONE);
-                    gpsScannerDialog.show(getFragmentManager(), "GPS");
-                } else {
-                    ToastUtil.toast(Evaluation.this, "Please choose evaluated river");
-                }
-            }
-        });
-
-        AE_create.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (evaluationSite != null) {
-                    localSaveRequests();
-                } else {
-
-                }
-            }
-        });
-
-    }
-
-    private void startSelectionDialog() {
-
-
-        for (InsectDTO i : response.getInsectList()) {
-            if (insectImageList == null) {
-                insectImageList = new ArrayList<>();
-            }
-            for (InsectImageDTO ii : i.getInsectImageList()) {
-                insectImageList.add(ii);
-            }
-        }
-        SL_show_insect.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (catType.equalsIgnoreCase("Select category")) {
-                    ToastUtil.toast(Evaluation.this, "Select category, before choosing insects");
-                } else {
-                    insectSelectionDialog = new InsectSelectionDialog();
-                    insectSelectionDialog.setmSites(insectImageList);
-                    insectSelectionDialog.setListener(new InsectSelectionDialog.InsectSelectionDialogListener() {
-                        @Override
-                        public void onSelectDone(final List<InsectImageDTO> insectImages) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (insectImages == null) {
-                                        return;
-                                    }
-
-                                    TV_avg_score.setText(calculateAverage(insectImages) + "");
-                                    TV_average_score.setText(((insectImages != null) ? insectImages.size() : 0.0) + "");
-                                    selectedInsects = insectImages;
-                                    statusScore(insectImages, catType);
-                                    TV_total_score.setText(calculateScore(insectImages) + "");
-                                    Log.e(LOG, calculateScore(insectImages) + "Yes");
-                                }
-                            });
-                        }
-                    });
-                    insectSelectionDialog.show(getFragmentManager(), "");
-                    insectSelectionDialog = null;
-                }
-            }
-        });
-    }
-
-    private List<InsectImageDTO> selectedInsects;
 
     private void getGPSCoordinates() {
         if (!mLocationClient.isConnected()) {
@@ -619,7 +322,7 @@ public class Evaluation extends ActionBarActivity implements LocationListener,
         Log.i(LOG,
                 "### onStart, binding RequestSyncService and PhotoUploadService");
         Intent intent = new Intent(this, CachedSyncService.class);
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+//        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
         if (mLocationClient != null) {
             mLocationClient.connect();
             Log.i(LOG,
@@ -665,16 +368,16 @@ public class Evaluation extends ActionBarActivity implements LocationListener,
                 + loc.getLongitude()
                 + " -- acc: " + loc.getAccuracy());
         mCurrentLocation = loc;
-        if (gpsScannerDialog != null) {
+        if (gpsScanFragment != null) {
             Log.w(LOG, "### Passing location");
-            gpsScannerDialog.setLocation(loc);
+            gpsScanFragment.setLocation(loc);
         }
         if (loc.getAccuracy() <= ACCURACY_THRESHOLD) {
             location = loc;
             Log.w(LOG, "### Passing location2");
             //gpsScannerDialog.dismiss();
-            gpsScannerDialog.setLocation(loc);
-            gpsScannerDialog.stopScan();
+            gpsScanFragment.setLocation(loc);
+            gpsScanFragment.stopScan();
             LocationServices.FusedLocationApi.removeLocationUpdates(
                     mLocationClient, this
             );
@@ -704,15 +407,19 @@ public class Evaluation extends ActionBarActivity implements LocationListener,
 
     @Override
     public void onStartScanRequested() {
-        AE_pin_point.setVisibility(View.GONE);
+        gpsScanFragment.startScan();
+        // AE_pin_point.setVisibility(View.GONE);
         getGPSCoordinates();
     }
+
+    EvaluationSiteDTO evaluationSite;
 
     @Override
     public void onLocationConfirmed(EvaluationSiteDTO es) {
         Log.w(LOG, "## asking GPSScanner to process confirmed location for site");
-        AE_pin_point.setVisibility(View.VISIBLE);
-        evaluationSite = new EvaluationSiteDTO();
+        evaluationFragment.setEvaluationSite(es);
+        // AE_pin_point.setVisibility(View.VISIBLE);
+       /* evaluationSite = new EvaluationSiteDTO();
         evaluationSite.setLocationConfirmed(1);
         evaluationSite.setLatitude(es.getLatitude());
         evaluationSite.setLongitude(es.getLongitude());
@@ -723,7 +430,7 @@ public class Evaluation extends ActionBarActivity implements LocationListener,
 
         Log.w(LOG, "## Evaluation site created");
         gpsScannerDialog.dismiss();
-        stopPeriodicUpdates();
+        stopPeriodicUpdates();*/
     }
 
     @Override
@@ -755,175 +462,6 @@ public class Evaluation extends ActionBarActivity implements LocationListener,
         super.onPause();
     }
 
-    private Integer conditionIDFunc(List<CategoryDTO> categorys, String status, String type) {
-        Integer cond = 0;
-        Log.i(LOG, categorys.size() + " " + type);
-        for (CategoryDTO c : categorys) {
-            Log.e(LOG, categorys.size() + " " + type);
-            if (type.equalsIgnoreCase(c.getCategoryName())) {
-                Log.d(LOG, categorys.size() + " " + type);
-                for (ConditionsDTO cd : c.getConditionsList()) {
-                    Log.w(LOG, categorys.size() + " " + type + " ");
-                    if (status.equalsIgnoreCase(cd.getConditionName())) {
-                        Log.i(LOG, cd.getConditionName() + " " + cd.getConditionsID());
-                        cond = cd.getConditionsID();
-                    }
-
-                }
-
-            }
-        }
-        return cond;
-    }
-
-    private void statusScore(List<InsectImageDTO> dtos, String type) {
-        String status = "";
-        double average = 0.0, total = 0.0;
-        for (InsectImageDTO ii : dtos) {
-            total = total + ii.getSensitivityScore();
-        }
-        average = total / dtos.size();
-
-
-        if (type.equalsIgnoreCase("Sandy Type")) {
-            if (average > 6.9) {
-                status = "Unmodified(NATURAL condition)";
-                TV_score_status.setTextColor(getResources().getColor(R.color.purple));
-                TV_avg_score.setTextColor(getResources().getColor(R.color.purple));
-                IMG_score_icon.setColorFilter(getResources().getColor(R.color.purple), PorterDuff.Mode.MULTIPLY);
-            } else if (average > 5.8 && average < 6.9) {
-                status = "Largely natural/few modifications(GOOD condition)";
-                TV_score_status.setTextColor(getResources().getColor(R.color.green));
-                TV_avg_score.setTextColor(getResources().getColor(R.color.green));
-                IMG_score_icon.setColorFilter(getResources().getColor(R.color.green), PorterDuff.Mode.MULTIPLY);
-            } else if (average > 4.9 && average < 5.8) {
-                status = "Moderately modified(FAIR condition)";
-                TV_score_status.setTextColor(getResources().getColor(R.color.yellow_dark));
-                TV_avg_score.setTextColor(getResources().getColor(R.color.yellow_dark));
-                IMG_score_icon.setColorFilter(getResources().getColor(R.color.yellow_dark), PorterDuff.Mode.MULTIPLY);
-            } else if (average > 4.3 && average < 4.9) {
-                status = "Largely modified(POOR condition)";
-                TV_score_status.setTextColor(getResources().getColor(R.color.orange));
-                TV_avg_score.setTextColor(getResources().getColor(R.color.orange));
-                IMG_score_icon.setColorFilter(getResources().getColor(R.color.orange), PorterDuff.Mode.MULTIPLY);
-            } else if (average < 4.3) {
-                status = "Seriously/critically modified";
-                TV_score_status.setTextColor(getResources().getColor(R.color.red));
-                TV_avg_score.setTextColor(getResources().getColor(R.color.red));
-                IMG_score_icon.setColorFilter(getResources().getColor(R.color.red), PorterDuff.Mode.MULTIPLY);
-            } else {
-                status = "Not specified";
-                TV_score_status.setTextColor(getResources().getColor(R.color.gray));
-                TV_avg_score.setTextColor(getResources().getColor(R.color.gray));
-                IMG_score_icon.setColorFilter(getResources().getColor(R.color.gray), PorterDuff.Mode.MULTIPLY);
-            }
-        } else if (type.equalsIgnoreCase("Rocky Type")) {
-            if (average > 7.9) {
-                status = "Unmodified(NATURAL condition)";
-                TV_score_status.setTextColor(getResources().getColor(R.color.purple));
-                TV_avg_score.setTextColor(getResources().getColor(R.color.purple));
-                IMG_score_icon.setColorFilter(getResources().getColor(R.color.purple), PorterDuff.Mode.MULTIPLY);
-            } else if (average > 6.8 && average < 7.9) {
-                status = "Largely natural/few modifications(GOOD condition)";
-                TV_score_status.setTextColor(getResources().getColor(R.color.green));
-                TV_avg_score.setTextColor(getResources().getColor(R.color.green));
-                IMG_score_icon.setColorFilter(getResources().getColor(R.color.green), PorterDuff.Mode.MULTIPLY);
-            } else if (average > 6.1 && average < 6.8) {
-                status = "Moderately modified(FAIR condition)";
-                TV_score_status.setTextColor(getResources().getColor(R.color.yellow_dark));
-                TV_avg_score.setTextColor(getResources().getColor(R.color.yellow_dark));
-                IMG_score_icon.setColorFilter(getResources().getColor(R.color.yellow_dark), PorterDuff.Mode.MULTIPLY);
-            } else if (average > 5.1 && average < 6.1) {
-                status = "Largely modified(POOR condition)";
-                TV_score_status.setTextColor(getResources().getColor(R.color.orange));
-                TV_avg_score.setTextColor(getResources().getColor(R.color.orange));
-                IMG_score_icon.setColorFilter(getResources().getColor(R.color.orange), PorterDuff.Mode.MULTIPLY);
-            } else if (average < 5.1) {
-                status = "Seriously/critically modified";
-                TV_avg_score.setTextColor(getResources().getColor(R.color.red));
-                TV_score_status.setTextColor(getResources().getColor(R.color.red));
-                IMG_score_icon.setColorFilter(getResources().getColor(R.color.red), PorterDuff.Mode.MULTIPLY);
-            } else {
-
-            }
-        }
-
-        TV_score_status.setText(status);
-        conditionID = conditionIDFunc(response.getCategoryList(), status, type);
-        Log.e(LOG, "lskdfsdf " + conditionIDFunc(response.getCategoryList(), status, type));
-    }
-
-    private double calculateScore(List<InsectImageDTO> dtos) {
-        double score = 0.0;
-        for (InsectImageDTO ii : dtos) {
-            score = score + ii.getSensitivityScore();
-        }
-        return score;
-    }
-
-    private double calculateAverage(List<InsectImageDTO> dtos) {
-        double average = 0.0, total = 0.0;
-        if (dtos.isEmpty()) {
-            return 0.0;
-        }
-        for (InsectImageDTO ii : dtos) {
-            total = total + ii.getSensitivityScore();
-        }
-        average = total / dtos.size();
-        return average;
-    }
-
-    private void getLocalData() {
-        //  Log.d(LOG, "******* getting cached data");
-        CacheUtil.getCachedData(ctx, CacheUtil.CACHE_DATA, new CacheUtil.CacheUtilListener() {
-            @Override
-            public void onFileDataDeserialized(final ResponseDTO respond) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (respond.getStatusCode() > 0) {
-                            Log.d(LOG, "** getting cached data");
-                            return;
-                        }
-                        response = respond;
-                        buildUI();
-                        WebCheckResult rc = WebCheck.checkNetworkAvailability(ctx);
-                        if (rc.isMobileConnected()) {
-                            getData();
-                            return;
-                        } else {
-                            if (rc.isWifiConnected()) {
-                                getData();
-                                return;
-                            }
-                        }
-
-                    }
-                });
-
-
-            }
-
-            @Override
-            public void onDataCached() {
-
-            }
-
-            @Override
-            public void onError() {
-
-            }
-        });
-
-    }
-
-    private void buildUI() {
-        setSpinner(response);
-        Log.d(LOG, "******* getting cached data");
-        startSelectionDialog();
-        addMinus();
-        startGPSDialog();
-    }
 
     public void getData() {
         RequestDTO req = new RequestDTO();
@@ -988,101 +526,72 @@ public class Evaluation extends ActionBarActivity implements LocationListener,
         }
     }
 
-    private void sendRequest(final RequestDTO request) {
-        WebSocketUtil.sendRequest(ctx, Statics.MINI_SASS_ENDPOINT, request, new WebSocketUtil.WebSocketListener() {
-            @Override
-            public void onMessage(ResponseDTO response) {
-                if (response.getStatusCode() > 0) {
-                    addRequestToCache(request);
-                } else {
-                    cleanForm();
-                }
-            }
-
-            @Override
-            public void onClose() {
-
-            }
-
-            @Override
-            public void onError(String message) {
-                addRequestToCache(request);
-            }
-        });
+    @Override
+    public void onScanGpsRequest() {
+        Log.d(LOG, "Map Started");
+        gpsScanFragment = new GPSScanFragment();
+        pageFragmentList.add(gpsScanFragment);
+        adapter.notifyDataSetChanged();
+        mPager.setCurrentItem(1, true);
     }
 
-    private void addRequestToCache(RequestDTO request) {
-        RequestCacheUtil.addRequest(ctx, request, new CacheUtil.CacheRequestListener() {
-            @Override
-            public void onDataCached() {
-                cleanForm();
-
-
-            }
-
-            @Override
-            public void onRequestCacheReturned(RequestCache cache) {
-
-            }
-
-            @Override
-            public void onError() {
-
-            }
-        });
+    @Override
+    public void onSelectInsectsRequest() {
+        Log.d(LOG, "Map Insect");
+        insectSelectorFragment = new InsectSelectorFragment();
+        insectSelectorFragment.setmSites(response.getInsectImageList());
+        pageFragmentList.add(insectSelectorFragment);
+        adapter.notifyDataSetChanged();
+        mPager.setCurrentItem(1, true);
     }
 
-    private void localSaveRequests() {
-        RequestDTO w = new RequestDTO(RequestDTO.ADD_EVALUATION);
+    @Override
+    public void onDoneEvaluationRequest() {
 
-        evaluationDTO = new EvaluationDTO();
-        if (selectedInsects == null) {
-            selectedInsects = new ArrayList<>();
-            ToastUtil.errorToast(Evaluation.this, "If you don't select insect group, you can't score evaluation(hint: SELECT INSECT GROUP)");
-            return;
+    }
+
+
+    @Override
+    public void onSelectDone(List<InsectImageDTO> insectImages) {
+        evaluationFragment.scoreUpdater(insectImages);
+    }
+
+    private class PagerAdapter extends FragmentStatePagerAdapter implements PageFragment {
+
+        public PagerAdapter(FragmentManager fm) {
+            super(fm);
         }
 
-        Log.d(LOG, "" + selectedInsects.size());
+        @Override
+        public Fragment getItem(int i) {
 
-
-        evaluationDTO.setConditionsID(conditionID);
-        evaluationDTO.setTeamMemberID(1);
-
-        evaluationDTO.setEvaluationSite(evaluationSite);
-
-
-        evaluationDTO.setRemarks(EDT_comment.getText().toString());
-        evaluationDTO.setpH(Double.parseDouble(WP_score.getText().toString()));
-        evaluationDTO.setOxygen(Double.parseDouble(WO_score.getText().toString()));
-        evaluationDTO.setWaterClarity(Double.parseDouble(WC_score.getText().toString()));
-        evaluationDTO.setWaterTemperature(Double.parseDouble(WT_score.getText().toString()));
-        evaluationDTO.setElectricityConductivity(Double.parseDouble(WE_score.getText().toString()));
-        evaluationDTO.setEvaluationDate(new Date().getTime());
-        evaluationDTO.setScore(Double.parseDouble(TV_avg_score.getText().toString()));
-        evaluationDTO.setLatitude(evaluationSite.getLatitude());
-        evaluationDTO.setLongitude(evaluationSite.getLongitude());
-
-
-        w.setInsectImages(selectedInsects);
-        w.setEvaluation(evaluationDTO);
-
-
-        Log.i(LOG, (new Gson()).toJson(w));
-        WebCheckResult wcr = WebCheck.checkNetworkAvailability(ctx);
-        if (evaluationDTO.getEvaluationSite() == null) {
-            ToastUtil.errorToast(Evaluation.this, "Please make sure Site Evaluation is picked(hint: SITE GPS LOCATION)");
-            return;
-        }
-        if (evaluationDTO.getConditionsID() == null) {
-            ToastUtil.errorToast(Evaluation.this, "If you don't select insect group, you can't score evaluation(hint: SELECT INSECT GROUP)");
-            return;
+            return (Fragment) pageFragmentList.get(i);
         }
 
-        if (wcr.isWifiConnected()) {
-            sendRequest(w);
-        } else {
-            addRequestToCache(w);
+        @Override
+        public int getCount() {
+            return pageFragmentList.size();
         }
 
+        @Override
+        public CharSequence getPageTitle(int position) {
+            String title = "Title";
+
+            switch (position) {
+                case 0:
+
+                    break;
+
+
+                default:
+                    break;
+            }
+            return title;
+        }
+
+        @Override
+        public void animateCounts() {
+
+        }
     }
 }

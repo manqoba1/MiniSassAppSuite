@@ -1,6 +1,7 @@
 package com.sifiso.codetribe.minisasslibrary.adapters;
 
 import android.content.Context;
+import android.graphics.PorterDuff;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,7 +65,7 @@ public class EvaluationAdapter extends BaseAdapter {
             h.ELI_wc = (TextView) v.findViewById(R.id.ELI_wc);
             h.ELI_wt = (TextView) v.findViewById(R.id.ELI_wt);
             h.ELI_remarks = (TextView) v.findViewById(R.id.ELI_remarks);
-
+            h.ELI_condition_image = (ImageView) v.findViewById(R.id.ELI_condition_image);
             v.setTag(h);
         } else {
             h = (Holder) v.getTag();
@@ -89,22 +90,27 @@ public class EvaluationAdapter extends BaseAdapter {
             case 1:
                 h.ELI_condition.setTextColor(mCtx.getResources().getColor(R.color.purple));
                 h.ELI_score.setTextColor(mCtx.getResources().getColor(R.color.purple));
+                h.ELI_condition_image.setColorFilter(mCtx.getResources().getColor(R.color.purple), PorterDuff.Mode.MULTIPLY);
                 break;
             case 6:
                 h.ELI_condition.setTextColor(mCtx.getResources().getColor(R.color.green));
                 h.ELI_score.setTextColor(mCtx.getResources().getColor(R.color.green));
+                h.ELI_condition_image.setColorFilter(mCtx.getResources().getColor(R.color.green), PorterDuff.Mode.MULTIPLY);
                 break;
             case 7:
                 h.ELI_condition.setTextColor(mCtx.getResources().getColor(R.color.yellow));
                 h.ELI_score.setTextColor(mCtx.getResources().getColor(R.color.yellow));
+                h.ELI_condition_image.setColorFilter(mCtx.getResources().getColor(R.color.yellow), PorterDuff.Mode.MULTIPLY);
                 break;
             case 8:
                 h.ELI_condition.setTextColor(mCtx.getResources().getColor(R.color.orange));
                 h.ELI_score.setTextColor(mCtx.getResources().getColor(R.color.orange));
+                h.ELI_condition_image.setColorFilter(mCtx.getResources().getColor(R.color.orange), PorterDuff.Mode.MULTIPLY);
                 break;
             case 9:
                 h.ELI_condition.setTextColor(mCtx.getResources().getColor(R.color.red));
                 h.ELI_score.setTextColor(mCtx.getResources().getColor(R.color.red));
+                h.ELI_condition_image.setColorFilter(mCtx.getResources().getColor(R.color.red), PorterDuff.Mode.MULTIPLY);
                 break;
 
         }
@@ -124,6 +130,7 @@ public class EvaluationAdapter extends BaseAdapter {
 
     class Holder {
         TextView ELI_team, ELI_date, ELI_wc, ELI_pH, ELI_wt, ELI_oxygen, ELI_score, ELI_condition, ELI_remarks;
+        ImageView ELI_condition_image;
     }
 
     public interface EvaluationAdapterListener {
