@@ -15,12 +15,17 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.sifiso.codetribe.minisasslibrary.R;
+import com.sifiso.codetribe.minisasslibrary.activities.EvaluationActivity;
+import com.sifiso.codetribe.minisasslibrary.activities.MapsActivity;
 import com.sifiso.codetribe.minisasslibrary.adapters.EvaluationAdapter;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationDTO;
+import com.sifiso.codetribe.minisasslibrary.dto.EvaluationInsectDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationSiteDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ResponseDTO;
+import com.sifiso.codetribe.minisasslibrary.services.CreateEvaluationListener;
 import com.sifiso.codetribe.minisasslibrary.util.Util;
 
 import java.util.ArrayList;
@@ -29,19 +34,19 @@ import java.util.List;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link EvaluationListFragment.EvaluationListFragmentListener} interface
+ * {@link CreateEvaluationListener} interface
  * to handle interaction events.
  * Use the {@link EvaluationListFragment#} factory method to
  * create an instance of this fragment.
  */
 public class EvaluationListFragment extends Fragment implements PageFragment {
 
-    private EvaluationListFragmentListener mListener;
+    private CreateEvaluationListener mListener;
     private LinearLayout FEL_search;
     private ListView FEL_list;
     private ImageView SLT_imgSearch2, SLT_hero;
     private EditText SLT_editSearch;
-    private TextView FEL_add;
+
 
     public EvaluationListFragment() {
         // Required empty public constructor
@@ -54,6 +59,7 @@ public class EvaluationListFragment extends Fragment implements PageFragment {
     }
 
     private void build() {
+
         FEL_list = (ListView) v.findViewById(R.id.FEL_list);
         FEL_search = (LinearLayout) v.findViewById(R.id.FEL_search);
         SLT_editSearch = (EditText) v.findViewById(R.id.SLT_editSearch);
@@ -62,6 +68,8 @@ public class EvaluationListFragment extends Fragment implements PageFragment {
         SLT_imgSearch2 = (ImageView) v.findViewById(R.id.SLT_imgSearch2);
         SLT_imgSearch2.setVisibility(View.GONE);
         SLT_hero.setImageDrawable(Util.getRandomHeroImage(ctx));
+
+
         setList();
     }
 
@@ -78,7 +86,7 @@ public class EvaluationListFragment extends Fragment implements PageFragment {
     private Context ctx;
     ResponseDTO response;
     private List<EvaluationDTO> evaluationList;
-
+Activity activity;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -88,6 +96,7 @@ public class EvaluationListFragment extends Fragment implements PageFragment {
         //setHasOptionsMenu(true);
         //  getActivity().setTheme(R.style.EvalListTheme);
         ctx = getActivity().getApplicationContext();
+        activity = getActivity();
         if (b != null) {
             evaluationSiteList = (List<EvaluationSiteDTO>) b.getSerializable("evaluationSite");
             response = (ResponseDTO) b.getSerializable("response");
@@ -120,6 +129,7 @@ public class EvaluationListFragment extends Fragment implements PageFragment {
     }
 
 
+
     private void setList() {
         if (evaluationList == null) evaluationList = new ArrayList<>();
         LayoutInflater inf = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -136,6 +146,19 @@ public class EvaluationListFragment extends Fragment implements PageFragment {
             public void onEvaluationRequest(List<EvaluationSiteDTO> siteList) {
 
             }
+
+            @Override
+            public void onViewInsect(List<EvaluationInsectDTO> insectImage) {
+               /* if(insectImage != null){
+                    return;
+                }*/
+                Util.showPopupInsectsSelected(ctx,activity,insectImage,SLT_hero,ctx.getResources().getString(R.string.insect_selected),new Util.UtilPopupListener() {
+                    @Override
+                    public void onItemSelected(int index) {
+
+                    }
+                });
+            }
         });
         FEL_list.setAdapter(adapter);
     }
@@ -145,7 +168,7 @@ public class EvaluationListFragment extends Fragment implements PageFragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (EvaluationListFragmentListener) activity;
+            mListener = (CreateEvaluationListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -174,11 +197,7 @@ public class EvaluationListFragment extends Fragment implements PageFragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface EvaluationListFragmentListener {
-        // TODO: Update argument type and name
-        public void onCreateEvaluation(ResponseDTO response);
 
-    }
 
     private List<EvaluationSiteDTO> evaluationSiteList;
 }

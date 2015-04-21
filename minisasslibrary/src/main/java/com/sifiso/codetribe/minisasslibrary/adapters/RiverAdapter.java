@@ -98,7 +98,14 @@ public class RiverAdapter extends BaseAdapter {
                 }
             }
         });
-        h.RLI_image.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.greatfishriver));
+        if(dto.getImageUri() ==null){
+            h.RLI_image.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.greatfishriver));
+        }else{
+            int rID = mCtx.getResources().getIdentifier(dto.getImageUri(), "drawable", mCtx.getPackageName());
+            h.RLI_image.setImageResource(rID);
+        }
+
+       // h.RLI_image.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.greatfishriver));
         h.RLI_image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

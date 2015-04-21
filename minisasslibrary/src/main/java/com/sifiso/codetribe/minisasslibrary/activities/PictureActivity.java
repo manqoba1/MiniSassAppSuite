@@ -149,7 +149,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
     }
     ActionBarActivity activity;
     Button btnStart;
-    View gpsStatus, topLayout;
+    View  topLayout;//gpsStatus,
     TextView txtMsg, txtAccuracy;
     Chronometer chrono;
     LinearLayout imageContainerLayout;
@@ -193,7 +193,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
         imgCamera = (ImageView) findViewById(R.id.CAM_imgCamera);
         imgCamera.setVisibility(View.GONE);
         topLayout.setVisibility(View.GONE);
-        gpsStatus.setVisibility(View.GONE);
+       // gpsStatus.setVisibility(View.GONE);
 
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -217,7 +217,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
                     @Override
                     public void onAnimationEnded() {
                         topLayout.setVisibility(View.GONE);
-                        gpsStatus.setVisibility(View.GONE);
+                        //gpsStatus.setVisibility(View.GONE);
                         dispatchTakePictureIntent();
                     }
                 });
@@ -283,7 +283,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
                     public void onClick(DialogInterface dialog, int which) {
                         imgCamera.setVisibility(View.GONE);
                         topLayout.setVisibility(View.VISIBLE);
-                        gpsStatus.setVisibility(View.VISIBLE);
+                        //gpsStatus.setVisibility(View.VISIBLE);
                         confirmedStandingAtLocation = true;
                         chrono.start();
                         try {
@@ -497,7 +497,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
     private void addImageToScroller() {
         Log.i(LOG, "addImageToScroller");
         if (currentSessionPhotos.size() == 1) {
-            imageContainerLayout.removeAllViews();
+//            imageContainerLayout.removeAllViews();
         }
         View v = inflater.inflate(R.layout.scroller_image_template, null);
         ImageView img = (ImageView) v.findViewById(R.id.image);
@@ -726,6 +726,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
         }
         Log.i(LOG, "onStart Bind to PhotoUploadService");
         Intent intent = new Intent(this, PhotoUploadService.class);
+
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
         super.onStart();
     }
@@ -744,6 +745,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
             mBound = false;
         }
     }
+
 
 
 
@@ -781,6 +783,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
 
         if (item.getItemId() == android.R.id.home) {
             onBackPressed();
+
             return true;
         }
         return false;
@@ -796,7 +799,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
         if (location != null) {
             Log.w(LOG,"## Good location spot");
             topLayout.setVisibility(View.GONE);
-            gpsStatus.setVisibility(View.GONE);
+            //gpsStatus.setVisibility(View.GONE);
             imgCamera.setVisibility(View.VISIBLE);
             btnStart.setVisibility(View.GONE);
             dispatchTakePictureIntent();

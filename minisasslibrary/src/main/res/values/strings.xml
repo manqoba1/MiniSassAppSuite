@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="insect_selected">Insects Found</string>
     <string name="app_name">MinisassLibrary</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="done_label">Done</string>
     <string name="map_unavailable">Map Unavailable, please try again</string>
     <string name="evaluation_map">Evaluation Map</string>
+
+    <string name="company_staff">Staff</string>
+    <string name="id_number">ID Number</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="get_status">Get Status</string>
+    <string name="take_picture">Take Picture</string>
+    <string name="send_app_link">Send App Link</string>
+    <string name="select_action">enter firs tname</string>
+    <string name="action_team">Teams</string>
 
     <string name="evaluation_image_map">Evaluation Image Map</string>
     <string name="sans_serif" translatable="false">sans-serif</string>
@@ -100,4 +111,7 @@
 
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_gpsscanner">GPSscanner</string>
+    <string name="title_activity_insect_picker">InsectPicker</string>
+    <string name="title_activity_evaluation">Evaluation</string>
 </resources>

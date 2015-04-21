@@ -41,10 +41,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sifiso.codetribe.minisasslibrary.R;
+import com.sifiso.codetribe.minisasslibrary.adapters.PopupInsectSelectedAdapter;
 import com.sifiso.codetribe.minisasslibrary.adapters.PopupListAdapter;
 import com.sifiso.codetribe.minisasslibrary.adapters.PopupRiverAdapter;
+import com.sifiso.codetribe.minisasslibrary.dto.CategoryDTO;
+import com.sifiso.codetribe.minisasslibrary.dto.EvaluationInsectDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.TownDTO;
+
+import org.joda.time.DateTime;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -130,67 +135,8 @@ public class Util {
         return sb.toString();
     }
 
-    public static void showPopupBasicTown(final Context ctx, Activity act,
-                                          final List<TownDTO> list,
-                                          View anchorView, String caption, final UtilPopupListener listener) {
-        final ListPopupWindow pop = new ListPopupWindow(act);
-        LayoutInflater inf = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View v = inf.inflate(R.layout.search_layout, null);
-        final EditText SLT_editSearch = (EditText) v.findViewById(R.id.SLT_editSearch);
-        final String inp = SLT_editSearch.getText().toString();
-        SLT_editSearch.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-                pop.setAdapter(new PopupListAdapter(ctx, R.layout.xxsimple_spinner_item,
-                        list, false));
 
 
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                for (int i = 0; i < list.size(); ++i) {
-                    String ser = list.get(i).getTownName();
-                    if (ser.substring(0, ser.indexOf(i)).equalsIgnoreCase(inp)) {
-                        pop.setAdapter(new PopupListAdapter(ctx, R.layout.xxsimple_spinner_item,
-                                list, false));
-                    }
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                for (int i = 0; i < list.size(); ++i) {
-                    String ser = list.get(i).getTownName();
-                    if (ser.substring(0, ser.indexOf(i)).equalsIgnoreCase(inp)) {
-                        pop.setAdapter(new PopupListAdapter(ctx, R.layout.xxsimple_spinner_item,
-                                list, false));
-                    }
-                }
-            }
-        });
-
-
-        pop.setPromptView(v);
-        pop.setPromptPosition(ListPopupWindow.POSITION_PROMPT_ABOVE);
-
-        pop.setAnchorView(anchorView);
-        pop.setHorizontalOffset(getPopupHorizontalOffset(act));
-        pop.setModal(true);
-        pop.setWidth(getPopupWidth(act));
-        pop.setHeight(getWindowWidth(act));
-        pop.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                pop.dismiss();
-                if (listener != null) {
-                    listener.onItemSelected(position);
-                }
-            }
-        });
-        pop.show();
-    }
 
     public static void pretendFlash(final View v, final int duration, final int max, final UtilAnimationListener listener) {
         final ObjectAnimator an = ObjectAnimator.ofFloat(v, "alpha", 1, 1);
@@ -666,9 +612,10 @@ public class Util {
         view.startAnimation(a);
     }
 
-    public static void showPopupBasicWithHeroImage(Context ctx, Activity act,
-                                                   List<TownDTO> list,
+    public static void showPopupCategoryBasicWithHeroImage(Context ctx, Activity act,
+                                                   List<CategoryDTO> list,
                                                    View anchorView, String caption, final UtilPopupListener listener) {
+        Log.d(LOG, "category size " + list.size());
         final ListPopupWindow pop = new ListPopupWindow(act);
         LayoutInflater inf = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View v = inf.inflate(R.layout.hero_image_popup, null);
@@ -720,6 +667,42 @@ public class Util {
 
         pop.setPromptPosition(ListPopupWindow.POSITION_PROMPT_ABOVE);
         pop.setAdapter(new PopupRiverAdapter(ctx, R.layout.xxsimple_spinner_item,
+                list, true));
+        Log.d(LOG, list.size() + " pop up length");
+        pop.setAnchorView(anchorView);
+        pop.setHorizontalOffset(getPopupHorizontalOffset(act));
+        pop.setModal(true);
+        pop.setWidth(getPopupWidth(act));
+        pop.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                pop.dismiss();
+                if (listener != null) {
+                    listener.onItemSelected(position);
+                }
+            }
+        });
+        pop.show();
+    }
+    public static void showPopupInsectsSelected(Context ctx, Activity act,
+                                                   List<EvaluationInsectDTO> list,
+                                                   View anchorView, String caption, final UtilPopupListener listener) {
+        final ListPopupWindow pop = new ListPopupWindow(act);
+        LayoutInflater inf = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View v = inf.inflate(R.layout.insect_popup, null);
+        TextView txt = (TextView) v.findViewById(R.id.HERO_caption);
+        if (caption != null) {
+            txt.setText(caption);
+        } else {
+            txt.setVisibility(View.GONE);
+        }
+        ImageView img = (ImageView) v.findViewById(R.id.HERO_image);
+         img.setImageDrawable(getRandomHeroImage(ctx));
+
+        pop.setPromptView(v);
+
+        pop.setPromptPosition(ListPopupWindow.POSITION_PROMPT_ABOVE);
+        pop.setAdapter(new PopupInsectSelectedAdapter(ctx, R.layout.xxsimple_spinner_item,
                 list, true));
         Log.d(LOG, list.size() + " pop up length");
         pop.setAnchorView(anchorView);
@@ -1419,9 +1402,9 @@ public class Util {
         return df.format(date);
     }
 
-    public static String getLongerDate(Date date) {
-        SimpleDateFormat df = new SimpleDateFormat("EEEE, dd MMMM yyyy");
-        return df.format(date);
+    public static String getLongerDate(DateTime date) {
+        SimpleDateFormat df = new SimpleDateFormat("EEEE, yyyy MMMM dd");
+        return df.format(date.toDate());
     }
 
     public static String getLongDateTime(Date date) {

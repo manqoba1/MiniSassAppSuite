@@ -15,15 +15,18 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.wallet.fragment.BuyButtonAppearance;
 import com.sifiso.codetribe.minisasslibrary.R;
+import com.sifiso.codetribe.minisasslibrary.activities.EvaluationActivity;
 import com.sifiso.codetribe.minisasslibrary.adapters.RiverAdapter;
 import com.sifiso.codetribe.minisasslibrary.dialogs.EvaluationListDialog;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationSiteDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverTownDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ResponseDTO;
+import com.sifiso.codetribe.minisasslibrary.services.CreateEvaluationListener;
 import com.sifiso.codetribe.minisasslibrary.util.ToastUtil;
 import com.sifiso.codetribe.minisasslibrary.util.Util;
 
@@ -37,12 +40,12 @@ public class RiverListFragment extends Fragment implements PageFragment {
     RiverAdapter riverAdapter;
     boolean isFound;
     String searchText;
-    RiverListFragmentListener mListener;
+    CreateEvaluationListener mListener;
     private Context ctx;
+    private Activity activity;
     private EditText SLT_editSearch;
-    private ImageView SLT_imgSearch2,SLT_hero;
+    private ImageView SLT_imgSearch2, SLT_hero;
     private ListView RL_riverList;
-    private TextView RL_add;
 
 
     public RiverListFragment() {
@@ -58,19 +61,27 @@ public class RiverListFragment extends Fragment implements PageFragment {
         }
     }
 
+    View v;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.river_list, container, false);
+        v = inflater.inflate(R.layout.river_list, container, false);
         ctx = getActivity().getApplicationContext();
+        activity = getActivity();
         getActivity().setTitle("MiniSASS Rivers");
-        SLT_editSearch = (EditText) v.findViewById(R.id.SLT_editSearch);
+        setField();
+        return v;
+    }
 
+    private void setField() {
+        SLT_editSearch = (EditText) v.findViewById(R.id.SLT_editSearch);
         SLT_hero = (ImageView) v.findViewById(R.id.SLT_hero);
-        SLT_hero.setImageDrawable(Util.getRandomHeroImage(ctx));
+
         SLT_imgSearch2 = (ImageView) v.findViewById(R.id.SLT_imgSearch2);
-       // SLT_imgSearch2.setVisibility(View.GONE);
-       // SLT_editSearch.setVisibility(View.GONE);
+        // SLT_imgSearch2.setVisibility(View.GONE);
+        // SLT_editSearch.setVisibility(View.GONE);
+
         SLT_imgSearch2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -79,8 +90,9 @@ public class RiverListFragment extends Fragment implements PageFragment {
             }
         });
         RL_riverList = (ListView) v.findViewById(R.id.RL_riverList);
+        SLT_hero.setImageDrawable(Util.getRandomHeroImage(ctx));
+
         setListView();
-        return v;
     }
 
     private void searchRiver() {
@@ -111,6 +123,18 @@ public class RiverListFragment extends Fragment implements PageFragment {
         InputMethodManager imm = (InputMethodManager) ctx
                 .getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(SLT_editSearch.getWindowToken(), 0);
+    }
+
+    public void startEvaluation() {
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Intent intent = new Intent(ctx, EvaluationActivity.class);
+                intent.putExtra("response", response);
+                startActivity(intent);
+            }
+        });
+
     }
 
     EvaluationListDialog evaluationListDialog;
@@ -144,7 +168,7 @@ public class RiverListFragment extends Fragment implements PageFragment {
         });
         LayoutInflater inf = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View v = inf.inflate(R.layout.hero_layout, null);
-       // RL_riverList.addHeaderView(v);
+        // RL_riverList.addHeaderView(v);
         RL_riverList.setAdapter(riverAdapter);
         RL_riverList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
@@ -161,16 +185,7 @@ public class RiverListFragment extends Fragment implements PageFragment {
 
     }
 
-    public interface RiverListFragmentListener {
 
-        public void onRefreshEvaluation(List<EvaluationSiteDTO> siteList, int index);
-
-        public void onRefreshTown(List<RiverTownDTO> riverTownList, int index);
-
-        public void onRefreshMap(RiverDTO river, int result);
-
-        public void onCreateEvaluationRL(RiverDTO river);
-    }
 
     static final int EVALUATION_VIEW = 12;
     static final int RIVER_VIEW = 13;
@@ -179,7 +194,7 @@ public class RiverListFragment extends Fragment implements PageFragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (RiverListFragmentListener) activity;
+            mListener = (CreateEvaluationListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");

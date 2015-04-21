@@ -1,10 +1,13 @@
 package com.sifiso.codetribe.riverteamapp;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -17,10 +20,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.internal.pa;
-import com.sifiso.codetribe.minisasslibrary.activities.Evaluation;
+import com.sifiso.codetribe.minisasslibrary.activities.EvaluationActivity;
+import com.sifiso.codetribe.minisasslibrary.activities.GPSscanner;
 import com.sifiso.codetribe.minisasslibrary.activities.MapsActivity;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationSiteDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverDTO;
@@ -31,21 +35,23 @@ import com.sifiso.codetribe.minisasslibrary.fragments.EvaluationListFragment;
 import com.sifiso.codetribe.minisasslibrary.fragments.PageFragment;
 import com.sifiso.codetribe.minisasslibrary.fragments.RiverListFragment;
 import com.sifiso.codetribe.minisasslibrary.fragments.TownListFragment;
+import com.sifiso.codetribe.minisasslibrary.services.CreateEvaluationListener;
+import com.sifiso.codetribe.minisasslibrary.services.RequestSyncService;
 import com.sifiso.codetribe.minisasslibrary.toolbox.WebCheck;
 import com.sifiso.codetribe.minisasslibrary.toolbox.WebCheckResult;
 import com.sifiso.codetribe.minisasslibrary.util.CacheUtil;
 import com.sifiso.codetribe.minisasslibrary.util.ErrorUtil;
 import com.sifiso.codetribe.minisasslibrary.util.Statics;
+import com.sifiso.codetribe.minisasslibrary.util.TimerUtil;
 import com.sifiso.codetribe.minisasslibrary.util.WebSocketUtil;
 import com.sifiso.codetribe.minisasslibrary.R;
-import com.sifiso.codetribe.minisasslibrary.viewsUtil.ZoomOutPageTransformer;
 import com.sifiso.codetribe.minisasslibrary.viewsUtil.ZoomOutPageTransformerImpl;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainPagerActivity extends ActionBarActivity implements EvaluationListFragment.EvaluationListFragmentListener, RiverListFragment.RiverListFragmentListener {
+public class MainPagerActivity extends ActionBarActivity implements CreateEvaluationListener {
     static final int NUM_ITEMS = 2;
     static final String LOG = MainPagerActivity.class.getSimpleName();
     Context ctx;
@@ -55,26 +61,31 @@ public class MainPagerActivity extends ActionBarActivity implements EvaluationLi
     TownListFragment townListFragment;
     List<PageFragment> pageFragmentList;
     ViewPager mPager;
-    TextView RL_add;
     Menu mMenu;
     PagerAdapter adapter;
-    Location mCurrentLocation;
-    GoogleApiClient mLocationClient;
     private ResponseDTO response;
+    private TextView RL_add;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ctx = getApplicationContext();
+        setField();
+
+
+    }
+
+    private void setField() {
         mPager = (ViewPager) findViewById(R.id.SITE_pager);
         RL_add = (TextView) findViewById(R.id.RL_add);
         RL_add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent evaluateIntent = new Intent(MainPagerActivity.this, Evaluation.class);
-                evaluateIntent.putExtra("response", response);
-                startActivityForResult(evaluateIntent, STATUS_CODE);
+                //Toast.makeText(ctx, " Clicked Evaluation", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(MainPagerActivity.this, EvaluationActivity.class);
+                intent.putExtra("statusCode", CREATE_EVALUATION);
+                startActivity(intent);
             }
         });
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
@@ -82,16 +93,66 @@ public class MainPagerActivity extends ActionBarActivity implements EvaluationLi
 
         PagerTitleStrip strip = (PagerTitleStrip) findViewById(R.id.pager_title_strip);
         strip.setVisibility(View.GONE);
+    }
 
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            Log.w(LOG, "## RequestSyncService ServiceConnection: onServiceConnected");
+            RequestSyncService.LocalBinder binder = (RequestSyncService.LocalBinder) service;
+            mService = binder.getService();
+            mBound = true;
+            WebCheckResult wcr = WebCheck.checkNetworkAvailability(ctx, true);
+            if (wcr.isWifiConnected()) {
+                mService.startSyncCachedRequests(new RequestSyncService.RequestSyncListener() {
+                    @Override
+                    public void onTasksSynced(int goodResponses, int badResponses) {
+                        Log.w(LOG, "@@ cached requests done, good: " + goodResponses + " bad: " + badResponses);
+                        getData();
+                    }
+
+                    @Override
+                    public void onError(String message) {
+
+                    }
+                });
+
+               /* Util.pretendFlash(progressBar, 1000, 2, new Util.UtilAnimationListener() {
+                    @Override
+                    public void onAnimationEnded() {
+
+                    }
+                });*/
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            Log.w(LOG, "## RequestSyncService onServiceDisconnected");
+            mBound = false;
+        }
+    };
+    boolean mBound;
+    RequestSyncService mService;
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(LOG,
+                "#################### onStop");
+        if (mBound) {
+
+            unbindService(mConnection);
+            mBound = false;
+        }
 
     }
+
 
     static final int STATUS_CODE = 220;
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-    }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -112,7 +173,22 @@ public class MainPagerActivity extends ActionBarActivity implements EvaluationLi
 
         pageFragmentList.add(riverListFragment);
         // pageFragmentList.add(evaluationListFragment);
+
         initializeAdapter();
+
+
+    }
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        //TimerUtil.killFlashTimer();
+
+        Intent intent = new Intent(MainPagerActivity.this, RequestSyncService.class);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        Log.d(LOG,
+                "#################### onStart");
 
     }
 
@@ -182,6 +258,7 @@ public class MainPagerActivity extends ActionBarActivity implements EvaluationLi
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         mMenu = menu;
+        //TimerUtil.killFlashTimer();
         getLocalData();
         // startActivity(new Intent(MainPagerActivity.this, SplashActivity.class));
 
@@ -197,6 +274,12 @@ public class MainPagerActivity extends ActionBarActivity implements EvaluationLi
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            return true;
+        }
+        if (id == R.id.action_add) {
+            Intent evaluateIntent = new Intent(ctx, EvaluationActivity.class);
+            evaluateIntent.putExtra("response", response);
+            startActivity(evaluateIntent);
             return true;
         }
 
@@ -271,13 +354,14 @@ public class MainPagerActivity extends ActionBarActivity implements EvaluationLi
         startActivity(intent);
     }
 
+
     @Override
     public void onCreateEvaluationRL(RiverDTO river) {
-        Intent createEva = new Intent(MainPagerActivity.this, Evaluation.class);
+        Intent createEva = new Intent(MainPagerActivity.this, EvaluationActivity.class);
         createEva.putExtra("riverCreate", river);
         createEva.putExtra("response", response);
         createEva.putExtra("statusCode", CREATE_EVALUATION);
-        startActivityForResult(createEva, CREATE_EVALUATION);
+        startActivity(createEva);
     }
 
     static final int CREATE_EVALUATION = 108;
@@ -286,7 +370,9 @@ public class MainPagerActivity extends ActionBarActivity implements EvaluationLi
 
     @Override
     public void onCreateEvaluation(ResponseDTO response) {
-
+        Intent intent = new Intent(MainPagerActivity.this, EvaluationActivity.class);
+        intent.putExtra("statusCode", CREATE_EVALUATION);
+        startActivity(intent);
     }
 
     private class PagerAdapter extends FragmentStatePagerAdapter implements PageFragment {
@@ -333,14 +419,20 @@ public class MainPagerActivity extends ActionBarActivity implements EvaluationLi
         CacheUtil.getCachedData(ctx, CacheUtil.CACHE_DATA, new CacheUtil.CacheUtilListener() {
             @Override
             public void onFileDataDeserialized(final ResponseDTO respond) {
-                response = respond;
-                if (response != null) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        response = respond;
+                        if (response != null) {
 
-                    buildPages();
-                }
-                if (w.isWifiConnected()) {
-                    getData();
-                }
+                            buildPages();
+                        }
+                        if (w.isWifiConnected()) {
+                            getData();
+                        }
+                    }
+                });
+
 
             }
 
@@ -351,9 +443,15 @@ public class MainPagerActivity extends ActionBarActivity implements EvaluationLi
 
             @Override
             public void onError() {
-                if (w.isWifiConnected()) {
-                    getData();
-                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (w.isWifiConnected()) {
+                            getData();
+                        }
+                    }
+                });
+
             }
         });
 
@@ -368,27 +466,35 @@ public class MainPagerActivity extends ActionBarActivity implements EvaluationLi
             WebSocketUtil.sendRequest(ctx, Statics.MINI_SASS_ENDPOINT, req, new WebSocketUtil.WebSocketListener() {
                 @Override
                 public void onMessage(final ResponseDTO r) {
-
-                    Log.e(LOG, "## getStarterData responded...statusCode: " + r.getStatusCode());
-                    if (!ErrorUtil.checkServerError(ctx, r)) {
-                        return;
-                    }
-                    response = r;
-                    CacheUtil.cacheData(ctx, r, CacheUtil.CACHE_DATA, new CacheUtil.CacheUtilListener() {
+                    runOnUiThread(new Runnable() {
                         @Override
-                        public void onFileDataDeserialized(final ResponseDTO resp) {
+                        public void run() {
+                            Log.e(LOG, "## getStarterData responded...statusCode: " + r.getStatusCode());
+                            if (!ErrorUtil.checkServerError(ctx, r)) {
+                                return;
+                            }
+                            response = r;
+                            CacheUtil.cacheData(ctx, r, CacheUtil.CACHE_DATA, new CacheUtil.CacheUtilListener() {
+                                @Override
+                                public void onFileDataDeserialized(final ResponseDTO resp) {
 
+                                }
 
-                        }
+                                @Override
+                                public void onDataCached() {
+                                    /*Intent intent = new Intent(getApplicationContext(), RequestSyncService.class);
+                                    startService(intent);*/
+                                    // getData();
+                                    buildPages();
+                                }
 
-                        @Override
-                        public void onDataCached() {
-                            //finish();
-                        }
+                                @Override
+                                public void onError() {
 
-                        @Override
-                        public void onError() {
-
+                                }
+                            });
+                            /*Intent intent = new Intent(getApplicationContext(), RequestSyncService.class);
+                            startService(intent);*/
                         }
                     });
 
@@ -405,6 +511,7 @@ public class MainPagerActivity extends ActionBarActivity implements EvaluationLi
 
                 }
             });
+
         } catch (Exception e) {
 
         }

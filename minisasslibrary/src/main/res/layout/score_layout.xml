@@ -32,6 +32,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/LL1"
+        android:padding="5dp"
         android:background="@drawable/xborder">
 
         <TextView
@@ -95,6 +96,7 @@
                 android:layout_alignBottom="@+id/IMG_score_icon"
                 android:layout_centerHorizontal="true"
                 android:layout_marginRight="10dp"
+                style="@style/TextStyleSmall"
                 android:text="0.0"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
@@ -112,7 +114,6 @@
                 style="@style/TextStyleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignStart="@+id/TV_avg_score"
                 android:layout_below="@+id/TV_avg_score"
                 android:layout_marginTop="15dp"
                 android:text="not specified"

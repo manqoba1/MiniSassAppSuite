@@ -7,13 +7,14 @@
 package com.sifiso.codetribe.minisasslibrary.dto.tranfer;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by aubreyM on 14/12/13.
  */
 public class RequestList implements Serializable {
-    private List<RequestDTO> requests;
+    private List<RequestDTO> requests = new ArrayList<>();
 
     public List<RequestDTO> getRequests() {
         return requests;

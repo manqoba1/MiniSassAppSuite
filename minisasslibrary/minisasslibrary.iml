@@ -114,7 +114,6 @@
     <orderEntry type="library" exported="" name="recyclerview-v7-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="activation" level="project" />
-    <orderEntry type="module" module-name="facebook" exported="" />
   </component>
 </module>
 

@@ -83,7 +83,7 @@ public class Welcome extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_welcome, menu);
-        startActivity(new Intent(Welcome.this, SplashActivity.class));
+        // startActivity(new Intent(Welcome.this, SplashActivity.class));
         // finish();
         return true;
     }
@@ -229,6 +229,17 @@ public class Welcome extends ActionBarActivity {
     protected void onRestart() {
         TimerUtil.killFlashTimer();
         super.onRestart();
+    }
+
+    boolean isFirst ;
+
+    @Override
+    protected void onStart() {
+        if (isFirst) {
+            isFirst = false;
+            startActivity(new Intent(Welcome.this, SplashActivity.class));
+        }
+        super.onStart();
     }
 
     static final String LOG = Welcome.class.getSimpleName();

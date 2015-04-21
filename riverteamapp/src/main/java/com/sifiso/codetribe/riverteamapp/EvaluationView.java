@@ -1,10 +1,13 @@
 package com.sifiso.codetribe.riverteamapp;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
@@ -15,7 +18,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.sifiso.codetribe.minisasslibrary.activities.Evaluation;
+import com.sifiso.codetribe.minisasslibrary.activities.EvaluationActivity;
 import com.sifiso.codetribe.minisasslibrary.activities.MapsActivity;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationSiteDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverDTO;
@@ -25,6 +28,8 @@ import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ResponseDTO;
 import com.sifiso.codetribe.minisasslibrary.fragments.EvaluationListFragment;
 import com.sifiso.codetribe.minisasslibrary.fragments.RiverListFragment;
 import com.sifiso.codetribe.minisasslibrary.fragments.TownListFragment;
+import com.sifiso.codetribe.minisasslibrary.services.CachedSyncService;
+import com.sifiso.codetribe.minisasslibrary.services.CreateEvaluationListener;
 import com.sifiso.codetribe.minisasslibrary.toolbox.WebCheck;
 import com.sifiso.codetribe.minisasslibrary.toolbox.WebCheckResult;
 import com.sifiso.codetribe.minisasslibrary.util.CacheUtil;
@@ -36,7 +41,7 @@ import com.sifiso.codetribe.minisasslibrary.R;
 import java.util.List;
 
 
-public class EvaluationView extends ActionBarActivity implements  RiverListFragment.RiverListFragmentListener, EvaluationListFragment.EvaluationListFragmentListener {
+public class EvaluationView extends ActionBarActivity implements CreateEvaluationListener {
 
     Menu mMenu;
     Context ctx;
@@ -60,7 +65,7 @@ public class EvaluationView extends ActionBarActivity implements  RiverListFragm
         RL_add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent evaluateIntent = new Intent(EvaluationView.this, Evaluation.class);
+                Intent evaluateIntent = new Intent(EvaluationView.this, EvaluationActivity.class);
 
                 evaluateIntent.putExtra("response", response);
                 startActivityForResult(evaluateIntent, STATUS_CODE);
@@ -68,6 +73,45 @@ public class EvaluationView extends ActionBarActivity implements  RiverListFragm
         });
 
     }
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            Log.w(LOG, "## RequestSyncService ServiceConnection: onServiceConnected");
+            CachedSyncService.LocalBinder binder = (CachedSyncService.LocalBinder) service;
+            mService = binder.getService();
+            mBound = true;
+            WebCheckResult wcr = WebCheck.checkNetworkAvailability(ctx, true);
+            if (wcr.isWifiConnected()) {
+                mService.startSyncCachedRequests(new CachedSyncService.RequestSyncListener() {
+                    @Override
+                    public void onTasksSynced(int goodResponses, int badResponses) {
+                        Log.w(LOG, "@@ cached requests done, good: " + goodResponses + " bad: " + badResponses);
+                        getData();
+                    }
+
+                    @Override
+                    public void onError(String message) {
+
+                    }
+                });
+
+               /* Util.pretendFlash(progressBar, 1000, 2, new Util.UtilAnimationListener() {
+                    @Override
+                    public void onAnimationEnded() {
+
+                    }
+                });*/
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            Log.w(LOG, "## RequestSyncService onServiceDisconnected");
+            mBound = false;
+        }
+    };
 
     @Override
     protected void onPause() {
@@ -151,7 +195,7 @@ public class EvaluationView extends ActionBarActivity implements  RiverListFragm
 
     @Override
     public void onCreateEvaluationRL(RiverDTO river) {
-        Intent createEva = new Intent(EvaluationView.this, Evaluation.class);
+        Intent createEva = new Intent(EvaluationView.this, EvaluationActivity.class);
         createEva.putExtra("riverCreate", river);
         createEva.putExtra("response", response);
         createEva.putExtra("statusCode", CREATE_EVALUATION);
@@ -280,12 +324,34 @@ public class EvaluationView extends ActionBarActivity implements  RiverListFragm
 
     @Override
     public void onCreateEvaluation(ResponseDTO resp) {
-        Intent evaluateIntent = new Intent(EvaluationView.this, Evaluation.class);
+        Intent evaluateIntent = new Intent(EvaluationView.this, EvaluationActivity.class);
         if (response == null) {
             response = resp;
         }
         evaluateIntent.putExtra("response", response);
         startActivityForResult(evaluateIntent, STATUS_CODE);
+    }
+    boolean mBound;
+    CachedSyncService mService;
+
+    @Override
+    protected void onStop() {
+        Log.d(LOG,
+                "#################### onStop");
+        if (mBound) {
+            unbindService(mConnection);
+            mBound = false;
+        }
+        super.onStop();
+    }
+
+    @Override
+    protected void onStart() {
+
+        Log.i(LOG, "onStart Bind to PhotoUploadService");
+        Intent intent = new Intent(this, CachedSyncService.class);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        super.onStart();
     }
 
     static final int STATUS_CODE = 220;

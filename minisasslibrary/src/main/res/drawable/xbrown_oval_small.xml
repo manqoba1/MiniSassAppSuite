@@ -7,6 +7,6 @@
         android:endColor="@color/SaddleBrown" />
 
     <size
-        android:height="42dp"
-        android:width="42dp" />
+        android:height="@dimen/circle_size_small"
+        android:width="@dimen/circle_size_small" />
 </shape>

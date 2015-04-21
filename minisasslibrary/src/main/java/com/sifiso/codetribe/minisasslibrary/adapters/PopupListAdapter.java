@@ -9,17 +9,18 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.sifiso.codetribe.minisasslibrary.R;
+import com.sifiso.codetribe.minisasslibrary.dto.CategoryDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.TownDTO;
 import com.sifiso.codetribe.minisasslibrary.util.Statics;
 
 import java.util.List;
 
-public class PopupListAdapter extends ArrayAdapter<String> {
+public class PopupListAdapter extends ArrayAdapter<CategoryDTO> {
 
 
     private final LayoutInflater mInflater;
     private final int mLayoutRes;
-    private List<TownDTO> mList;
+    private List<CategoryDTO> mList;
     private Context ctx;
     private String title;
     private boolean showAlternateIcon;
@@ -28,9 +29,9 @@ public class PopupListAdapter extends ArrayAdapter<String> {
     static final String LOG = PopupListAdapter.class.getSimpleName();
 
     public PopupListAdapter(Context context, int textViewResourceId,
-                            List<TownDTO> list, boolean showAlternateIcon) {
+                            List<CategoryDTO> list, boolean showAlternateIcon) {
 
-        super(context, textViewResourceId);
+        super(context, textViewResourceId, list);
         this.mLayoutRes = textViewResourceId;
         mList = list;
         this.showAlternateIcon = showAlternateIcon;
@@ -41,8 +42,6 @@ public class PopupListAdapter extends ArrayAdapter<String> {
 
 
     View view;
-
-
 
 
     static class ViewHolderItem {
@@ -82,8 +81,8 @@ public class PopupListAdapter extends ArrayAdapter<String> {
             item.image.setImageDrawable(ctx.getResources().getDrawable(android.R.drawable.ic_dialog_email));
 
         }
-        final TownDTO p = mList.get(position);
-        item.txtString.setText((CharSequence) p);
+        final CategoryDTO p = mList.get(position);
+        item.txtString.setText(p.getCategoryName());
         Statics.setRobotoFontLight(ctx, item.txtString);
         return (convertView);
     }

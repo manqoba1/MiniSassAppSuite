@@ -1,29 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/xborder">
 
     <TextView
         android:id="@+id/WT_sp_river"
-        style="@style/Title2TextStyleBlue"
+        style="@style/Title2TextStyleRed"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/WT_sp_category"
         android:focusable="false"
         android:hint="Select river"
         android:padding="10dp"
-        android:layout_below="@+id/WT_sp_category"
-        android:textColor="@color/navy_blue"
-        android:textColorHint="@color/navy_blue" />
+        android:textColor="@color/red"
+        android:textColorHint="@color/red" />
 
-    <Spinner
+    <TextView
         android:id="@+id/WT_sp_category"
         style="@style/Title2TextStyleBlue"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-
+        android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:background="@drawable/xborder"
-        android:focusable="false" />
+        android:focusable="false"
+        android:hint="Select category"
+        android:padding="10dp"
+        android:textColor="@color/navy_blue"
+        android:textColorHint="@color/navy_blue" />
 
     <Button
         android:id="@+id/WT_gps_picker"

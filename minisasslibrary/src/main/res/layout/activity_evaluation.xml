@@ -2,32 +2,85 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    android:padding="10dp"
+    tools:context="com.sifiso.codetribe.minisasslibrary.activities.EvaluationActivity">
 
-    <android.support.v4.view.ViewPager
-        android:id="@+id/SITE_pager"
+    <ScrollView
+        android:id="@+id/scroll"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <android.support.v4.view.PagerTitleStrip
-            android:id="@+id/pager_title_strip"
-            style="@style/PagerSmall"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top"
-            android:background="@color/blue_dark2"
-            android:paddingBottom="8dp"
-            android:paddingTop="8dp"
-            android:textColor="#fff"
-            android:visibility="gone" />
-    </android.support.v4.view.ViewPager>
+            android:layout_height="match_parent">
 
-    <ProgressBar
-        android:id="@+id/progressBar"
+
+            <include
+                android:id="@+id/l1"
+                layout="@layout/site_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp" />
+
+            <include
+                android:id="@+id/l2"
+                layout="@layout/water_test"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/l1"
+                android:layout_marginTop="10dp" />
+
+            <include
+                android:id="@+id/l3"
+                layout="@layout/score_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/l2"
+                android:layout_marginTop="10dp" />
+
+            <include
+                android:id="@+id/l4"
+                layout="@layout/comments"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/l3"
+                android:layout_marginTop="10dp" />
+
+            <Button
+                android:id="@+id/AE_create"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_below="@+id/l4"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/xsquare_blue"
+                android:drawablePadding="10dp"
+                android:drawableRight="@android:drawable/ic_menu_save"
+                android:text="create Evaluation"
+                android:textColor="@color/white" />
+
+            <ImageView
+                android:id="@+id/AE_pin_point"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginRight="10dp"
+                android:backgroundTint="@color/blue"
+                android:src="@drawable/ic_point"
+                android:tint="@color/red"
+                android:visibility="gone" />
+
+
+        </RelativeLayout>
+    </ScrollView>
+
+    <ViewStub
+        android:id="@+id/viewStub"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:padding="@dimen/mon_wide"
-        android:visibility="gone" />
-
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true" />
 </RelativeLayout>

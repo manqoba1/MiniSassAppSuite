@@ -115,7 +115,7 @@ public class SignActivity extends ActionBarActivity {
     }
 
     private void checkVirgin() {
-
+        //SharedUtil.clearTeam(ctx);
         TeamMemberDTO dto = SharedUtil.getTeamMember(ctx);
         if (dto != null) {
             Log.i(LOG, "++++++++ Not a virgin anymore ...checking GCM registration....");

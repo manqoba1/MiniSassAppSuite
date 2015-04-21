@@ -45,6 +45,11 @@ public class SharedUtil {
         return gson.fromJson(s, ImageLocation.class);
     }
 
+    public static void clearTeam(Context ctx) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ctx);
+        sp.edit().remove(TEAM_MEMBER_JSON).commit();
+    }
+
     public static EvaluationDTO getEvaluation(Context ctx) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ctx);
         String st = sp.getString(EVALUATION_JSON, null);

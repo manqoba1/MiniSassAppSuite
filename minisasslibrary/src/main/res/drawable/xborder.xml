@@ -7,11 +7,7 @@
         android:width="0.1dp"
         android:color="@color/grey" />
 
-    <padding
-        android:bottom="3dp"
-        android:left="15dp"
-        android:right="5dp"
-        android:top="3dp" />
+
 
     <corners android:radius="2dp" />
 

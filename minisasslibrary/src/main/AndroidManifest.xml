@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.sifiso.codetribe.minisasslibrary" >
+    package="com.sifiso.codetribe.minisasslibrary">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -16,38 +16,30 @@
     <application
         android:name=".MiniSassApp"
         android:allowBackup="true"
-        android:label="@string/app_name" >
-        <activity
-            android:name=".activities.Registration"
-            android:label="@string/app_name" >
-        </activity>
+        android:label="@string/app_name">
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyCTXbeTpsumXsaIoCwJXoFi-JYDXfc4M5A" />
         <activity
             android:name=".activities.SplashActivity"
-            android:label="@string/app_name" >
-        </activity>
+            android:label="@string/app_name"></activity>
         <activity
             android:name=".activities.PictureActivity"
             android:label="@string/app_name"
-            android:screenOrientation="portrait" >
-        </activity>
+            android:screenOrientation="portrait"></activity>
         <activity
             android:name=".activities.MapsActivity"
-            android:label="@string/title_activity_minisass_maps" >
-        </activity>
+            android:label="@string/title_activity_minisass_maps"></activity>
         <activity
             android:name=".activities.PictureRecyclerGridActivity"
-            android:label="@string/title_activity_picture_recycler_grid" >
-        </activity>
+            android:label="@string/title_activity_picture_recycler_grid"></activity>
         <activity
             android:name=".activities.FullPhotoActivity"
-            android:label="@string/title_activity_full_photo" >
-        </activity>
+            android:label="@string/title_activity_full_photo"></activity>
         <activity
             android:name=".activities.ImageActivity"
-            android:label="@string/title_activity_image" >
-        </activity>
+            android:label="@string/title_activity_image"></activity>
         <activity android:name=".TwitterOAuthActivity" />
-
         <activity android:name="com.facebook.LoginActivity" />
 
         <meta-data
@@ -56,6 +48,26 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-      </application>
+
+        <activity
+            android:name=".activities.GPSscanner"
+            android:label="@string/title_activity_gpsscanner"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".activities.InsectPicker"
+            android:label="@string/title_activity_insect_picker"></activity>
+        <activity
+            android:name=".activities.EvaluationActivity"
+            android:label="@string/title_activity_evaluation">
+
+        </activity>
+
+        <service
+            android:name=".services.CachedSyncService"
+            android:exported="false" />
+        <service
+            android:name=".services.RequestSyncService"
+            android:exported="false" />
+    </application>
 
 </manifest>

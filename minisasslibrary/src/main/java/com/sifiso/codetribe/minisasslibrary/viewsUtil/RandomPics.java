@@ -59,7 +59,7 @@ public class RandomPics {
                     break;
                 case 6:
                     v.setImageDrawable(ctx.getResources().getDrawable(R.drawable.greatkeiriver));
-                    txt.setText("GreatKei River");
+                    txt.setText("GreatKoi River");
                     break;
                 case 7:
                     v.setImageDrawable(ctx.getResources().getDrawable(R.drawable.komatiriver));

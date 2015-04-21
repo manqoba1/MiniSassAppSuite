@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:padding="5dp">
+
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout2"
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true">
+
+        <LinearLayout
+            android:id="@+id/hear_lay"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/RLI_image"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <TextView
+                android:id="@+id/RLI_river_name"
+                style="@style/Title3TextStyleBlack"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_toEndOf="@+id/RLI_image"
+                android:layout_weight="2"
+                android:gravity="center"
+                android:text="greatkoi River "
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <ImageView
+                android:id="@+id/RLI_map_eval"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
+                android:layout_weight="1"
+                android:backgroundTint="@color/white"
+                android:scaleType="fitXY"
+
+                android:src="@android:drawable/ic_menu_mapmode"
+                android:tint="@color/green" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/RLI_image"
+            android:layout_width="@dimen/image_margin"
+            android:layout_height="@dimen/image_margin"
+            android:scaleType="fitXY"
+            android:src="@drawable/limpoporiver" />
+
+
+        <LinearLayout
+            android:id="@+id/hear_lay2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="20dp"
+            android:layout_below="@+id/hear_lay"
+            android:layout_alignStart="@+id/hear_lay">
+
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@+id/textView5"
+                android:layout_below="@+id/RLI_map_eval"
+                android:layout_weight="2"
+                android:text="Evaluations"
+                android:textSize="@dimen/font_circle_text"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/SaddleBrown" />
+
+            <TextView
+                android:id="@+id/RLI_evaluation"
+                style="@style/BrownCircleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/textView3"
+                android:layout_toStartOf="@+id/RLI_map_eval"
+                android:layout_weight="1"
+                android:text="1"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/hear_lay3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="20dp"
+            android:layout_alignEnd="@+id/hear_lay2"
+            android:layout_below="@+id/hear_lay2"
+            android:layout_toEndOf="@+id/RLI_image">
+
+
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/RLI_image"
+                android:layout_centerHorizontal="true"
+                android:layout_weight="2"
+                android:text="Townships"
+                android:textSize="@dimen/font_circle_text"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/purple" />
+
+            <TextView
+                android:id="@+id/RLI_town"
+                style="@style/PurpleCircleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:layout_alignStart="@+id/RLI_evaluation"
+                android:layout_alignTop="@+id/textView5"
+                android:text="1"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/AntiqueWhite"
+            android:orientation="vertical"
+            android:padding="8dp"
+            android:layout_below="@+id/RLI_image"
+            android:layout_alignEnd="@+id/hear_lay2"
+            android:layout_marginTop="90dp">
+
+            <LinearLayout
+                android:id="@+id/linearLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/RLI_town"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView6"
+                    style="@style/TextStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Origin Country"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                <TextView
+                    android:id="@+id/textView7"
+                    style="@style/TextStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="End Country"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/linearLayout"
+                android:layout_marginTop="@dimen/padding_top_10"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/RLI_start"
+                    style="@style/TextStyleSmallNormal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Small Text"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                <TextView
+                    android:id="@+id/RLI_end"
+                    style="@style/TextStyleBlueSmallNormal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="Small Text"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+            </LinearLayout>
+        </LinearLayout>
+
+    </RelativeLayout>
+
+
+</RelativeLayout>

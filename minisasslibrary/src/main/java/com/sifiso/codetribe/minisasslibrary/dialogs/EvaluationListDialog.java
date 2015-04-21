@@ -21,6 +21,7 @@ import android.widget.ListView;
 import com.sifiso.codetribe.minisasslibrary.R;
 import com.sifiso.codetribe.minisasslibrary.adapters.EvaluationAdapter;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationDTO;
+import com.sifiso.codetribe.minisasslibrary.dto.EvaluationInsectDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationSiteDTO;
 
 import java.util.ArrayList;
@@ -103,6 +104,11 @@ public class EvaluationListDialog extends DialogFragment {
 
             @Override
             public void onEvaluationRequest(List<EvaluationSiteDTO> siteList) {
+
+            }
+
+            @Override
+            public void onViewInsect(List<EvaluationInsectDTO> insectImage) {
 
             }
         });

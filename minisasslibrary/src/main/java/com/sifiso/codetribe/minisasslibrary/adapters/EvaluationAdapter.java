@@ -14,7 +14,9 @@ import android.widget.TextView;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.sifiso.codetribe.minisasslibrary.R;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationDTO;
+import com.sifiso.codetribe.minisasslibrary.dto.EvaluationInsectDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationSiteDTO;
+import com.sifiso.codetribe.minisasslibrary.dto.InsectImageDTO;
 import com.sifiso.codetribe.minisasslibrary.util.Util;
 
 import java.util.Date;
@@ -51,7 +53,7 @@ public class EvaluationAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View v, ViewGroup parent) {
-        Holder h;
+        final Holder h;
         if (v == null) {
             h = new Holder();
             LayoutInflater inflater = (LayoutInflater) mCtx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -70,7 +72,7 @@ public class EvaluationAdapter extends BaseAdapter {
         } else {
             h = (Holder) v.getTag();
         }
-        EvaluationDTO site = mList.get(position);
+        final EvaluationDTO site = mList.get(position);
 
         h.ELI_team.setText(site.getTeamName());
 
@@ -85,6 +87,18 @@ public class EvaluationAdapter extends BaseAdapter {
         } else {
             h.ELI_remarks.setVisibility(View.VISIBLE);
         }
+        h.ELI_score.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Util.flashOnce(h.ELI_score,200,new Util.UtilAnimationListener() {
+                    @Override
+                    public void onAnimationEnded() {
+                        mListener.onViewInsect(site.getEvaluationInsectList());
+                    }
+                });
+
+            }
+        });
         h.ELI_remarks.setText(site.getRemarks());
         switch (site.getConditionsID()) {
             case 1:
@@ -138,6 +152,6 @@ public class EvaluationAdapter extends BaseAdapter {
 
         public void onEvaluationRequest(List<EvaluationSiteDTO> siteList);
 
-
+        public void onViewInsect(List<EvaluationInsectDTO> insectImage);
     }
 }

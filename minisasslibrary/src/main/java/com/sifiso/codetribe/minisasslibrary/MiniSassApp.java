@@ -47,7 +47,7 @@ public class MiniSassApp extends Application {
         sb.append("\n\n\n#######################################\n");
         sb.append("#######################################\n");
         sb.append("###\n");
-        sb.append("###  Monitor App has started\n");
+        sb.append("###  Minisass App has started\n");
         sb.append("###\n");
         sb.append("#######################################\n\n");
 
@@ -71,6 +71,9 @@ public class MiniSassApp extends Application {
                         .build();
 
         File cacheDir = StorageUtils.getCacheDirectory(this, true);
+        if(cacheDir !=null){
+            StorageUtils.getCacheDirectory(this, true).deleteOnExit();
+        }
         Log.d(LOG, "## onCreate, ImageLoader cacheDir, files: " + cacheDir.listFiles().length);
         //
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this)
@@ -80,11 +83,13 @@ public class MiniSassApp extends Application {
                 .defaultDisplayImageOptions(defaultOptions)
                 .build();
 
-        ImageLoader.getInstance().init(config);
-        L.writeDebugLogs(false);
-        L.writeLogs(false);
+        if( ImageLoader.getInstance() == null) {
+            ImageLoader.getInstance().init(config);
+            L.writeDebugLogs(false);
+            L.writeLogs(false);
 
-        Log.w(LOG, "###### ImageLoaderConfiguration has been initialised");
+            Log.w(LOG, "###### ImageLoaderConfiguration has been initialised");
+        }
     }
 
     public enum TrackerName {

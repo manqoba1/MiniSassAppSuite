@@ -44,7 +44,7 @@ public class RequestSyncService extends IntentService {
         Log.w(LOG, "FIRED: RequestSyncService, onHandleIntent");
         FileInputStream stream;
         try {
-            stream = getApplicationContext().openFileInput("requestCace.json");
+            stream = getApplicationContext().openFileInput("requestCache.json");
             String json = getStringFromInputStream(stream);
             RequestCache cache = gson.fromJson(json, RequestCache.class);
             if (cache != null) {
@@ -59,6 +59,7 @@ public class RequestSyncService extends IntentService {
             }
         } catch (FileNotFoundException e) {
             Log.i(LOG, "fileNotFoundException, there is no request cache currently");
+            //onHandleIntent(null);
             requestSyncListener.onTasksSynced(0, 0);
         } catch (Exception e) {
             Log.e(LOG, "there's an issue with the sync", e);

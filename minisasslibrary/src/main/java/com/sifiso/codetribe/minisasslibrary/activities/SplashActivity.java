@@ -105,6 +105,11 @@ public class SplashActivity extends ActionBarActivity {
         super.onDestroy();
     }
 
+    @Override
+    public void onBackPressed() {
+
+        super.onBackPressed();
+    }
 
     @Override
     protected void onPause() {
