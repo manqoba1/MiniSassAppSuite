@@ -56,6 +56,8 @@ public class InsectPicker extends ActionBarActivity {
         SD_list.setAdapter(adapter);
     }
 
+
+
     private void collectCheckedInsects(InsectImageDTO mDtos) {
         if (listCal == null) {
             listCal = new ArrayList<>(mSites.size());
@@ -83,7 +85,11 @@ public class InsectPicker extends ActionBarActivity {
 
     Intent intent;
     static final int INSECT_DATA = 103;
-
+    @Override
+    public void onPause() {
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+        super.onPause();
+    }
     @Override
     public void onBackPressed() {
         intent = new Intent(InsectPicker.this, EvaluationActivity.class);
@@ -125,6 +131,7 @@ public class InsectPicker extends ActionBarActivity {
             intent.putExtra("overallInsect", (java.io.Serializable) mSites);
             intent.putExtra("selectedInsects", (java.io.Serializable) listCal);
             setResult(INSECT_DATA, intent);
+            finish();
         }
         return super.onOptionsItemSelected(item);
     }

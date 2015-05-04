@@ -46,6 +46,7 @@ import com.sifiso.codetribe.minisasslibrary.adapters.PopupListAdapter;
 import com.sifiso.codetribe.minisasslibrary.adapters.PopupRiverAdapter;
 import com.sifiso.codetribe.minisasslibrary.dto.CategoryDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationInsectDTO;
+import com.sifiso.codetribe.minisasslibrary.dto.InsectDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.TownDTO;
 
@@ -685,8 +686,8 @@ public class Util {
         pop.show();
     }
     public static void showPopupInsectsSelected(Context ctx, Activity act,
-                                                   List<EvaluationInsectDTO> list,
-                                                   View anchorView, String caption, final UtilPopupListener listener) {
+                                                   final List<EvaluationInsectDTO> list,
+                                                   View anchorView, String caption, final UtilPopupInsectListener listener) {
         final ListPopupWindow pop = new ListPopupWindow(act);
         LayoutInflater inf = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View v = inf.inflate(R.layout.insect_popup, null);
@@ -714,7 +715,7 @@ public class Util {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 pop.dismiss();
                 if (listener != null) {
-                    listener.onItemSelected(position);
+                    listener.onInsectSelected(list.get(position).getInsect());
                 }
             }
         });
@@ -1566,5 +1567,9 @@ public class Util {
 
     public interface UtilPopupListener {
         public void onItemSelected(int index);
+
+    }
+    public interface UtilPopupInsectListener{
+        public void onInsectSelected(InsectDTO insect);
     }
 }

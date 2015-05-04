@@ -52,14 +52,15 @@
 
             <TextView
                 android:id="@+id/edtTown"
-                style="@style/Title4TextStyleBlue"
+                style="@style/Title4TextStyleGray"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/edtRegTeamName"
                 android:layout_marginTop="10dp"
                 android:focusable="false"
+
                 android:hint="Select Town"
-                android:textColorHint="@color/navy_blue" />
+                android:textColorHint="@color/gray" />
         </LinearLayout>
 
         <LinearLayout
@@ -122,17 +123,17 @@
             android:id="@+id/btnLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
             android:layout_below="@+id/fieldsLayout2"
+            android:background="@color/white"
             android:orientation="horizontal">
 
             <Button
                 android:id="@+id/btnReg"
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@color/OrangeRed"
-                android:text="RESISTER"
+                android:text="Register"
                 android:textColor="@color/white"
                 android:textStyle="bold" />
         </LinearLayout>

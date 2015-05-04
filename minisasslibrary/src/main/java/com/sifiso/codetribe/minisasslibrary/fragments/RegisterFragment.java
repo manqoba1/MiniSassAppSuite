@@ -124,29 +124,36 @@ public class RegisterFragment extends Fragment implements PageFragment {
                 sendRegistration();
             }
         });
+        rsTeamName.setError("Required field");
+        rsTown.setError("Required field");
 
+        rsMemberEmail.setError("Required field");
+        rsMemberName.setError("Required field");
     }
 
     public void sendRegistration() {
 
-        if (rsTeamName.getText() == null) {
-            Toast.makeText(ctx, "Enter Team Name", Toast.LENGTH_SHORT).show();
+        if (rsTeamName.getText().toString().isEmpty()) {
+            //Toast.makeText(ctx, "Enter Team Name", Toast.LENGTH_SHORT).show();
+            rsTeamName.setError("Enter team name");
             return;
         }
 
-        if (rsTown.getText() == null && townID == null) {
-
-            Toast.makeText(ctx, "Select Towmn", Toast.LENGTH_SHORT).show();
+        if (rsTown.getText().toString().isEmpty() && townID == null) {
+            rsTown.setError("Select town");
+            //Toast.makeText(ctx, "Select Town", Toast.LENGTH_SHORT).show();
             return;
         }
 
 
-        if (rsMemberSurname.getText() == null) {
-            Toast.makeText(ctx, "Enter Last Name", Toast.LENGTH_SHORT).show();
+        if (rsMemberSurname.getText().toString().isEmpty()) {
+            rsMemberSurname.setError("Enter last name");
+            // Toast.makeText(ctx, "Enter Last Name", Toast.LENGTH_SHORT).show();
             return;
         }
         if (rsMemberEmail.getText().toString().isEmpty()) {
-            Toast.makeText(ctx, "Enter Enail Address", Toast.LENGTH_SHORT).show();
+            rsMemberEmail.setError("Enter email address");
+            //Toast.makeText(ctx, "Enter Email Address", Toast.LENGTH_SHORT).show();
             return;
         }
 

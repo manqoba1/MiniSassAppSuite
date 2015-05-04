@@ -59,7 +59,7 @@
             android:layout_alignParentStart="true"
             android:layout_below="@+id/textView"
             android:layout_marginTop="10dp"
-            android:text="Number of Groups"
+            android:text="Number of insect Groups"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <TextView
@@ -98,6 +98,7 @@
                 android:layout_marginRight="10dp"
                 style="@style/TextStyleSmall"
                 android:text="0.0"
+                android:textColor="@color/red"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
             <ImageView
@@ -107,7 +108,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentTop="true"
                 android:layout_marginRight="5dp"
-                android:src="@drawable/ic_insect" />
+                android:src="@drawable/red_crap" />
 
             <TextView
                 android:id="@+id/TV_score_status"
@@ -116,7 +117,8 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/TV_avg_score"
                 android:layout_marginTop="15dp"
-                android:text="not specified"
+                android:text="Not specified"
+                android:textColor="@color/red"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
         </RelativeLayout>
 

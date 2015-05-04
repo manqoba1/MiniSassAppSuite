@@ -56,7 +56,7 @@ public class Welcome extends ActionBarActivity {
         imageView = (ImageView) findViewById(R.id.imgBackground);
         // imageText = (TextView) findViewById(com.sifiso.codetribe.minisasslibrary.R.id.imageText);
         //flashImages();
-        //checkVirgin();
+        checkVirgin();
         bLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -122,7 +122,7 @@ public class Welcome extends ActionBarActivity {
 
             }
 
-            Intent intent = new Intent(ctx, EvaluationView.class);
+            Intent intent = new Intent(ctx, MainPagerActivity.class);
             startActivity(intent);
             finish();
             return;

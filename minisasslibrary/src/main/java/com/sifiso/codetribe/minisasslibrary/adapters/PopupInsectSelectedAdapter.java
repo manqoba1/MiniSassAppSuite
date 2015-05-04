@@ -64,24 +64,27 @@ public class PopupInsectSelectedAdapter extends ArrayAdapter<EvaluationInsectDTO
 
             item.image = (ImageView) convertView
                     .findViewById(R.id.image1);
-
+            item.score_weight =(TextView) convertView.findViewById(R.id.score_weight);
             convertView.setTag(item);
         } else {
             item = (ViewHolderItem) convertView.getTag();
         }
 
-        item.image.setImageDrawable(ctx.getResources().getDrawable(R.drawable.ic_insect));
-
         item.image.setColorFilter(ctx.getResources().getColor(R.color.blue), PorterDuff.Mode.MULTIPLY);
+        item.image.setImageDrawable(ctx.getResources().getDrawable(R.drawable.ic_action_crab));
+
+
         final EvaluationInsectDTO insect = mList.get(position);
         item.txtString.setText(insect.getInsect().getGroupName());
-
+        item.score_weight.setText(insect.getInsect().getSensitivityScore()+"");
         Statics.setRobotoFontLight(ctx, item.txtString);
+        Statics.setRobotoFontLight(ctx, item.score_weight);
         return (convertView);
     }
 
     static class ViewHolderItem {
-        TextView txtString;
+        TextView txtString,score_weight;
         ImageView image;
+
     }
 }

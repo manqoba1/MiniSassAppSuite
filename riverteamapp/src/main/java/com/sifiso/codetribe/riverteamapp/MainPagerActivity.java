@@ -21,11 +21,14 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.sifiso.codetribe.minisasslibrary.MiniSassApp;
 import com.sifiso.codetribe.minisasslibrary.activities.EvaluationActivity;
 import com.sifiso.codetribe.minisasslibrary.activities.GPSscanner;
 import com.sifiso.codetribe.minisasslibrary.activities.MapsActivity;
+import com.sifiso.codetribe.minisasslibrary.activities.TeamMemberActivity;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationSiteDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverTownDTO;
@@ -273,15 +276,12 @@ public class MainPagerActivity extends ActionBarActivity implements CreateEvalua
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.add_member) {
+            Intent intent = new Intent(MainPagerActivity.this, TeamMemberActivity.class);
+            startActivity(intent);
             return true;
         }
-        if (id == R.id.action_add) {
-            Intent evaluateIntent = new Intent(ctx, EvaluationActivity.class);
-            evaluateIntent.putExtra("response", response);
-            startActivity(evaluateIntent);
-            return true;
-        }
+
 
         return super.onOptionsItemSelected(item);
     }
@@ -348,7 +348,7 @@ public class MainPagerActivity extends ActionBarActivity implements CreateEvalua
 
     @Override
     public void onRefreshMap(RiverDTO river, int result) {
-        Intent intent = new Intent(MainPagerActivity.this, MapsActivity.class);
+        Intent intent = new Intent(MainPagerActivity.this, com.sifiso.codetribe.riverteamapp.MapsActivity.class);
         intent.putExtra("river", river);
         intent.putExtra("displayType", result);
         startActivity(intent);
@@ -460,7 +460,7 @@ public class MainPagerActivity extends ActionBarActivity implements CreateEvalua
     public void getData() {
         RequestDTO req = new RequestDTO();
         req.setRequestType(RequestDTO.GET_DATA);
-
+        req.setCountryCode("ZA");
         try {
 
             WebSocketUtil.sendRequest(ctx, Statics.MINI_SASS_ENDPOINT, req, new WebSocketUtil.WebSocketListener() {

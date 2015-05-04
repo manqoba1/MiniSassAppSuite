@@ -29,7 +29,7 @@
             android:tint="@color/blue"
             android:visibility="gone" />
 
-        <EditText
+        <AutoCompleteTextView
             android:id="@+id/SLT_editSearch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

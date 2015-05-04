@@ -19,11 +19,13 @@ import android.widget.Toast;
 
 import com.sifiso.codetribe.minisasslibrary.R;
 import com.sifiso.codetribe.minisasslibrary.activities.EvaluationActivity;
+import com.sifiso.codetribe.minisasslibrary.activities.InsectBrowser;
 import com.sifiso.codetribe.minisasslibrary.activities.MapsActivity;
 import com.sifiso.codetribe.minisasslibrary.adapters.EvaluationAdapter;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationInsectDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationSiteDTO;
+import com.sifiso.codetribe.minisasslibrary.dto.InsectDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ResponseDTO;
 import com.sifiso.codetribe.minisasslibrary.services.CreateEvaluationListener;
 import com.sifiso.codetribe.minisasslibrary.util.Util;
@@ -86,7 +88,8 @@ public class EvaluationListFragment extends Fragment implements PageFragment {
     private Context ctx;
     ResponseDTO response;
     private List<EvaluationDTO> evaluationList;
-Activity activity;
+    Activity activity;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -129,7 +132,6 @@ Activity activity;
     }
 
 
-
     private void setList() {
         if (evaluationList == null) evaluationList = new ArrayList<>();
         LayoutInflater inf = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -152,10 +154,13 @@ Activity activity;
                /* if(insectImage != null){
                     return;
                 }*/
-                Util.showPopupInsectsSelected(ctx,activity,insectImage,SLT_hero,ctx.getResources().getString(R.string.insect_selected),new Util.UtilPopupListener() {
+                Util.showPopupInsectsSelected(ctx, activity, insectImage, SLT_hero, ctx.getResources().getString(R.string.insect_selected), new Util.UtilPopupInsectListener() {
                     @Override
-                    public void onItemSelected(int index) {
-
+                    public void onInsectSelected(InsectDTO insect) {
+                        Intent intent = new Intent(activity.getApplicationContext(), InsectBrowser.class);
+                        intent.putExtra("insect",insect);
+                        startActivity(intent);
+                       // Toast.makeText(ctx, insect.getGroupName(), Toast.LENGTH_LONG).show();
                     }
                 });
             }

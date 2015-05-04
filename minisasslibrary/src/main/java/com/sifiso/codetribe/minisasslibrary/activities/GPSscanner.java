@@ -1,11 +1,15 @@
 package com.sifiso.codetribe.minisasslibrary.activities;
 
 import android.animation.ObjectAnimator;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.SystemClock;
+import android.provider.Settings;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,9 +23,10 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
+
+import android.location.LocationListener;
+
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.sifiso.codetribe.minisasslibrary.R;
@@ -31,18 +36,20 @@ import com.sifiso.codetribe.minisasslibrary.services.CachedSyncService;
 import com.sifiso.codetribe.minisasslibrary.util.Statics;
 import com.sifiso.codetribe.minisasslibrary.util.Util;
 
-public class GPSscanner extends ActionBarActivity implements LocationListener,
-        GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener,
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class GPSscanner extends ActionBarActivity implements LocationListener {
     static final String LOG = GPSscanner.class.getSimpleName();
-    Location mCurrentLocation;
-    GoogleApiClient mLocationClient;
+    //Location mCurrentLocation;
+    // GoogleApiClient mLocationClient;
     ResponseDTO response;
     Location location;
-    LocationRequest mLocationRequest;
-
+    // LocationRequest mLocationRequest;
+    LocationManager locationManager;
     static final int GPS_DATA = 102;
-    //
+    public boolean isGPSEnabled = false;
+    public boolean isNetworkEnabled = false;
+    public boolean canGetLocation = false;
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 2;
+    private static final long MIN_TIME_BW_UPDATES = 1;
     TextView desiredAccuracy, txtLat, txtLng, txtAccuracy;
     RelativeLayout GPS_nameLayout;
 
@@ -63,13 +70,19 @@ public class GPSscanner extends ActionBarActivity implements LocationListener,
         ctx = getApplicationContext();
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        mLocationClient = new GoogleApiClient.Builder(this)
+       /* mLocationClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
-        mLocationClient.connect();
+        mLocationClient.connect();*/
+        evaluationSite = new EvaluationSiteDTO();
         setFields();
+    }
+
+    private Location getLocation() {
+        onLocationChanged(location);
+        return location;
     }
 
     private void setFields() {
@@ -133,26 +146,28 @@ public class GPSscanner extends ActionBarActivity implements LocationListener,
     }
 
     public void startScan() {
-        getGPSCoordinates();
-        txtAccuracy.setText("0.00");
+        //getGPSCoordinates();
+        getLocation();
+        //txtAccuracy.setText("0.00");
         chronometer.setBase(SystemClock.elapsedRealtime());
         chronometer.start();
         isScanning = true;
 
     }
 
-    public void setLocation(Location location) {
+    public void setLocation(Location loc) {
         if (evaluationSite == null) {
             evaluationSite = new EvaluationSiteDTO();
         }
-        this.location = location;
-        txtLat.setText("" + location.getLatitude());
-        txtLng.setText("" + location.getLongitude());
-        txtAccuracy.setText("" + location.getAccuracy());
+        this.location = loc;
+        txtLat.setText("" + loc.getLatitude());
+        txtLng.setText("" + loc.getLongitude());
+        txtAccuracy.setText("" + loc.getAccuracy());
 
         evaluationSite.setLatitude(location.getLatitude());
         evaluationSite.setLongitude(location.getLongitude());
         evaluationSite.setAccuracy(location.getAccuracy());
+
         Util.flashSeveralTimes(hero, 200, 2, null);
         if (location.getAccuracy() == seekBar.getProgress()
                 || location.getAccuracy() < seekBar.getProgress()) {
@@ -162,6 +177,8 @@ public class GPSscanner extends ActionBarActivity implements LocationListener,
             evaluationSite.setLatitude(location.getLatitude());
             evaluationSite.setLongitude(location.getLongitude());
             evaluationSite.setAccuracy(location.getAccuracy());
+            Log.i(LOG,
+                    "### onStart l, " + location.getAccuracy());
             GPS_nameLayout.setVisibility(View.VISIBLE);
             stopScan();
             return;
@@ -191,7 +208,7 @@ public class GPSscanner extends ActionBarActivity implements LocationListener,
         // super.onBackPressed();
     }
 
-    private void getGPSCoordinates() {
+   /* private void getGPSCoordinates() {
         if (!mLocationClient.isConnected()) {
             mLocationClient.connect();
         }
@@ -209,7 +226,7 @@ public class GPSscanner extends ActionBarActivity implements LocationListener,
         } catch (IllegalStateException e) {
             Log.e(LOG, "---- mLocationClient.requestLocationUpdates ILLEGAL STATE", e);
         }
-    }
+    }*/
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -221,13 +238,13 @@ public class GPSscanner extends ActionBarActivity implements LocationListener,
         super.onConfigurationChanged(newConfig);
     }
 
-    private void stopPeriodicUpdates() {
+  /*  private void stopPeriodicUpdates() {
         LocationServices.FusedLocationApi.removeLocationUpdates(
                 mLocationClient, this
         );
         Log.e(LOG,
                 "#################### stopPeriodicUpdates - removeLocationUpdates");
-    }
+    }*/
 
     @Override
     public void onStart() {
@@ -236,11 +253,11 @@ public class GPSscanner extends ActionBarActivity implements LocationListener,
                 "### onStart, binding RequestSyncService and PhotoUploadService");
         Intent intent = new Intent(this, CachedSyncService.class);
 //        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-        if (mLocationClient != null) {
+       /* if (mLocationClient != null) {
             mLocationClient.connect();
             Log.i(LOG,
                     "### onStart - locationClient connecting ... ");
-        }
+        }*/
 //        getGPSCoordinates();
         startScan();
     }
@@ -277,7 +294,8 @@ public class GPSscanner extends ActionBarActivity implements LocationListener,
     public void onStop() {
         Log.d(LOG,
                 "#################### onStop");
-        if (mLocationClient != null) {
+        stopScan();
+       /* if (mLocationClient != null) {
             if (mLocationClient.isConnected()) {
                 stopScan();
             }
@@ -285,13 +303,13 @@ public class GPSscanner extends ActionBarActivity implements LocationListener,
             mLocationClient.disconnect();
             Log.e(LOG, "### onStop - locationClient isConnected: "
                     + mLocationClient.isConnected());
-        }
+        }*/
 
 
         super.onStop();
     }
 
-    @Override
+    /*@Override
     public void onConnected(Bundle bundle) {
         Log.i(LOG,
                 "### ---> PlayServices onConnected() - gotta start something! >>");
@@ -309,17 +327,86 @@ public class GPSscanner extends ActionBarActivity implements LocationListener,
     @Override
     public void onDisconnected() {
 
-    }
+    }*/
 
     @Override
     public void onLocationChanged(Location loc) {
-        Log.w(LOG, "### Location changed, lat: "
+       /* Log.w(LOG, "### Location changed, lat: "
                 + loc.getLatitude() + " lng: "
                 + loc.getLongitude()
-                + " -- acc: " + loc.getAccuracy());
-        mCurrentLocation = loc;
+                + " -- acc: " + loc.getAccuracy());*/
+        locationManager = (LocationManager) ctx.getSystemService(Context.LOCATION_SERVICE);
+        isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+
+        Log.v(LOG + " gps", "=" + isGPSEnabled);
+
+        isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+        Log.v(LOG + " network", "=" + isNetworkEnabled);
+
+        if (isGPSEnabled == false && isNetworkEnabled == false) {
+            Log.d(LOG, "is not connected");
+            showSettingDialog();
+        } else {
+            canGetLocation = true;
+            if (isNetworkEnabled) {
+                location = null;
+                locationManager.requestLocationUpdates(
+                        LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES,
+                        MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                Log.d(LOG, "Network");
+                if (locationManager != null) {
+                    location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                    if (location != null) {
+                        setGPSLocation(location);
+                    }
+                }
+            }
+
+            if (isGPSEnabled) {
+                location = null;
+                if (location == null) {
+                    locationManager.requestLocationUpdates(
+                            LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES,
+                            MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                    Log.d(LOG, "GPs");
+                    if (locationManager != null) {
+                        location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                        if (location != null) {
+                            setGPSLocation(location);
+                        }
+                    }
+                }
+            }
+
+        }
+    }
+
+    public void showSettingDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(GPSscanner.this);
+
+        builder.setTitle("GPS settings");
+        builder.setMessage("GPS is not enabled. Do you want to go to settings menu, to search for location?");
+        builder.setPositiveButton("Settings", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                startActivity(intent);
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
+    }
+
+    private void setGPSLocation(Location loc) {
         setLocation(loc);
 
+        Log.w(LOG, "### Passing " + loc.getAccuracy());
         if (loc.getAccuracy() <= ACCURACY_THRESHOLD) {
             location = loc;
             Log.w(LOG, "### Passing location2");
@@ -333,19 +420,44 @@ public class GPSscanner extends ActionBarActivity implements LocationListener,
         }
     }
 
-    public void stopScan() {
-        stopPeriodicUpdates();
-        // listener.onLocationConfirmed(evaluationSite);
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
 
-        isScanning = false;
-
-        chronometer.stop();
     }
 
     @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
+    public void onProviderEnabled(String provider) {
 
     }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
+
+    public void stopScan() {
+        //stopPeriodicUpdates();
+        // listener.onLocationConfirmed(evaluationSite);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                chronometer.stop();
+            }
+        });
+
+        if (locationManager != null) {
+            locationManager.removeUpdates(GPSscanner.this);
+            isScanning = false;
+
+
+        }
+
+    }
+
+   /* @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+    }*/
 
     static final int ACCURACY_THRESHOLD = 5;
 }

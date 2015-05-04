@@ -120,7 +120,7 @@ public class RiverAdapter extends BaseAdapter {
                 mListener.onMapRequest(dto, EVALUATION_VIEW);
             }
         });
-        animateView(v);
+        //animateView(v);
         return v;
     }
 

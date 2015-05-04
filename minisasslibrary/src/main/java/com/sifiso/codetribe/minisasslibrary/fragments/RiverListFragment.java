@@ -11,6 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -30,6 +32,7 @@ import com.sifiso.codetribe.minisasslibrary.services.CreateEvaluationListener;
 import com.sifiso.codetribe.minisasslibrary.util.ToastUtil;
 import com.sifiso.codetribe.minisasslibrary.util.Util;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -43,7 +46,7 @@ public class RiverListFragment extends Fragment implements PageFragment {
     CreateEvaluationListener mListener;
     private Context ctx;
     private Activity activity;
-    private EditText SLT_editSearch;
+    private AutoCompleteTextView SLT_editSearch;
     private ImageView SLT_imgSearch2, SLT_hero;
     private ListView RL_riverList;
 
@@ -75,7 +78,7 @@ public class RiverListFragment extends Fragment implements PageFragment {
     }
 
     private void setField() {
-        SLT_editSearch = (EditText) v.findViewById(R.id.SLT_editSearch);
+        SLT_editSearch = (AutoCompleteTextView) v.findViewById(R.id.SLT_editSearch);
         SLT_hero = (ImageView) v.findViewById(R.id.SLT_hero);
 
         SLT_imgSearch2 = (ImageView) v.findViewById(R.id.SLT_imgSearch2);
@@ -93,6 +96,19 @@ public class RiverListFragment extends Fragment implements PageFragment {
         SLT_hero.setImageDrawable(Util.getRandomHeroImage(ctx));
 
         setListView();
+        riverToSearch();
+    }
+
+    List<String> stringRiver;
+
+    private void riverToSearch() {
+        stringRiver = new ArrayList<>();
+        for (int i = 0; i < response.getRiverList().size(); i++) {
+            RiverDTO riverText = response.getRiverList().get(i);
+            stringRiver.add(riverText.getRiverName());
+        }
+        ArrayAdapter<String> riverSearchAdapter = new ArrayAdapter<String>(ctx, R.layout.xsimple_spinner_dropdown_item, stringRiver);
+        SLT_editSearch.setAdapter(riverSearchAdapter);
     }
 
     private void searchRiver() {
@@ -184,7 +200,6 @@ public class RiverListFragment extends Fragment implements PageFragment {
     public void animateCounts() {
 
     }
-
 
 
     static final int EVALUATION_VIEW = 12;

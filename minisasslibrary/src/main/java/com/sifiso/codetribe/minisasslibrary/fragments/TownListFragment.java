@@ -5,16 +5,23 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.sifiso.codetribe.minisasslibrary.R;
 import com.sifiso.codetribe.minisasslibrary.adapters.TownAdapter;
+import com.sifiso.codetribe.minisasslibrary.dto.RiverDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverTownDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.TeamDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.TownDTO;
+import com.sifiso.codetribe.minisasslibrary.util.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +34,10 @@ import java.util.List;
  */
 public class TownListFragment extends Fragment implements PageFragment {
     ListView FTL_townList;
+    private AutoCompleteTextView SLT_editSearch;
+    private ImageView SLT_imgSearch2, SLT_hero;
+    boolean isFound;
+    String searchText;
 
     public TownListFragment() {
         // Required empty public constructor
@@ -42,7 +53,20 @@ public class TownListFragment extends Fragment implements PageFragment {
 
     private void setField() {
         FTL_townList = (ListView) v.findViewById(R.id.FTL_townList);
+        SLT_imgSearch2 = (ImageView) v.findViewById(R.id.SLT_imgSearch2);
+        SLT_editSearch = (AutoCompleteTextView) v.findViewById(R.id.SLT_editSearch);
+        SLT_hero = (ImageView) v.findViewById(R.id.SLT_hero);
+        SLT_imgSearch2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                searchRiver();
+            }
+        });
+
+        SLT_hero.setImageDrawable(Util.getRandomHeroImage(ctx));
         setList();
+        riverToSearch();
     }
 
     View v;
@@ -61,9 +85,11 @@ public class TownListFragment extends Fragment implements PageFragment {
         setField();
         return v;
     }
-public String getTownName(){
-    return riverTownList.get(0).getRiver().getRiverName();
-}
+
+    public String getTownName() {
+        return riverTownList.get(0).getRiver().getRiverName();
+    }
+
     private List<RiverTownDTO> riverTownList;
     private List<TownDTO> townList;
     private TownAdapter adapter;
@@ -89,6 +115,49 @@ public String getTownName(){
         });
 
         FTL_townList.setAdapter(adapter);
+    }
+
+    List<String> stringRiver;
+
+    private void riverToSearch() {
+        stringRiver = new ArrayList<>();
+        for (int i = 0; i < riverTownList.size(); i++) {
+
+            RiverTownDTO riverText = riverTownList.get(i);
+            stringRiver.add(riverText.getTown().getTownName());
+        }
+        ArrayAdapter<String> riverSearchAdapter = new ArrayAdapter<String>(ctx, R.layout.xsimple_spinner_dropdown_item, stringRiver);
+        SLT_editSearch.setAdapter(riverSearchAdapter);
+    }
+
+    private void searchRiver() {
+        if (SLT_editSearch.getText().toString().isEmpty()) {
+            return;
+        }
+        int index = 0;
+        searchText = SLT_editSearch.getText().toString();
+        for (int i = 0; i < riverTownList.size(); i++) {
+            RiverTownDTO searchRiver = riverTownList.get(i);
+            if (searchRiver.getTown().getTownName().contains(searchText)) {
+                isFound = true;
+                break;
+            }
+            index++;
+        }
+        if (isFound) {
+            FTL_townList.setSelection(index);
+
+
+        } else {
+            Util.showToast(ctx, ctx.getString(R.string.river_not_found) + " " + SLT_editSearch.getText().toString());
+        }
+        hideKeyboard();
+    }
+
+    void hideKeyboard() {
+        InputMethodManager imm = (InputMethodManager) ctx
+                .getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(SLT_editSearch.getWindowToken(), 0);
     }
 
     @Override

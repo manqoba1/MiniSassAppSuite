@@ -14,7 +14,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
@@ -45,9 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class MapsActivity extends FragmentActivity implements LocationListener,
-        GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener,
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class MapsActivity extends FragmentActivity implements LocationListener {
 
     GoogleMap googleMap;
     GoogleApiClient mGoogleApiClient;
@@ -88,11 +85,11 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         river = (RiverDTO) getIntent().getSerializableExtra("river");
         index = getIntent().getIntExtra("index", 0);
         int displayType = getIntent().getIntExtra("displayType", EVALUATION_VIEW);
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
+       /* mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
-                .build();
+                .build();*/
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         text = (TextView) findViewById(R.id.textMap);
@@ -110,7 +107,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         googleMap = mapFragment.getMap();
         if (googleMap == null) {
             Util.showToast(ctx, getString(R.string.map_unavailable));
-            finish();
+           // finish();
             return;
         }
 
@@ -315,25 +312,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
     }
 
-    @Override
-    public void onConnected(Bundle bundle) {
 
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onDisconnected() {
-
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-
-    }
 
     @Override
     public void onBackPressed() {

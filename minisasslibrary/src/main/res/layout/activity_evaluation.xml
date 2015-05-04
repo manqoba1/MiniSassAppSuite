@@ -58,7 +58,7 @@
                 android:background="@drawable/xsquare_blue"
                 android:drawablePadding="10dp"
                 android:drawableRight="@android:drawable/ic_menu_save"
-                android:text="create Evaluation"
+                android:text="Save"
                 android:textColor="@color/white" />
 
             <ImageView

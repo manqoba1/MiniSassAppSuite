@@ -33,7 +33,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
@@ -59,9 +58,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class PictureActivity extends ActionBarActivity implements LocationListener,
-        GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener,
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
+public class PictureActivity extends ActionBarActivity implements LocationListener{
 
     LocationRequest mLocationRequest;
 
@@ -103,11 +100,11 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
         setFields();
 
         evaluationImage = (EvaluationImageDTO) getIntent().getSerializableExtra("evaluationImage");
-        googleApiClient = new GoogleApiClient.Builder(this)
+       /* googleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
-                .build();
+                .build();*/
 
         setTitle(getString(R.string.evaluation_image_pics));
         Util.showToast(ctx, "Start taking pictures for evaluation image");
@@ -380,10 +377,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
         super.onSaveInstanceState(b);
     }
 
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
 
-    }
 
     class PhotoTask extends AsyncTask<Void, Void, Integer> {
 
@@ -790,7 +784,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
     }
 
 
-    @Override
+   /* @Override
     public void onConnected(Bundle bundle) {
         Log.i(LOG,
                 "+++ fired onConnected() -  requestLocationUpdates ...");
@@ -819,7 +813,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
     public void onDisconnected() {
         Log.i(LOG, "onDisconnected FIRED");
 
-    }
+    }*/
 
     protected void startLocationUpdates() {
         if(googleApiClient.isConnected()) {

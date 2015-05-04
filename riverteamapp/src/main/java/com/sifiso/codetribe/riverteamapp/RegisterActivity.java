@@ -28,7 +28,6 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.sifiso.codetribe.minisasslibrary.dto.GcmDeviceDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.TeamDTO;
@@ -107,12 +106,12 @@ public class RegisterActivity extends ActionBarActivity implements SearchTownFra
                     PageFragment pf = pageFragmentList.get(arg0);
                     if (pf instanceof RegisterFragment) {
                         isBack = false;
-                        getSupportActionBar().setTitle("Sing up Member");
+                        getSupportActionBar().setTitle("Sign up member");
                         pageFragmentList.remove(searchTownFragment);
                         adapter.notifyDataSetChanged();
                     } else if (pf instanceof SearchTownFragment) {
                         isBack = false;
-                        getSupportActionBar().setTitle("Search Town");
+                        getSupportActionBar().setTitle("Search town");
                     }
 
                 }
@@ -148,7 +147,7 @@ public class RegisterActivity extends ActionBarActivity implements SearchTownFra
         getMenuInflater().inflate(R.menu.menu_register, menu);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Team Member");
+        getSupportActionBar().setTitle("Team member");
         getCachedData();
         return true;
     }

@@ -18,6 +18,7 @@
             android:backgroundTint="@color/DodgerBlue"
             android:hint="email address"
             android:textColor="@color/Gray"
+            android:inputType="textEmailAddress"
             android:padding="8dp" />
 
         <EditText

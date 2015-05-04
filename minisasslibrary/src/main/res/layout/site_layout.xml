@@ -9,7 +9,7 @@
         style="@style/Title2TextStyleRed"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/WT_sp_category"
+
         android:focusable="false"
         android:hint="Select river"
         android:padding="10dp"
@@ -25,15 +25,16 @@
         android:focusable="false"
         android:hint="Select category"
         android:padding="10dp"
-        android:textColor="@color/navy_blue"
-        android:textColorHint="@color/navy_blue" />
+        android:layout_below="@+id/WT_sp_river"
+        android:textColor="@color/teal"
+        android:textColorHint="@color/teal" />
 
     <Button
         android:id="@+id/WT_gps_picker"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/WT_sp_river"
+        android:layout_below="@+id/WT_sp_category"
         android:layout_marginTop="10dp"
         android:background="@drawable/xsquare_red"
         android:text="Site GSP location"

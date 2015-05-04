@@ -190,8 +190,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/ELI_condition_image"
-            android:src="@drawable/ic_insect"
-            android:tint="@color/grey"
+            android:src="@drawable/blue_crap"
+
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true" />
     </RelativeLayout>

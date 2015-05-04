@@ -35,6 +35,7 @@ import com.sifiso.codetribe.minisasslibrary.dto.EvaluationSiteDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.InsectDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.InsectImageDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverDTO;
+import com.sifiso.codetribe.minisasslibrary.dto.TeamMemberDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.RequestDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ResponseDTO;
 import com.sifiso.codetribe.minisasslibrary.fragments.PageFragment;
@@ -45,6 +46,7 @@ import com.sifiso.codetribe.minisasslibrary.toolbox.WebCheckResult;
 import com.sifiso.codetribe.minisasslibrary.util.CacheUtil;
 import com.sifiso.codetribe.minisasslibrary.util.ErrorUtil;
 import com.sifiso.codetribe.minisasslibrary.util.RequestCacheUtil;
+import com.sifiso.codetribe.minisasslibrary.util.SharedUtil;
 import com.sifiso.codetribe.minisasslibrary.util.Statics;
 import com.sifiso.codetribe.minisasslibrary.util.ToastUtil;
 import com.sifiso.codetribe.minisasslibrary.util.Util;
@@ -52,6 +54,8 @@ import com.sifiso.codetribe.minisasslibrary.util.WebSocketUtil;
 
 import org.joda.time.DateTime;
 
+import java.math.BigDecimal;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -74,7 +78,7 @@ public class EvaluationActivity extends ActionBarActivity {
     private ViewStub viewStub;
     private Integer categoryID;
     private Integer riverID;
-
+    private TeamMemberDTO teamMember;
     String catType = "Select category";
 
     static final int ACCURACY_THRESHOLD = 5;
@@ -145,14 +149,15 @@ public class EvaluationActivity extends ActionBarActivity {
         getSupportActionBar().setSubtitle(Util.getLongerDate(new DateTime()));
         ctx = getApplicationContext();
         //activity = EvaluationActivity.this;
+        teamMember = SharedUtil.getTeamMember(ctx);
         setTitle("Create Evaluations");
 
-
+        setField();
         if (savedInstanceState != null) {
             response = (ResponseDTO) savedInstanceState.getSerializable("response");
             buildUI();
         }
-        setField();
+
     }
 
 
@@ -204,6 +209,7 @@ public class EvaluationActivity extends ActionBarActivity {
                 Log.w(LOG, "### map has returned with data?");
                 if (resultCode == RESULT_OK) {
                     response = (ResponseDTO) data.getSerializableExtra("response");
+                    teamMember = SharedUtil.getTeamMember(ctx);
                 }
                 break;
             case STATUS_CODE:
@@ -226,6 +232,7 @@ public class EvaluationActivity extends ActionBarActivity {
                     Log.w(LOG, "### gps ui has returned with data?");
                     setEvaluationSite((EvaluationSiteDTO) data.getSerializableExtra("siteData"));
                     // evaluationFragment.setResponse(response);
+                    teamMember = SharedUtil.getTeamMember(ctx);
                 }
                 break;
             case INSECT_DATA:
@@ -234,6 +241,7 @@ public class EvaluationActivity extends ActionBarActivity {
                     Log.w(LOG, "### insect ui has returned with data?");
                     insectImageList = (List<InsectImageDTO>) data.getSerializableExtra("overallInsect");
                     scoreUpdater((List<InsectImageDTO>) data.getSerializableExtra("selectedInsects"));
+                    teamMember = SharedUtil.getTeamMember(ctx);
                 }
                 break;
         }
@@ -255,10 +263,10 @@ public class EvaluationActivity extends ActionBarActivity {
                 Util.showPopupCategoryBasicWithHeroImage(ctx, EvaluationActivity.this, resp.getCategoryList(), WT_sp_category, "", new Util.UtilPopupListener() {
                     @Override
                     public void onItemSelected(int index) {
-
-                        WT_sp_category.setText(resp.getCategoryList().get(index).getCategoryName());
-                        categoryID = resp.getCategoryList().get(index).getCategoryID();
-                        catType = (resp.getCategoryList().get(index).getCategoryName());
+                        indexCat = index;
+                        WT_sp_category.setText(resp.getCategoryList().get(indexCat).getCategoryName());
+                        categoryID = resp.getCategoryList().get(indexCat).getCategoryID();
+                        catType = (resp.getCategoryList().get(indexCat).getCategoryName());
                         Log.e(LOG, catType);
                     }
                 });
@@ -272,10 +280,12 @@ public class EvaluationActivity extends ActionBarActivity {
 
                 Util.showPopupRiverWithHeroImage(ctx, EvaluationActivity.this, resp.getRiverList(), WT_sp_river, "", new Util.UtilPopupListener() {
                     @Override
-                    public void onItemSelected(int index) {
+                    public void onItemSelected(int ind) {
                         // WT_sp_river.setTextColor(getResources().getColor(R.color.gray));
-                        WT_sp_river.setText(resp.getRiverList().get(index).getRiverName());
-                        riverID = resp.getRiverList().get(index).getRiverID();
+                        indexRiv = ind;
+                        WT_sp_river.setText(resp.getRiverList().get(indexRiv).getRiverName());
+                        riverID = resp.getRiverList().get(indexRiv).getRiverID();
+                        Log.e(LOG, "" + riverID);
                     }
                 });
             }
@@ -283,6 +293,8 @@ public class EvaluationActivity extends ActionBarActivity {
 
 
     }
+
+    private int indexCat, indexRiv;
 
     private void setField() {
 
@@ -563,8 +575,8 @@ public class EvaluationActivity extends ActionBarActivity {
                 TV_average_score.setText("0.0");
                 TV_avg_score.setText("0.0");
                 IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_insect));
-                WT_sp_river.setText("");
-                WT_sp_category.refreshDrawableState();
+                WT_sp_river.setText("Select river");
+                WT_sp_category.setText("Select category");
                 EDT_comment.setText("");
                 AE_pin_point.setVisibility(View.GONE);
                 evaluationSite = new EvaluationSiteDTO();
@@ -614,34 +626,39 @@ public class EvaluationActivity extends ActionBarActivity {
             }
             average = total / dtos.size();
         }
-
-
+        average = Math.round(average * 100.0) / 100.0;
+        Log.d(LOG, average + "");
         if (type.equalsIgnoreCase("Sandy Type")) {
             if (average > 6.9) {
                 status = "Unmodified(NATURAL condition)";
                 TV_score_status.setTextColor(getResources().getColor(R.color.purple));
                 TV_avg_score.setTextColor(getResources().getColor(R.color.purple));
-                IMG_score_icon.setColorFilter(getResources().getColor(R.color.purple), PorterDuff.Mode.MULTIPLY);
+                IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.purple_crap));
+                //IMG_score_icon.setColorFilter(getResources().getColor(R.color.purple), PorterDuff.Mode.MULTIPLY);
             } else if (average > 5.8 && average < 6.9) {
                 status = "Largely natural/few modifications(GOOD condition)";
                 TV_score_status.setTextColor(getResources().getColor(R.color.green));
                 TV_avg_score.setTextColor(getResources().getColor(R.color.green));
-                IMG_score_icon.setColorFilter(getResources().getColor(R.color.green), PorterDuff.Mode.MULTIPLY);
+                IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.green_crap));
+                // IMG_score_icon.setColorFilter(getResources().getColor(R.color.green), PorterDuff.Mode.MULTIPLY);
             } else if (average > 4.9 && average < 5.8) {
                 status = "Moderately modified(FAIR condition)";
-                TV_score_status.setTextColor(getResources().getColor(R.color.yellow_dark));
-                TV_avg_score.setTextColor(getResources().getColor(R.color.yellow_dark));
-                IMG_score_icon.setColorFilter(getResources().getColor(R.color.yellow_dark), PorterDuff.Mode.MULTIPLY);
+                TV_score_status.setTextColor(getResources().getColor(R.color.blue));
+                TV_avg_score.setTextColor(getResources().getColor(R.color.blue));
+                IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.blue_crap));
+                // IMG_score_icon.setColorFilter(getResources().getColor(R.color.yellow_dark), PorterDuff.Mode.MULTIPLY);
             } else if (average > 4.3 && average < 4.9) {
                 status = "Largely modified(POOR condition)";
-                TV_score_status.setTextColor(getResources().getColor(R.color.orange));
-                TV_avg_score.setTextColor(getResources().getColor(R.color.orange));
-                IMG_score_icon.setColorFilter(getResources().getColor(R.color.orange), PorterDuff.Mode.MULTIPLY);
+                TV_score_status.setTextColor(getResources().getColor(R.color.Chocolate));
+                TV_avg_score.setTextColor(getResources().getColor(R.color.Chocolate));
+                IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.orange_crap));
+                // IMG_score_icon.setColorFilter(getResources().getColor(R.color.orange), PorterDuff.Mode.MULTIPLY);
             } else if (average < 4.3) {
                 status = "Seriously/critically modified";
                 TV_score_status.setTextColor(getResources().getColor(R.color.red));
                 TV_avg_score.setTextColor(getResources().getColor(R.color.red));
-                IMG_score_icon.setColorFilter(getResources().getColor(R.color.red), PorterDuff.Mode.MULTIPLY);
+                IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.red_crap));
+                //IMG_score_icon.setColorFilter(getResources().getColor(R.color.red), PorterDuff.Mode.MULTIPLY);
             } else {
                 status = "Not specified";
                 TV_score_status.setTextColor(getResources().getColor(R.color.gray));
@@ -653,7 +670,8 @@ public class EvaluationActivity extends ActionBarActivity {
                 status = "Unmodified(NATURAL condition)";
                 TV_score_status.setTextColor(getResources().getColor(R.color.purple));
                 TV_avg_score.setTextColor(getResources().getColor(R.color.purple));
-                IMG_score_icon.setColorFilter(getResources().getColor(R.color.purple), PorterDuff.Mode.MULTIPLY);
+                IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.purple_crap));
+                //IMG_score_icon.setColorFilter(getResources().getColor(R.color.purple), PorterDuff.Mode.MULTIPLY);
             } else if (average > 6.8 && average < 7.9) {
                 status = "Largely natural/few modifications(GOOD condition)";
                 TV_score_status.setTextColor(getResources().getColor(R.color.green));
@@ -674,9 +692,9 @@ public class EvaluationActivity extends ActionBarActivity {
                 TV_avg_score.setTextColor(getResources().getColor(R.color.red));
                 TV_score_status.setTextColor(getResources().getColor(R.color.red));
                 IMG_score_icon.setColorFilter(getResources().getColor(R.color.red), PorterDuff.Mode.MULTIPLY);
-            } else {
+            }/* else {
 
-            }
+            }*/
         }
 
         TV_score_status.setText(status);
@@ -705,6 +723,7 @@ public class EvaluationActivity extends ActionBarActivity {
             total = total + ii.getSensitivityScore();
         }
         average = total / dtos.size();
+        average = Math.round(average * 100.0) / 100.0;
         return average;
     }
 
@@ -802,8 +821,8 @@ public class EvaluationActivity extends ActionBarActivity {
 
 
         evaluationDTO.setConditionsID(conditionID);
-        evaluationDTO.setTeamMemberID(1);
-        evaluationSite.setDateRegistered(c.getTime().getTime());
+        evaluationDTO.setTeamMemberID(teamMember.getTeamMemberID());
+        evaluationSite.setDateRegistered(new DateTime().toDate().getTime());
         evaluationDTO.setEvaluationSite(evaluationSite);
 
 
@@ -813,7 +832,7 @@ public class EvaluationActivity extends ActionBarActivity {
         evaluationDTO.setWaterClarity(Double.parseDouble(WC_score.getText().toString()));
         evaluationDTO.setWaterTemperature(Double.parseDouble(WT_score.getText().toString()));
         evaluationDTO.setElectricityConductivity(Double.parseDouble(WE_score.getText().toString()));
-        evaluationDTO.setEvaluationDate(c.getTime().getTime());
+        evaluationDTO.setEvaluationDate(new DateTime().toDate().getTime());
         evaluationDTO.setScore(Double.parseDouble(TV_avg_score.getText().toString()));
         evaluationDTO.setLatitude(evaluationSite.getLatitude());
         evaluationDTO.setLongitude(evaluationSite.getLongitude());
@@ -868,7 +887,11 @@ public class EvaluationActivity extends ActionBarActivity {
         super.onDestroy();
     }
 
-
+    @Override
+    public void onPause() {
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+        super.onPause();
+    }
     @Override
     public void onStop() {
         Log.d(LOG,
@@ -886,11 +909,7 @@ public class EvaluationActivity extends ActionBarActivity {
     EvaluationSiteDTO evaluationSite;
 
 
-    @Override
-    public void onPause() {
-        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
-        super.onPause();
-    }
+
 
 
     List<InsectImageDTO> insectImageList;

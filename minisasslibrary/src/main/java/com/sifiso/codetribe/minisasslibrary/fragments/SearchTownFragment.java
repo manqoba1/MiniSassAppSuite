@@ -5,26 +5,32 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.sifiso.codetribe.minisasslibrary.R;
 import com.sifiso.codetribe.minisasslibrary.adapters.SearchTownAdapter;
+import com.sifiso.codetribe.minisasslibrary.dto.RiverTownDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.TownDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ResponseDTO;
+import com.sifiso.codetribe.minisasslibrary.util.Util;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class SearchTownFragment extends Fragment implements PageFragment{
-    ImageView SLT_hero;
-    EditText SLT_editSearch;
+public class SearchTownFragment extends Fragment implements PageFragment {
+    private ImageView SLT_imgSearch2, SLT_hero;
+    AutoCompleteTextView SLT_editSearch;
     ListView STF_list;
     SearchTownAdapter adapter;
     SearchTownFragmentListener mListener;
@@ -33,20 +39,33 @@ public class SearchTownFragment extends Fragment implements PageFragment{
     View v;
     List<TownDTO> townList;
     ResponseDTO response;
+    boolean isFound;
+    String searchText;
 
     public SearchTownFragment() {
         // Required empty public constructor
     }
 
     private void setFields() {
-        SLT_editSearch = (EditText) v.findViewById(R.id.SLT_editSearch);
+        SLT_editSearch = (AutoCompleteTextView) v.findViewById(R.id.SLT_editSearch);
+        SLT_imgSearch2 = (ImageView) v.findViewById(R.id.SLT_imgSearch2);
         SLT_hero = (ImageView) v.findViewById(R.id.SLT_hero);
         STF_list = (ListView) v.findViewById(R.id.STF_list);
+        SLT_imgSearch2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                searchRiver();
+            }
+        });
+
+        SLT_hero.setImageDrawable(Util.getRandomHeroImage(ctx));
         setList();
+        riverToSearch();
     }
 
     private void setList() {
-        if(townList == null){
+        if (townList == null) {
             townList = new ArrayList<>();
         }
         townList = response.getTownList();
@@ -109,16 +128,48 @@ public class SearchTownFragment extends Fragment implements PageFragment{
 
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
+    List<String> stringRiver;
+
+    private void riverToSearch() {
+        stringRiver = new ArrayList<>();
+        for (int i = 0; i < response.getTownList().size(); i++) {
+
+            TownDTO town = response.getTownList().get(i);
+            stringRiver.add(town.getTownName());
+        }
+        ArrayAdapter<String> riverSearchAdapter = new ArrayAdapter<String>(ctx, R.layout.xsimple_spinner_dropdown_item, stringRiver);
+        SLT_editSearch.setAdapter(riverSearchAdapter);
+    }
+
+    private void searchRiver() {
+        if (SLT_editSearch.getText().toString().isEmpty()) {
+            return;
+        }
+        int index = 0;
+        searchText = SLT_editSearch.getText().toString();
+        for (int i = 0; i < response.getTownList().size(); i++) {
+            TownDTO searchRiver = response.getTownList().get(i);
+            if (searchRiver.getTownName().contains(searchText)) {
+                isFound = true;
+                break;
+            }
+            index++;
+        }
+        if (isFound) {
+            STF_list.setSelection(index);
+
+        } else {
+            Util.showToast(ctx, ctx.getString(R.string.river_not_found) + " " + SLT_editSearch.getText().toString());
+        }
+        hideKeyboard();
+    }
+
+    void hideKeyboard() {
+        InputMethodManager imm = (InputMethodManager) ctx
+                .getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(SLT_editSearch.getWindowToken(), 0);
+    }
+
     public interface SearchTownFragmentListener {
         // TODO: Update argument type and name
         public void onTownSelected(TownDTO town);
