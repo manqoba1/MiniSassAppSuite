@@ -157,6 +157,11 @@ public class EvaluationActivity extends ActionBarActivity {
             response = (ResponseDTO) savedInstanceState.getSerializable("response");
             buildUI();
         }
+        // (RiverDTO) data.getSerializableExtra("riverCreate");
+        if (getIntent().getSerializableExtra("riverCreate") != null) {
+            river = (RiverDTO) getIntent().getSerializableExtra("riverCreate");
+            setRiverField(river);
+        }
 
     }
 
@@ -220,7 +225,7 @@ public class EvaluationActivity extends ActionBarActivity {
                 break;
             case CREATE_EVALUATION:
                 Log.w(LOG, "### setting ui has returned with data?");
-                if (resultCode == RESULT_OK) {
+                if (resultCode == CREATE_EVALUATION) {
                     RiverDTO riv = (RiverDTO) data.getSerializableExtra("riverCreate");
                     response = (ResponseDTO) data.getSerializableExtra("response");
                     setRiverField(riv);
@@ -248,6 +253,7 @@ public class EvaluationActivity extends ActionBarActivity {
     }
 
     public void setRiverField(RiverDTO r) {
+        ToastUtil.toast(ctx, "yes");
         riverID = r.getRiverID();
         WT_sp_river.setText(r.getRiverName());
 
@@ -534,7 +540,7 @@ public class EvaluationActivity extends ActionBarActivity {
 
         for (InsectDTO i : response.getInsectList()) {
             if (insectImageList == null) {
-                insectImageList = new ArrayList<>();
+                insectImageList = new ArrayList<InsectImageDTO>();
             }
             for (InsectImageDTO ii : i.getInsectImageList()) {
                 insectImageList.add(ii);
@@ -589,6 +595,9 @@ public class EvaluationActivity extends ActionBarActivity {
                 WC_score.setText("0.0");
                 WP_score.setText("0.0");
                 WT_score.setText("0.0");
+                categoryID = null;
+                riverID = null;
+                conditionID = null;
             }
         });
 
@@ -735,6 +744,7 @@ public class EvaluationActivity extends ActionBarActivity {
         startGPSDialog();
     }
 
+
     private void sendRequest(final RequestDTO request) {
         WebSocketUtil.sendRequest(ctx, Statics.MINI_SASS_ENDPOINT, request, new WebSocketUtil.WebSocketListener() {
             @Override
@@ -745,7 +755,7 @@ public class EvaluationActivity extends ActionBarActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            cleanForm();
+                            // cleanForm();
                             showImageDialog();
                         }
                     });
@@ -771,7 +781,7 @@ public class EvaluationActivity extends ActionBarActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        cleanForm();
+
                         showImageDialog();
                     }
                 });
@@ -834,8 +844,6 @@ public class EvaluationActivity extends ActionBarActivity {
         evaluationDTO.setElectricityConductivity(Double.parseDouble(WE_score.getText().toString()));
         evaluationDTO.setEvaluationDate(new DateTime().toDate().getTime());
         evaluationDTO.setScore(Double.parseDouble(TV_avg_score.getText().toString()));
-        evaluationDTO.setLatitude(evaluationSite.getLatitude());
-        evaluationDTO.setLongitude(evaluationSite.getLongitude());
 
         evaluationDTO.setEvaluationImageList(takenImages);
 
@@ -849,13 +857,14 @@ public class EvaluationActivity extends ActionBarActivity {
             ToastUtil.errorToast(ctx, "Please make sure Site Evaluation is picked(hint: SITE GPS LOCATION)");
             return;
         }
-        if (evaluationDTO.getConditionsID() == null) {
+        if (evaluationDTO.getConditionsID() == null && conditionID == null) {
             ToastUtil.errorToast(ctx, "If you don't select insect group, you can't score evaluation(hint: SELECT INSECT GROUP)");
             return;
         }
 
         if (wcr.isWifiConnected()) {
-            sendRequest(w);
+            //sendRequest(w);
+            addRequestToCache(w);
         } else {
             addRequestToCache(w);
         }
@@ -892,6 +901,7 @@ public class EvaluationActivity extends ActionBarActivity {
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
         super.onPause();
     }
+
     @Override
     public void onStop() {
         Log.d(LOG,
@@ -909,9 +919,6 @@ public class EvaluationActivity extends ActionBarActivity {
     EvaluationSiteDTO evaluationSite;
 
 
-
-
-
     List<InsectImageDTO> insectImageList;
 
 
@@ -923,23 +930,26 @@ public class EvaluationActivity extends ActionBarActivity {
                         EvaluationActivity.this);
 
                 // set title
-                alertDialogBuilder.setTitle("Create Evaluation Gallery?");
+                alertDialogBuilder.setTitle("Evaluation Created");
 
                 // set dialog message
                 alertDialogBuilder
-                        .setMessage("Click no to exit!")
+                        .setMessage("Create another one?")
                         .setCancelable(false)
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                Intent intent = new Intent(ctx, PictureActivity.class);
+                                // Intent intent = new Intent(ctx, PictureActivity.class);
                                 // intent.putExtra("takenImages", )
-                                startActivityForResult(intent, CAPTURE_IMAGE);
+                                // startActivityForResult(intent, CAPTURE_IMAGE);
+                                cleanForm();
+                                dialog.cancel();
                             }
                         })
                         .setNegativeButton("No", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 // if this button is clicked, just close
                                 // the dialog box and do nothing
+                                finish();
                                 dialog.cancel();
                             }
                         });

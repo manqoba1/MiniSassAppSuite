@@ -327,7 +327,7 @@ public class PictureActivity extends ActionBarActivity implements LocationListen
         }
     };
 
-    List<String> currentSessionPhotos = new ArrayList<>();
+    List<String> currentSessionPhotos = new ArrayList<String>();
     static final int REQUEST_VIDEO_CAPTURE = 1;
 
     @Override

@@ -77,7 +77,7 @@ public class EvaluationListDialog extends DialogFragment {
 
                 for (EvaluationDTO eval : evalSite.getEvaluationList()) {
                     if (evaluationList == null) {
-                        evaluationList = new ArrayList<>();
+                        evaluationList = new ArrayList<EvaluationDTO>();
                     }
                     evaluationList.add(eval);
                 }

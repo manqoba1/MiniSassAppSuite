@@ -79,7 +79,7 @@ public class RegisterActivity extends ActionBarActivity implements SearchTownFra
 
     private void buildPages() {
 
-        pageFragmentList = new ArrayList<>();
+        pageFragmentList = new ArrayList<PageFragment>();
         registerFragment = new RegisterFragment();
         Bundle data = new Bundle();
         data.putSerializable("response", response);

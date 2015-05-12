@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.sifiso.codetribe.riverteamapp" >
+    package="com.sifiso.codetribe.riverteamapp">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -9,15 +9,15 @@
     <!--
  The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
          Google Maps Android API v2, but are recommended.
-    -->
+
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+     -->
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:theme="@style/RiverTheme" >
+        android:label="@string/app_name">
 
         <!-- new credentials on the aubrey.malabie account -->
         <!--
@@ -34,20 +34,16 @@
         <activity
             android:name=".MainPagerActivity"
             android:label="@string/app_name"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait">
+
         </activity>
         <activity
             android:name=".EvaluationView"
-            android:label="@string/title_activity_evaluation_view" >
-        </activity>
+            android:label="@string/title_activity_evaluation_view"></activity>
         <activity
             android:name="com.sifiso.codetribe.minisasslibrary.activities.EvaluationActivity"
-            android:label="@string/title_activity_evaluation" >
-        </activity>
-        <activity
-            android:name="com.sifiso.codetribe.minisasslibrary.activities.MiniSassMapsActivity"
-            android:label="@string/title_activity_minisass_maps" >
-        </activity>
+            android:label="@string/title_activity_evaluation"></activity>
+
         <activity
             android:name=".RegisterActivity"
             android:label="@string/title_activity_register"
@@ -57,11 +53,13 @@
             android:label="@string/title_activity_sign"
             android:windowSoftInputMode="stateHidden" />
         <activity
-            android:name="com.sifiso.codetribe.minisasslibrary.activities.TeamMemberActivity"
-            android:label="@string/title_activity_sign" />
+            android:name="com.sifiso.codetribe.minisasslibrary.activities.SplashActivity"
+            android:label="@string/app_name">
+
+        </activity>
         <activity
             android:name=".Welcome"
-            android:label="@string/title_activity_welcome" >
+            android:label="@string/title_activity_welcome">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -70,7 +68,11 @@
         </activity>
         <activity
             android:name=".MapsActivity"
-            android:label="@string/title_activity_maps" >
+            android:label="@string/title_activity_maps"></activity>
+        <activity
+            android:name=".WelcomeScreen"
+            android:label="@string/title_activity_welcome_screen">
+
         </activity>
     </application>
 

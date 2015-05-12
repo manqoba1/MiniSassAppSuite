@@ -189,7 +189,7 @@ public class RiverListFragment extends Fragment implements PageFragment {
         RL_riverList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                ToastUtil.toast(ctx, "Create Evaluation");
+
                 mListener.onCreateEvaluationRL((RiverDTO) parent.getItemAtPosition(position));
                 return false;
             }

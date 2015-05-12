@@ -28,7 +28,6 @@ import com.sifiso.codetribe.minisasslibrary.MiniSassApp;
 import com.sifiso.codetribe.minisasslibrary.activities.EvaluationActivity;
 import com.sifiso.codetribe.minisasslibrary.activities.GPSscanner;
 import com.sifiso.codetribe.minisasslibrary.activities.MapsActivity;
-import com.sifiso.codetribe.minisasslibrary.activities.TeamMemberActivity;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationSiteDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverTownDTO;
@@ -46,6 +45,7 @@ import com.sifiso.codetribe.minisasslibrary.util.CacheUtil;
 import com.sifiso.codetribe.minisasslibrary.util.ErrorUtil;
 import com.sifiso.codetribe.minisasslibrary.util.Statics;
 import com.sifiso.codetribe.minisasslibrary.util.TimerUtil;
+import com.sifiso.codetribe.minisasslibrary.util.ToastUtil;
 import com.sifiso.codetribe.minisasslibrary.util.WebSocketUtil;
 import com.sifiso.codetribe.minisasslibrary.R;
 import com.sifiso.codetribe.minisasslibrary.viewsUtil.ZoomOutPageTransformerImpl;
@@ -165,7 +165,7 @@ public class MainPagerActivity extends ActionBarActivity implements CreateEvalua
 
     private void buildPages() {
 
-        pageFragmentList = new ArrayList<>();
+        pageFragmentList = new ArrayList<PageFragment>();
         riverListFragment = new RiverListFragment();
         Bundle data = new Bundle();
         data.putSerializable("response", response);
@@ -249,8 +249,8 @@ public class MainPagerActivity extends ActionBarActivity implements CreateEvalua
                 public void onPageScrollStateChanged(int arg0) {
                 }
             });
-            ZoomOutPageTransformerImpl z = new ZoomOutPageTransformerImpl();
-            mPager.setPageTransformer(true, z);
+            //ZoomOutPageTransformerImpl z = new ZoomOutPageTransformerImpl();
+           // mPager.setPageTransformer(true, z);
         } catch (Exception e) {
             Log.e(LOG, "-- Some shit happened, probably IllegalState of some kind ...");
         }
@@ -277,8 +277,8 @@ public class MainPagerActivity extends ActionBarActivity implements CreateEvalua
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.add_member) {
-            Intent intent = new Intent(MainPagerActivity.this, TeamMemberActivity.class);
-            startActivity(intent);
+            /*Intent intent = new Intent(MainPagerActivity.this, TeamMemberActivity.class);
+            startActivity(intent);*/
             return true;
         }
 
@@ -357,11 +357,12 @@ public class MainPagerActivity extends ActionBarActivity implements CreateEvalua
 
     @Override
     public void onCreateEvaluationRL(RiverDTO river) {
+       // ToastUtil.toast(ctx, river.getRiverName());
         Intent createEva = new Intent(MainPagerActivity.this, EvaluationActivity.class);
         createEva.putExtra("riverCreate", river);
         createEva.putExtra("response", response);
         createEva.putExtra("statusCode", CREATE_EVALUATION);
-        startActivity(createEva);
+        startActivityForResult(createEva, CREATE_EVALUATION);
     }
 
     static final int CREATE_EVALUATION = 108;

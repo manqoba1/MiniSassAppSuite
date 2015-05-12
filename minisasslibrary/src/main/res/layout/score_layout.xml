@@ -20,7 +20,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/xsquare_animal_colors"
-            android:backgroundTint="@color/white"
             android:drawableRight="@drawable/ic_insect"
             android:text="Select insect group"
             android:textColor="@color/white" />

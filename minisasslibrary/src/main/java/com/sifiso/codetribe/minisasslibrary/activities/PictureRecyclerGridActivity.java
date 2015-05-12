@@ -49,7 +49,7 @@ public class PictureRecyclerGridActivity extends ActionBarActivity {
     int lastIndex;
     //List<EvaluationImageDTO> imagesList;
     Activity activity;
-    private List<ImagesDTO> imagesForDeletion = new ArrayList<>();
+    private List<ImagesDTO> imagesForDeletion = new ArrayList<ImagesDTO>();
 
 
 

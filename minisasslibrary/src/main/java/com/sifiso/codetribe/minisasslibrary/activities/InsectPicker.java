@@ -60,7 +60,7 @@ public class InsectPicker extends ActionBarActivity {
 
     private void collectCheckedInsects(InsectImageDTO mDtos) {
         if (listCal == null) {
-            listCal = new ArrayList<>(mSites.size());
+            listCal = new ArrayList<InsectImageDTO>(mSites.size());
         }
 
 

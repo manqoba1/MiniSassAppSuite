@@ -124,8 +124,8 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
     static final int EVALUATION_VIEW = 12;
     static final int RIVER_VIEW = 13;
 
-    private List<Polyline> polylines = new ArrayList<>();
-    private List<LatLng> iterateList = new ArrayList<>();
+    private List<Polyline> polylines = new ArrayList<Polyline>();
+    private List<LatLng> iterateList = new ArrayList<LatLng>();
 
     private void MeasureRiverLength() {
         googleMap.clear();
@@ -206,7 +206,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
                     }
                     index++;
                     Log.d(LOG, "" + index);
-                    final Marker m = googleMap.addMarker(new MarkerOptions().position(new LatLng(eva.getLatitude(), eva.getLongitude())).icon(desc)
+                    final Marker m = googleMap.addMarker(new MarkerOptions().position(new LatLng(eva.getEvaluationSite().getLatitude(), eva.getEvaluationSite().getLongitude())).icon(desc)
                             .snippet(eva.getRemarks()));
                    m.showInfoWindow();
                     markers.add(m);

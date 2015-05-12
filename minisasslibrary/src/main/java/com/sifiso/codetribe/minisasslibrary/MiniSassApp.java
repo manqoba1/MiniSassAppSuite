@@ -98,7 +98,7 @@ public class MiniSassApp extends Application {
         ECOMMERCE_TRACKER //tracker used by all ecommerce transaction from a company
     }
     static final String PROPERTY_ID = "UA-53661372-2";
-    HashMap<TrackerName, Tracker>mTrackers = new HashMap<>();
+    HashMap<TrackerName, Tracker>mTrackers = new HashMap<TrackerName, Tracker>();
 
     public synchronized Tracker getTracker(TrackerName trackerId) {
         if (!mTrackers.containsKey(trackerId)) {

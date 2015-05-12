@@ -204,11 +204,11 @@ public class SignActivity extends ActionBarActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Log.d(LOG,resp.getTeamMember().getEmail());
+                       // Log.d(LOG,resp.getTeamMember().getEmail());
                         if (!ErrorUtil.checkServerError(ctx, resp)) {
                             return;
                         }
-                        Log.d(LOG,resp.getTeamMember().getEmail());
+                       // Log.d(LOG,resp.getTeamMember().getEmail());
                         SharedUtil.saveTeamMember(ctx, resp.getTeamMember());
                         SharedUtil.storeEmail(ctx, esEmail.getText().toString());
                         Intent intent = new Intent(SignActivity.this, MainPagerActivity.class);

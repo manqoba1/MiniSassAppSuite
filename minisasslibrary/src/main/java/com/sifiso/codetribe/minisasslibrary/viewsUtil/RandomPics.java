@@ -90,8 +90,11 @@ public class RandomPics {
                     txt.setText("Umgeni River");
                     break;
                 case 14:
+
                     v.setImageDrawable(ctx.getResources().getDrawable(R.drawable.vaalriver));
                     txt.setText("Vaal River");
+                    break;
+                default:
                     break;
             }
             count++;

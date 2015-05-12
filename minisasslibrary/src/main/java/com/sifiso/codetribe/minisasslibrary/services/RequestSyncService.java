@@ -44,6 +44,7 @@ public class RequestSyncService extends IntentService {
         Log.w(LOG, "FIRED: RequestSyncService, onHandleIntent");
         FileInputStream stream;
         try {
+
             stream = getApplicationContext().openFileInput("requestCache.json");
             String json = getStringFromInputStream(stream);
             RequestCache cache = gson.fromJson(json, RequestCache.class);
