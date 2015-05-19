@@ -16,49 +16,118 @@
             android:layout_height="match_parent">
 
 
-            <include
-                android:id="@+id/l1"
-                layout="@layout/site_layout"
+            <Button
+                android:id="@+id/AE_find_near_sites"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="10dp" />
+                android:layout_height="wrap_content"
+                android:background="@drawable/gradient_find_site"
+                android:text="Find sites visited before"
+                android:textColor="@color/white" />
 
-            <include
-                android:id="@+id/l2"
-                layout="@layout/water_test"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_below="@+id/l1"
-                android:layout_marginTop="10dp" />
 
-            <include
-                android:id="@+id/l3"
-                layout="@layout/score_layout"
+            <RelativeLayout
+                android:id="@+id/result1"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_below="@+id/l2"
-                android:layout_marginTop="10dp" />
+                android:layout_height="wrap_content"
 
-            <include
-                android:id="@+id/l4"
-                layout="@layout/comments"
+                android:layout_below="@+id/AE_find_near_sites">
+
+                <include
+
+                    android:id="@+id/l1"
+                    layout="@layout/site_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="10dp"
+
+                    />
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/AE_down_up"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_below="@+id/l3"
-                android:layout_marginTop="10dp" />
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/result1"
+                android:layout_marginTop="10dp"
+                android:background="@color/gray"
+                android:drawableRight="@android:drawable/arrow_up_float"
+                android:padding="1dp"
+                android:text="Do you have testing equipments? If yes tab here."
+                android:textColor="@color/White" />
+
+            <RelativeLayout
+                android:id="@+id/result2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/AE_down_up"
+                android:visibility="gone">
+
+                <include
+                    android:id="@+id/l2"
+                    layout="@layout/water_test"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="10dp" />
+            </RelativeLayout>
+            <LinearLayout
+                android:id="@+id/LL1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_below="@+id/result2"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/SL_show_insect"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/xsquare_animal_colors"
+                    android:text="Which insects group did you find"
+                    android:textColor="@color/white" />
+            </LinearLayout>
+
+            <RelativeLayout
+                android:id="@+id/result3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/LL1"
+                android:visibility="gone">
+
+                <include
+                    android:id="@+id/l3"
+                    layout="@layout/score_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="10dp" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/result4"
+                android:layout_width="match_parent"
+
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/result3">
+
+                <include
+                    android:id="@+id/l4"
+                    layout="@layout/comments"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="10dp" />
+            </RelativeLayout>
 
             <Button
                 android:id="@+id/AE_create"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                android:layout_below="@+id/l4"
+                android:layout_below="@+id/result4"
                 android:layout_centerHorizontal="true"
                 android:layout_marginBottom="10dp"
                 android:background="@drawable/xsquare_blue"
                 android:drawablePadding="10dp"
                 android:drawableRight="@android:drawable/ic_menu_save"
-                android:text="Save"
+                android:text="Submit"
                 android:textColor="@color/white" />
 
             <ImageView

@@ -45,7 +45,7 @@ public class PopupListAdapter extends ArrayAdapter<CategoryDTO> {
 
 
     static class ViewHolderItem {
-        TextView txtString;
+        TextView txtString, score_weight;
         ImageView image;
     }
 
@@ -69,19 +69,21 @@ public class PopupListAdapter extends ArrayAdapter<CategoryDTO> {
 
             item.image = (ImageView) convertView
                     .findViewById(R.id.image1);
-
+            item.score_weight = (TextView) convertView.findViewById(R.id.score_weight);
             convertView.setTag(item);
         } else {
             item = (ViewHolderItem) convertView.getTag();
         }
-        if (showAlternateIcon) {
-            item.image.setImageDrawable(ctx.getResources().getDrawable(android.R.drawable.sym_action_email));
+        item.score_weight.setVisibility(View.GONE);
+
+        final CategoryDTO p = mList.get(position);
+        if (p.getCategoryID() == 8) {
+            item.image.setImageDrawable(ctx.getResources().getDrawable(R.drawable.ic_sand));
 
         } else {
-            item.image.setImageDrawable(ctx.getResources().getDrawable(android.R.drawable.ic_dialog_email));
+            item.image.setImageDrawable(ctx.getResources().getDrawable(R.drawable.ic_rock));
 
         }
-        final CategoryDTO p = mList.get(position);
         item.txtString.setText(p.getCategoryName());
         Statics.setRobotoFontLight(ctx, item.txtString);
         return (convertView);

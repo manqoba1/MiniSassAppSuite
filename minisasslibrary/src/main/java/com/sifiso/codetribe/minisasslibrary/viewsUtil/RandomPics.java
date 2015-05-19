@@ -98,7 +98,7 @@ public class RandomPics {
                     break;
             }
             count++;
-            if (count > 5) {
+            if (count > 10) {
                 count = 0;
                 listener.onCompleteFlash();
             }

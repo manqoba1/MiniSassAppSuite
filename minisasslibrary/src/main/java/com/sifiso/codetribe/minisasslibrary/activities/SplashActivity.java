@@ -46,10 +46,12 @@ public class SplashActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
 
+                TimerUtil.killFlashTimer();
                 finish();
+
             }
         });
-        flashImages();
+       // flashImages();
 
     }
 
@@ -65,7 +67,7 @@ public class SplashActivity extends ActionBarActivity {
                         RandomPics.getImage(ctx, imageView, imageText, new RandomPics.RandomPicsListener() {
                             @Override
                             public void onCompleteFlash() {
-
+                                TimerUtil.killFlashTimer();
                             }
                         });
                     }
@@ -78,6 +80,8 @@ public class SplashActivity extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_splash, menu);
+        flashImages();
+
         return true;
     }
 
@@ -122,7 +126,7 @@ public class SplashActivity extends ActionBarActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        flashImages();
+       // flashImages();
     }
 
     @Override

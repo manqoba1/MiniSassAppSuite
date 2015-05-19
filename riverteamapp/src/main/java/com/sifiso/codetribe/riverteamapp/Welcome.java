@@ -237,7 +237,7 @@ public class Welcome extends ActionBarActivity {
     protected void onStart() {
          if (isFirst) {
            isFirst = false;
-        startActivity(new Intent(Welcome.this, SplashActivity.class));
+       // startActivity(new Intent(Welcome.this, SplashActivity.class));
         }
         super.onStart();
     }

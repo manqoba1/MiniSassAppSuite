@@ -13,12 +13,15 @@ public class TimerUtil {
     public interface TimerListener {
         public void onSessionDisconnected();
     }
-    public interface TimerFlashListener{
+
+    public interface TimerFlashListener {
         public void onStartFlash();
     }
+
     static TimerListener listener;
     static Timer timer;
     static final long TEN_SECONDS = 10 * 1000;
+
     public static void startTimer(TimerListener timerListener) {
         //
         Log.d("TimerUtil", "########## Websocket Session Timer starting .....");
@@ -33,6 +36,7 @@ public class TimerUtil {
             }
         }, TEN_SECONDS);
     }
+
     public static void killTimer() {
         if (timer != null) {
             timer.cancel();
@@ -40,9 +44,11 @@ public class TimerUtil {
             Log.w("TimerUtil", "########## Websocket Session Timer KILLED");
         }
     }
+
     static TimerFlashListener timerFlashListener;
     static Timer timerFlash;
-    public static void startFlashTime(final TimerFlashListener flashListener){
+
+    public static void startFlashTime(final TimerFlashListener flashListener) {
         timerFlashListener = flashListener;
         timerFlash = new Timer();
         timerFlash.schedule(new TimerTask() {
@@ -50,7 +56,7 @@ public class TimerUtil {
             public void run() {
                 flashListener.onStartFlash();
             }
-        },100, 5000);
+        }, 100, 5000);
     }
 
     public static void killFlashTimer() {

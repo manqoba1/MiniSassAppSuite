@@ -66,7 +66,11 @@ public class GPSscanner extends ActionBarActivity implements LocationListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_gpsscanner);
+        try {
+            setContentView(R.layout.activity_gpsscanner);
+        }catch (Exception e){
+
+        }
         ctx = getApplicationContext();
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -205,28 +209,9 @@ public class GPSscanner extends ActionBarActivity implements LocationListener {
         eval.putExtra("siteData", evaluationSite);
         setResult(GPS_DATA, eval);
         finish();
-        // super.onBackPressed();
     }
 
-   /* private void getGPSCoordinates() {
-        if (!mLocationClient.isConnected()) {
-            mLocationClient.connect();
-        }
-        mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(
-                mLocationClient);
-        mLocationRequest = LocationRequest.create();
-        mLocationRequest.setInterval(1000);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mLocationRequest.setFastestInterval(1000);
 
-        try {
-            LocationServices.FusedLocationApi.requestLocationUpdates(
-                    mLocationClient, mLocationRequest, this
-            );
-        } catch (IllegalStateException e) {
-            Log.e(LOG, "---- mLocationClient.requestLocationUpdates ILLEGAL STATE", e);
-        }
-    }*/
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {

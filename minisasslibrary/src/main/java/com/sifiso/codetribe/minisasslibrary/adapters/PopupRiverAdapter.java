@@ -63,28 +63,30 @@ public class PopupRiverAdapter extends ArrayAdapter<RiverDTO> {
 
             item.image = (ImageView) convertView
                     .findViewById(R.id.image1);
-
+            item.score_weight = (TextView) convertView.findViewById(R.id.score_weight);
             convertView.setTag(item);
         } else {
             item = (ViewHolderItem) convertView.getTag();
         }
+        item.score_weight.setVisibility(View.GONE);
         if (showAlternateIcon) {
-            item.image.setImageDrawable(ctx.getResources().getDrawable(android.R.drawable.ic_dialog_map));
+            item.image.setImageDrawable(ctx.getResources().getDrawable(R.drawable.ic_river));
 
         } else {
-            item.image.setImageDrawable(ctx.getResources().getDrawable(android.R.drawable.ic_dialog_email));
+            item.image.setImageDrawable(ctx.getResources().getDrawable(R.drawable.ic_river));
 
         }
         //final TownDTO p = mList.get(position);
         //String string = mStrings[position];
         final RiverDTO river = mList.get(position);
+
         item.txtString.setText(river.getRiverName());
         Statics.setRobotoFontLight(ctx, item.txtString);
         return (convertView);
     }
 
     static class ViewHolderItem {
-        TextView txtString;
+        TextView txtString,score_weight;
         ImageView image;
     }
 }

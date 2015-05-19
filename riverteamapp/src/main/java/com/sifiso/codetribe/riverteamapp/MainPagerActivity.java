@@ -46,6 +46,7 @@ import com.sifiso.codetribe.minisasslibrary.util.ErrorUtil;
 import com.sifiso.codetribe.minisasslibrary.util.Statics;
 import com.sifiso.codetribe.minisasslibrary.util.TimerUtil;
 import com.sifiso.codetribe.minisasslibrary.util.ToastUtil;
+import com.sifiso.codetribe.minisasslibrary.util.Util;
 import com.sifiso.codetribe.minisasslibrary.util.WebSocketUtil;
 import com.sifiso.codetribe.minisasslibrary.R;
 import com.sifiso.codetribe.minisasslibrary.viewsUtil.ZoomOutPageTransformerImpl;
@@ -85,10 +86,15 @@ public class MainPagerActivity extends ActionBarActivity implements CreateEvalua
         RL_add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Toast.makeText(ctx, " Clicked Evaluation", Toast.LENGTH_LONG).show();
-                Intent intent = new Intent(MainPagerActivity.this, EvaluationActivity.class);
-                intent.putExtra("statusCode", CREATE_EVALUATION);
-                startActivity(intent);
+                Util.flashOnce(RL_add, 200, new Util.UtilAnimationListener() {
+                    @Override
+                    public void onAnimationEnded() {
+                        Intent intent = new Intent(MainPagerActivity.this, EvaluationActivity.class);
+                        intent.putExtra("statusCode", CREATE_EVALUATION);
+                        startActivity(intent);
+                    }
+                });
+
             }
         });
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
@@ -186,7 +192,7 @@ public class MainPagerActivity extends ActionBarActivity implements CreateEvalua
     @Override
     protected void onStart() {
         super.onStart();
-        //TimerUtil.killFlashTimer();
+        TimerUtil.killFlashTimer();
 
         Intent intent = new Intent(MainPagerActivity.this, RequestSyncService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
@@ -250,7 +256,7 @@ public class MainPagerActivity extends ActionBarActivity implements CreateEvalua
                 }
             });
             //ZoomOutPageTransformerImpl z = new ZoomOutPageTransformerImpl();
-           // mPager.setPageTransformer(true, z);
+            // mPager.setPageTransformer(true, z);
         } catch (Exception e) {
             Log.e(LOG, "-- Some shit happened, probably IllegalState of some kind ...");
         }
@@ -348,7 +354,7 @@ public class MainPagerActivity extends ActionBarActivity implements CreateEvalua
 
     @Override
     public void onRefreshMap(RiverDTO river, int result) {
-        Intent intent = new Intent(MainPagerActivity.this, com.sifiso.codetribe.riverteamapp.MapsActivity.class);
+        Intent intent = new Intent(MainPagerActivity.this, MapsActivity.class);
         intent.putExtra("river", river);
         intent.putExtra("displayType", result);
         startActivity(intent);
@@ -357,7 +363,7 @@ public class MainPagerActivity extends ActionBarActivity implements CreateEvalua
 
     @Override
     public void onCreateEvaluationRL(RiverDTO river) {
-       // ToastUtil.toast(ctx, river.getRiverName());
+        // ToastUtil.toast(ctx, river.getRiverName());
         Intent createEva = new Intent(MainPagerActivity.this, EvaluationActivity.class);
         createEva.putExtra("riverCreate", river);
         createEva.putExtra("response", response);

@@ -6,31 +6,12 @@
     android:backgroundTint="@color/background_floating_material_light">
 
 
-    <LinearLayout
-        android:id="@+id/LL1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginBottom="10dp"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/SL_show_insect"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/xsquare_animal_colors"
-            android:drawableRight="@drawable/ic_insect"
-            android:text="Select insect group"
-            android:textColor="@color/white" />
-    </LinearLayout>
 
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/LL1"
         android:padding="5dp"
         android:background="@drawable/xborder">
 

@@ -22,6 +22,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -44,6 +45,7 @@ import com.sifiso.codetribe.minisasslibrary.services.RequestSyncService;
 import com.sifiso.codetribe.minisasslibrary.toolbox.WebCheck;
 import com.sifiso.codetribe.minisasslibrary.toolbox.WebCheckResult;
 import com.sifiso.codetribe.minisasslibrary.util.CacheUtil;
+import com.sifiso.codetribe.minisasslibrary.util.Constants;
 import com.sifiso.codetribe.minisasslibrary.util.ErrorUtil;
 import com.sifiso.codetribe.minisasslibrary.util.RequestCacheUtil;
 import com.sifiso.codetribe.minisasslibrary.util.SharedUtil;
@@ -54,9 +56,9 @@ import com.sifiso.codetribe.minisasslibrary.util.WebSocketUtil;
 
 import org.joda.time.DateTime;
 
-import java.math.BigDecimal;
-import java.sql.Date;
+
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -68,8 +70,11 @@ public class EvaluationActivity extends ActionBarActivity {
     private EditText WC_score, WP_score, WT_score, WO_score, WE_score;
     private TextView TV_total_score, TV_average_score, TV_avg_score, TV_score_status;
     private ImageView IMG_score_icon, AE_pin_point;
-    private TextView WT_sp_river, WT_sp_category, EDT_comment;
-    private Button WT_gps_picker, SL_show_insect, AE_create;
+    private TextView WT_sp_river, WT_sp_category, EDT_comment, AE_down_up;
+    private Button WT_gps_picker, SL_show_insect, AE_create, AE_find_near_sites;
+
+    //layouts
+    RelativeLayout result2, result3;
     EvaluationDTO evaluationDTO;
     Integer teamMemberID, conditionID;
     double wc = 0.0, wt = 0.0, we = 0.0, wp = 0.0, wo = 0.0;
@@ -94,10 +99,72 @@ public class EvaluationActivity extends ActionBarActivity {
     Menu mMenu;
     List<PageFragment> pageFragmentList;
     ResponseDTO response;
-    boolean mBound;
+    boolean mBound, mShowMore;
     RequestSyncService mService;
 
     private Context ctx;
+
+    private void setField() {
+
+        WC_minus = (TextView) findViewById(R.id.WC_minus);
+        WC_score = (EditText) findViewById(R.id.WC_score);
+        WC_add = (TextView) findViewById(R.id.WC_add);
+        WT_minus = (TextView) findViewById(R.id.WT_minus);
+        WT_score = (EditText) findViewById(R.id.WT_score);
+        WT_add = (TextView) findViewById(R.id.WT_add);
+        WP_minus = (TextView) findViewById(R.id.WP_minus);
+        WP_score = (EditText) findViewById(R.id.WP_score);
+        WP_add = (TextView) findViewById(R.id.WP_add);
+        WO_minus = (TextView) findViewById(R.id.WO_minus);
+        WO_score = (EditText) findViewById(R.id.WO_score);
+        WO_add = (TextView) findViewById(R.id.WO_add);
+        WE_minus = (TextView) findViewById(R.id.WE_minus);
+        WE_score = (EditText) findViewById(R.id.WE_score);
+        WE_add = (TextView) findViewById(R.id.WE_add);
+        result3 = (RelativeLayout) findViewById(R.id.result3);
+        result3.setVisibility(View.GONE);
+        result2 = (RelativeLayout) findViewById(R.id.result2);
+        result2.setVisibility(View.VISIBLE);
+        TV_total_score = (TextView) findViewById(R.id.TV_total_score);
+        TV_average_score = (TextView) findViewById(R.id.TV_average_score);
+        TV_avg_score = (TextView) findViewById(R.id.TV_avg_score);
+        TV_score_status = (TextView) findViewById(R.id.TV_score_status);
+        IMG_score_icon = (ImageView) findViewById(R.id.IMG_score_icon);
+        WT_sp_river = (TextView) findViewById(R.id.WT_sp_river);
+        WT_sp_category = (TextView) findViewById(R.id.WT_sp_category);
+        EDT_comment = (EditText) findViewById(R.id.EDT_comment);
+        AE_pin_point = (ImageView) findViewById(R.id.AE_pin_point);
+        WT_gps_picker = (Button) findViewById(R.id.WT_gps_picker);
+        SL_show_insect = (Button) findViewById(R.id.SL_show_insect);
+        AE_create = (Button) findViewById(R.id.AE_create);
+        AE_down_up = (TextView) findViewById(R.id.AE_down_up);
+        AE_down_up.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mShowMore) {
+                    mShowMore = false;
+                    result2.setVisibility(View.VISIBLE);
+                    // AE_down_up.setCompoundDrawables(ctx.getResources().getDrawable(android.R.drawable.arrow_down_float), null, null, null);
+                    AE_down_up.setCompoundDrawablesWithIntrinsicBounds(0, 0, android.R.drawable.arrow_down_float, 0);
+                } else {
+                    mShowMore = true;
+                    result2.setVisibility(View.GONE);
+                    AE_down_up.setCompoundDrawablesWithIntrinsicBounds(0, 0, android.R.drawable.arrow_up_float, 0);
+                }
+            }
+        });
+        AE_find_near_sites = (Button) findViewById(R.id.AE_find_near_sites);
+
+        viewStub = (ViewStub) findViewById(R.id.viewStub);
+        if (codeStatus == CREATE_EVALUATION) {
+            river = (RiverDTO) getIntent().getSerializableExtra("riverCreate");
+            WT_sp_river.setTextColor(getResources().getColor(R.color.gray));
+            WT_sp_river.setText(river.getRiverName());
+            riverID = river.getRiverID();
+        }
+        // buildUI();
+    }
+
     private ServiceConnection mConnection = new ServiceConnection() {
 
         @Override
@@ -235,6 +302,7 @@ public class EvaluationActivity extends ActionBarActivity {
                 Log.w(LOG, "### gps ui has returned with data?");
                 if (resultCode == GPS_DATA) {
                     Log.w(LOG, "### gps ui has returned with data?");
+
                     setEvaluationSite((EvaluationSiteDTO) data.getSerializableExtra("siteData"));
                     // evaluationFragment.setResponse(response);
                     teamMember = SharedUtil.getTeamMember(ctx);
@@ -245,7 +313,9 @@ public class EvaluationActivity extends ActionBarActivity {
                 if (resultCode == INSECT_DATA) {
                     Log.w(LOG, "### insect ui has returned with data?");
                     insectImageList = (List<InsectImageDTO>) data.getSerializableExtra("overallInsect");
+
                     scoreUpdater((List<InsectImageDTO>) data.getSerializableExtra("selectedInsects"));
+                    result3.setVisibility(View.VISIBLE);
                     teamMember = SharedUtil.getTeamMember(ctx);
                 }
                 break;
@@ -302,46 +372,6 @@ public class EvaluationActivity extends ActionBarActivity {
 
     private int indexCat, indexRiv;
 
-    private void setField() {
-
-        WC_minus = (TextView) findViewById(R.id.WC_minus);
-        WC_score = (EditText) findViewById(R.id.WC_score);
-        WC_add = (TextView) findViewById(R.id.WC_add);
-        WT_minus = (TextView) findViewById(R.id.WT_minus);
-        WT_score = (EditText) findViewById(R.id.WT_score);
-        WT_add = (TextView) findViewById(R.id.WT_add);
-        WP_minus = (TextView) findViewById(R.id.WP_minus);
-        WP_score = (EditText) findViewById(R.id.WP_score);
-        WP_add = (TextView) findViewById(R.id.WP_add);
-        WO_minus = (TextView) findViewById(R.id.WO_minus);
-        WO_score = (EditText) findViewById(R.id.WO_score);
-        WO_add = (TextView) findViewById(R.id.WO_add);
-        WE_minus = (TextView) findViewById(R.id.WE_minus);
-        WE_score = (EditText) findViewById(R.id.WE_score);
-        WE_add = (TextView) findViewById(R.id.WE_add);
-
-        TV_total_score = (TextView) findViewById(R.id.TV_total_score);
-        TV_average_score = (TextView) findViewById(R.id.TV_average_score);
-        TV_avg_score = (TextView) findViewById(R.id.TV_avg_score);
-        TV_score_status = (TextView) findViewById(R.id.TV_score_status);
-        IMG_score_icon = (ImageView) findViewById(R.id.IMG_score_icon);
-        WT_sp_river = (TextView) findViewById(R.id.WT_sp_river);
-        WT_sp_category = (TextView) findViewById(R.id.WT_sp_category);
-        EDT_comment = (EditText) findViewById(R.id.EDT_comment);
-        AE_pin_point = (ImageView) findViewById(R.id.AE_pin_point);
-        WT_gps_picker = (Button) findViewById(R.id.WT_gps_picker);
-        SL_show_insect = (Button) findViewById(R.id.SL_show_insect);
-        AE_create = (Button) findViewById(R.id.AE_create);
-
-        viewStub = (ViewStub) findViewById(R.id.viewStub);
-        if (codeStatus == CREATE_EVALUATION) {
-            river = (RiverDTO) getIntent().getSerializableExtra("riverCreate");
-            WT_sp_river.setTextColor(getResources().getColor(R.color.gray));
-            WT_sp_river.setText(river.getRiverName());
-            riverID = river.getRiverID();
-        }
-        // buildUI();
-    }
 
     private void addMinus() {
         WO_add.setOnClickListener(new View.OnClickListener() {
@@ -517,7 +547,7 @@ public class EvaluationActivity extends ActionBarActivity {
                     Intent intent = new Intent(EvaluationActivity.this, GPSscanner.class);
                     startActivityForResult(intent, GPS_DATA);
                 } else {
-                    ToastUtil.toast(ctx, "Please choose evaluated river");
+                    ToastUtil.toast(ctx, "Please choose river");
                 }
             }
         });
@@ -525,11 +555,30 @@ public class EvaluationActivity extends ActionBarActivity {
         AE_create.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (evaluationSite != null) {
-                    localSaveRequests();
-                } else {
-                    ToastUtil.toast(ctx, "Please choose evaluated river");
+                if (riverID == null) {
+                    ToastUtil.toast(ctx, "Please select river");
+                    return;
                 }
+                if (categoryID == null) {
+                    ToastUtil.toast(ctx, "Please select category");
+                    return;
+                }
+
+                if (evaluationSite == null) {
+                    ToastUtil.toast(ctx, "Evaluation site not defined (Hint: Select insect group)");
+                    return;
+                }
+                if (selectedInsects == null) {
+                    selectedInsects = new ArrayList<>();
+                    ToastUtil.toast(ctx, "Select insect group found, to score evaluation (Hint: Select insect group)");
+                    return;
+                }
+                if (conditionID == null) {
+                    ToastUtil.toast(ctx, "Condition not specified, Please select insect group found");
+                    return;
+                }
+
+                localSaveRequests();
             }
         });
 
@@ -549,12 +598,13 @@ public class EvaluationActivity extends ActionBarActivity {
         SL_show_insect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (catType.equalsIgnoreCase("Select category")) {
+                if (categoryID == null) {
                     ToastUtil.toast(ctx, "Select category, before choosing insects");
                 } else {
 
                     Log.d(LOG, "Insect Select " + insectImageList.size());
                     Intent intent = new Intent(EvaluationActivity.this, InsectPicker.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     intent.putExtra("insetImageList", (java.io.Serializable) insectImageList);
                     startActivityForResult(intent, INSECT_DATA);
                 }
@@ -563,6 +613,11 @@ public class EvaluationActivity extends ActionBarActivity {
     }
 
     public void scoreUpdater(List<InsectImageDTO> insectImages) {
+        if (insectImages == null) {
+            result3.setVisibility(View.GONE);
+        } else {
+            result3.setVisibility(View.VISIBLE);
+        }
         TV_avg_score.setText(calculateAverage(insectImages) + "");
         TV_average_score.setText(((insectImages != null) ? insectImages.size() : 0.0) + "");
         selectedInsects = insectImages;
@@ -580,9 +635,9 @@ public class EvaluationActivity extends ActionBarActivity {
                 TV_total_score.setText("0.0");
                 TV_average_score.setText("0.0");
                 TV_avg_score.setText("0.0");
-                IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_insect));
-                WT_sp_river.setText("Select river");
-                WT_sp_category.setText("Select category");
+                IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.red_crap));
+                WT_sp_river.setText("What is the current river are you at?");
+                WT_sp_category.setText("hat type of environment are you at? Rocky or Sandy?");
                 EDT_comment.setText("");
                 AE_pin_point.setVisibility(View.GONE);
                 evaluationSite = new EvaluationSiteDTO();
@@ -603,16 +658,16 @@ public class EvaluationActivity extends ActionBarActivity {
 
     }
 
-    private Integer conditionIDFunc(List<CategoryDTO> categorys, String status, String type) {
-        Integer cond = 0;
-        Log.i(LOG, categorys.size() + " " + type);
+    private Integer conditionIDFunc(List<CategoryDTO> categorys, int statusCondition, int categoryID) {
+        Integer cond = null;
+        Log.i(LOG, categorys.size() + " " + categoryID);
         for (CategoryDTO c : categorys) {
-            Log.e(LOG, categorys.size() + " " + type);
-            if (type.equalsIgnoreCase(c.getCategoryName())) {
-                Log.d(LOG, categorys.size() + " " + type);
+            Log.e(LOG, categorys.size() + " " + categoryID);
+            if (categoryID == c.getCategoryID()) {
+                Log.d(LOG, categorys.size() + " " + categoryID);
                 for (ConditionsDTO cd : c.getConditionsList()) {
-                    Log.w(LOG, categorys.size() + " " + type + " ");
-                    if (status.equalsIgnoreCase(cd.getConditionName())) {
+                    Log.w(LOG, categorys.size() + " " + cd.getConditionName() + " ");
+                    if (statusCondition == cd.getConditionsID()) {
                         Log.i(LOG, cd.getConditionName() + " " + cd.getConditionsID());
                         cond = cd.getConditionsID();
                     }
@@ -624,11 +679,15 @@ public class EvaluationActivity extends ActionBarActivity {
         return cond;
     }
 
-    private void statusScore(List<InsectImageDTO> dtos, String type) {
+
+    private void statusScore(List<InsectImageDTO> dtos, String categoryName) {
         String status = "";
+        int statusCondition = 0;
+        int categoryID = 0;
         double average = 0.0, total = 0.0;
         if (dtos == null || dtos.size() == 0) {
             average = 0.0;
+
         } else {
             for (InsectImageDTO ii : dtos) {
                 total = total + ii.getSensitivityScore();
@@ -637,78 +696,109 @@ public class EvaluationActivity extends ActionBarActivity {
         }
         average = Math.round(average * 100.0) / 100.0;
         Log.d(LOG, average + "");
-        if (type.equalsIgnoreCase("Sandy Type")) {
+        if (categoryName.equalsIgnoreCase("Sandy Type")) {
+            categoryID = 8;
             if (average > 6.9) {
                 status = "Unmodified(NATURAL condition)";
+                statusCondition = Constants.UNMODIFIED_NATURAL_SAND;
                 TV_score_status.setTextColor(getResources().getColor(R.color.purple));
                 TV_avg_score.setTextColor(getResources().getColor(R.color.purple));
                 IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.purple_crap));
                 //IMG_score_icon.setColorFilter(getResources().getColor(R.color.purple), PorterDuff.Mode.MULTIPLY);
             } else if (average > 5.8 && average < 6.9) {
                 status = "Largely natural/few modifications(GOOD condition)";
+                statusCondition = Constants.LARGELY_NATURAL_SAND;
                 TV_score_status.setTextColor(getResources().getColor(R.color.green));
                 TV_avg_score.setTextColor(getResources().getColor(R.color.green));
                 IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.green_crap));
                 // IMG_score_icon.setColorFilter(getResources().getColor(R.color.green), PorterDuff.Mode.MULTIPLY);
             } else if (average > 4.9 && average < 5.8) {
                 status = "Moderately modified(FAIR condition)";
+                statusCondition = Constants.MODERATELY_MODIFIED_SAND;
                 TV_score_status.setTextColor(getResources().getColor(R.color.blue));
                 TV_avg_score.setTextColor(getResources().getColor(R.color.blue));
                 IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.blue_crap));
                 // IMG_score_icon.setColorFilter(getResources().getColor(R.color.yellow_dark), PorterDuff.Mode.MULTIPLY);
             } else if (average > 4.3 && average < 4.9) {
                 status = "Largely modified(POOR condition)";
+                statusCondition = Constants.LARGELY_MODIFIED_SAND;
                 TV_score_status.setTextColor(getResources().getColor(R.color.Chocolate));
                 TV_avg_score.setTextColor(getResources().getColor(R.color.Chocolate));
                 IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.orange_crap));
                 // IMG_score_icon.setColorFilter(getResources().getColor(R.color.orange), PorterDuff.Mode.MULTIPLY);
             } else if (average < 4.3) {
                 status = "Seriously/critically modified";
+                statusCondition = Constants.CRITICALLY_MODIFIED_SAND;
                 TV_score_status.setTextColor(getResources().getColor(R.color.red));
                 TV_avg_score.setTextColor(getResources().getColor(R.color.red));
                 IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.red_crap));
                 //IMG_score_icon.setColorFilter(getResources().getColor(R.color.red), PorterDuff.Mode.MULTIPLY);
             } else {
                 status = "Not specified";
+                statusCondition = Constants.NOT_SPECIFIED;
                 TV_score_status.setTextColor(getResources().getColor(R.color.gray));
                 TV_avg_score.setTextColor(getResources().getColor(R.color.gray));
                 IMG_score_icon.setColorFilter(getResources().getColor(R.color.gray), PorterDuff.Mode.MULTIPLY);
             }
-        } else if (type.equalsIgnoreCase("Rocky Type")) {
+        } else if (categoryName.equalsIgnoreCase("Rocky Type")) {
+            categoryID = 9;
             if (average > 7.9) {
                 status = "Unmodified(NATURAL condition)";
+                statusCondition = Constants.UNMODIFIED_NATURAL_ROCK;
                 TV_score_status.setTextColor(getResources().getColor(R.color.purple));
                 TV_avg_score.setTextColor(getResources().getColor(R.color.purple));
                 IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.purple_crap));
                 //IMG_score_icon.setColorFilter(getResources().getColor(R.color.purple), PorterDuff.Mode.MULTIPLY);
             } else if (average > 6.8 && average < 7.9) {
                 status = "Largely natural/few modifications(GOOD condition)";
+                statusCondition = Constants.LARGELY_NATURAL_ROCK;
                 TV_score_status.setTextColor(getResources().getColor(R.color.green));
                 TV_avg_score.setTextColor(getResources().getColor(R.color.green));
-                IMG_score_icon.setColorFilter(getResources().getColor(R.color.green), PorterDuff.Mode.MULTIPLY);
+                IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.green_crap));
+                // IMG_score_icon.setColorFilter(getResources().getColor(R.color.green), PorterDuff.Mode.MULTIPLY);
             } else if (average > 6.1 && average < 6.8) {
                 status = "Moderately modified(FAIR condition)";
-                TV_score_status.setTextColor(getResources().getColor(R.color.yellow_dark));
-                TV_avg_score.setTextColor(getResources().getColor(R.color.yellow_dark));
-                IMG_score_icon.setColorFilter(getResources().getColor(R.color.yellow_dark), PorterDuff.Mode.MULTIPLY);
+                statusCondition = Constants.MODERATELY_MODIFIED_ROCK;
+                TV_score_status.setTextColor(getResources().getColor(R.color.blue));
+                TV_avg_score.setTextColor(getResources().getColor(R.color.blue));
+                IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.blue_crap));
+                // IMG_score_icon.setColorFilter(getResources().getColor(R.color.yellow_dark), PorterDuff.Mode.MULTIPLY);
             } else if (average > 5.1 && average < 6.1) {
                 status = "Largely modified(POOR condition)";
-                TV_score_status.setTextColor(getResources().getColor(R.color.orange));
-                TV_avg_score.setTextColor(getResources().getColor(R.color.orange));
-                IMG_score_icon.setColorFilter(getResources().getColor(R.color.orange), PorterDuff.Mode.MULTIPLY);
+                statusCondition = Constants.LARGELY_MODIFIED_ROCK;
+                TV_score_status.setTextColor(getResources().getColor(R.color.Chocolate));
+                TV_avg_score.setTextColor(getResources().getColor(R.color.Chocolate));
+                IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.orange_crap));
+                // IMG_score_icon.setColorFilter(getResources().getColor(R.color.orange), PorterDuff.Mode.MULTIPLY);
             } else if (average < 5.1) {
                 status = "Seriously/critically modified";
-                TV_avg_score.setTextColor(getResources().getColor(R.color.red));
+                statusCondition = Constants.CRITICALLY_MODIFIED_ROCK;
                 TV_score_status.setTextColor(getResources().getColor(R.color.red));
-                IMG_score_icon.setColorFilter(getResources().getColor(R.color.red), PorterDuff.Mode.MULTIPLY);
-            }/* else {
-
-            }*/
+                TV_avg_score.setTextColor(getResources().getColor(R.color.red));
+                IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.red_crap));
+                //IMG_score_icon.setColorFilter(getResources().getColor(R.color.red), PorterDuff.Mode.MULTIPLY);
+            } else {
+                status = "Not specified";
+                statusCondition = Constants.NOT_SPECIFIED;
+                TV_score_status.setTextColor(getResources().getColor(R.color.gray));
+                TV_avg_score.setTextColor(getResources().getColor(R.color.gray));
+                IMG_score_icon.setColorFilter(getResources().getColor(R.color.gray), PorterDuff.Mode.MULTIPLY);
+            }
         }
 
         TV_score_status.setText(status);
-        conditionID = conditionIDFunc(response.getCategoryList(), status, type);
-        Log.e(LOG, "lskdfsdf " + conditionIDFunc(response.getCategoryList(), status, type));
+        if (statusCondition == Constants.NOT_SPECIFIED) {
+            conditionID = null;
+
+        } else {
+
+            conditionID = conditionIDFunc(response.getCategoryList(), statusCondition, categoryID);
+        }
+        if (dtos == null || dtos.size() == 0) {
+            conditionID = null;
+
+        }
+        Log.e(LOG, "Check conditionID : " + conditionID);
     }
 
     private double calculateScore(List<InsectImageDTO> dtos) {
@@ -821,18 +911,14 @@ public class EvaluationActivity extends ActionBarActivity {
         RequestDTO w = new RequestDTO(RequestDTO.ADD_EVALUATION);
         c = new GregorianCalendar();
         evaluationDTO = new EvaluationDTO();
-        if (selectedInsects == null) {
-            selectedInsects = new ArrayList<>();
-            ToastUtil.errorToast(ctx, "If you don't select insect group, you can't score evaluation(hint: SELECT INSECT GROUP)");
-            return;
-        }
+
 
         Log.d(LOG, "" + selectedInsects.size());
 
 
         evaluationDTO.setConditionsID(conditionID);
         evaluationDTO.setTeamMemberID(teamMember.getTeamMemberID());
-        evaluationSite.setDateRegistered(new DateTime().toDate().getTime());
+        evaluationSite.setDateRegistered(new Date().getTime());
         evaluationDTO.setEvaluationSite(evaluationSite);
 
 
@@ -842,9 +928,9 @@ public class EvaluationActivity extends ActionBarActivity {
         evaluationDTO.setWaterClarity(Double.parseDouble(WC_score.getText().toString()));
         evaluationDTO.setWaterTemperature(Double.parseDouble(WT_score.getText().toString()));
         evaluationDTO.setElectricityConductivity(Double.parseDouble(WE_score.getText().toString()));
-        evaluationDTO.setEvaluationDate(new DateTime().toDate().getTime());
+        evaluationDTO.setEvaluationDate(new Date().getTime());
         evaluationDTO.setScore(Double.parseDouble(TV_avg_score.getText().toString()));
-
+        Log.i(LOG, new Date(evaluationDTO.getEvaluationDate()).toString());
         evaluationDTO.setEvaluationImageList(takenImages);
 
         w.setInsectImages(selectedInsects);
@@ -853,16 +939,9 @@ public class EvaluationActivity extends ActionBarActivity {
         //ToastUtil.errorToast(ctx, c.getTime().getTime() + " : " + c.getTime());
         Log.i(LOG, (new Gson()).toJson(w));
         WebCheckResult wcr = WebCheck.checkNetworkAvailability(ctx);
-        if (evaluationDTO.getEvaluationSite() == null) {
-            ToastUtil.errorToast(ctx, "Please make sure Site Evaluation is picked(hint: SITE GPS LOCATION)");
-            return;
-        }
-        if (evaluationDTO.getConditionsID() == null && conditionID == null) {
-            ToastUtil.errorToast(ctx, "If you don't select insect group, you can't score evaluation(hint: SELECT INSECT GROUP)");
-            return;
-        }
 
-        if (wcr.isWifiConnected()) {
+
+        if (wcr.isWifiConnected() || wcr.isMobileConnected()) {
             //sendRequest(w);
             addRequestToCache(w);
         } else {
@@ -975,9 +1054,7 @@ public class EvaluationActivity extends ActionBarActivity {
                     public void run() {
                         response = respond;
                         buildUI();
-                        if (w.isWifiConnected()) {
-                            getData();
-                        }
+
                     }
                 });
 
@@ -994,9 +1071,7 @@ public class EvaluationActivity extends ActionBarActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if (w.isWifiConnected()) {
-                            getData();
-                        }
+
                     }
                 });
 

@@ -62,7 +62,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
     EvaluationDTO evaluation;
     RiverDTO river;
     int index;
-    TextView text, txtCount, textMap;
+    TextView /*text,*/ txtCount, textMap;
     View topLayout;
     ProgressBar progressBar;
     static final Locale loc = Locale.getDefault();
@@ -74,12 +74,9 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_maps);
         ctx = getApplicationContext();
-        try {
-            setContentView(R.layout.activity_maps);
-        } catch (Exception e) {
-            Log.e(LOG, "FAILED to set ContentView", e);
-        }
+
         evaluationImage = (EvaluationImageDTO) getIntent().getSerializableExtra("evaluationImage");
         evaluation = (EvaluationDTO) getIntent().getSerializableExtra("evaluation");
         river = (RiverDTO) getIntent().getSerializableExtra("river");
@@ -92,14 +89,14 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
                 .build();*/
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
-        text = (TextView) findViewById(R.id.textMap);
+//        text = (TextView) findViewById(R.id.textMap);
         txtCount = (TextView) findViewById(R.id.count);
         textMap = (TextView) findViewById(R.id.textMap);
         // textMap.setText(river.getRiverName());
         //  txtCount.setText(river.getEvaluationSiteList().size() + "");
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         progressBar.setVisibility(View.GONE);
-        Statics.setRobotoFontBold(ctx, text);
+        //Statics.setRobotoFontBold(ctx, text);
 
         topLayout = findViewById(R.id.top);
 
@@ -118,7 +115,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
             MeasureRiverLength();
         }
 
-        //  setGoogleMap();
+        setGoogleMap();
     }
 
     static final int EVALUATION_VIEW = 12;
