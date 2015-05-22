@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
@@ -102,10 +103,9 @@ public class InsectPicker extends ActionBarActivity {
     private void setFields() {
         SD_list = (RecyclerView) findViewById(R.id.SD_list);
         SD_list.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
-
+        //SD_list.setLayoutManager(new LinearLayoutManager(ctx,LinearLayoutManager.HORIZONTAL,false));
         SD_list.setItemAnimator(new DefaultItemAnimator());
         SD_list.addItemDecoration(new DividerItemDecoration(ctx, RecyclerView.HORIZONTAL));
-
     }
 
     @Override

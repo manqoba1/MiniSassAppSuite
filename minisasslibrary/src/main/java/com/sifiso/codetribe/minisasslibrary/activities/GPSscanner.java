@@ -236,14 +236,7 @@ public class GPSscanner extends ActionBarActivity implements LocationListener {
         super.onStart();
         Log.i(LOG,
                 "### onStart, binding RequestSyncService and PhotoUploadService");
-        Intent intent = new Intent(this, CachedSyncService.class);
-//        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-       /* if (mLocationClient != null) {
-            mLocationClient.connect();
-            Log.i(LOG,
-                    "### onStart - locationClient connecting ... ");
-        }*/
-//        getGPSCoordinates();
+
         startScan();
     }
 

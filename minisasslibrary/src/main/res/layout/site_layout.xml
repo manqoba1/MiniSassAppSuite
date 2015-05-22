@@ -22,7 +22,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:focusable="false"
-        android:hint="What type of environment are you at? Rocky or Sandy?"
+        android:hint="What environment are you at? Rocky or Sandy?"
         android:padding="10dp"
         android:layout_below="@+id/WT_sp_river"
         android:textColor="@color/teal"

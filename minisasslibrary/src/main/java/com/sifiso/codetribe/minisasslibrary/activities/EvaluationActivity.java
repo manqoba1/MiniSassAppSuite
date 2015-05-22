@@ -8,8 +8,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.PorterDuff;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -63,7 +67,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 
-public class EvaluationActivity extends ActionBarActivity {
+public class EvaluationActivity extends ActionBarActivity implements LocationListener {
     static final String LOG = EvaluationActivity.class.getSimpleName();
     private TextView WC_minus, WC_add, WT_minus, WT_add,
             WP_minus, WP_add, WO_minus, WO_add, WE_minus, WE_add;
@@ -86,7 +90,7 @@ public class EvaluationActivity extends ActionBarActivity {
     private TeamMemberDTO teamMember;
     String catType = "Select category";
 
-    static final int ACCURACY_THRESHOLD = 5;
+    static final int ACCURACY_THRESHOLD = 10;
     static final int MAP_REQUESTED = 9007;
     static final int STATUS_CODE = 220;
     static final int INSECT_DATA = 103;
@@ -269,6 +273,7 @@ public class EvaluationActivity extends ActionBarActivity {
         }
         if (id == android.R.id.home) {
             finish();
+            stopScan();
 
         }
         return super.onOptionsItemSelected(item);
@@ -343,7 +348,8 @@ public class EvaluationActivity extends ActionBarActivity {
                         WT_sp_category.setText(resp.getCategoryList().get(indexCat).getCategoryName());
                         categoryID = resp.getCategoryList().get(indexCat).getCategoryID();
                         catType = (resp.getCategoryList().get(indexCat).getCategoryName());
-                        Log.e(LOG, catType);
+                        evaluationSite.setCategoryID(categoryID);
+                        Log.e(LOG, categoryID + "");
                     }
                 });
             }
@@ -361,6 +367,7 @@ public class EvaluationActivity extends ActionBarActivity {
                         indexRiv = ind;
                         WT_sp_river.setText(resp.getRiverList().get(indexRiv).getRiverName());
                         riverID = resp.getRiverList().get(indexRiv).getRiverID();
+                        evaluationSite.setRiverID(riverID);
                         Log.e(LOG, "" + riverID);
                     }
                 });
@@ -961,6 +968,7 @@ public class EvaluationActivity extends ActionBarActivity {
 
     @Override
     public void onStart() {
+        startScan();
         super.onStart();
         Log.i(LOG,
                 "### onStart, binding RequestSyncService and PhotoUploadService");
@@ -991,6 +999,7 @@ public class EvaluationActivity extends ActionBarActivity {
             unbindService(mConnection);
             mBound = false;
         }
+        stopScan();
         super.onStop();
     }
 
@@ -1135,5 +1144,141 @@ public class EvaluationActivity extends ActionBarActivity {
         } catch (Exception e) {
 
         }
+    }
+
+    Location location;
+    LocationManager locationManager;
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 2;
+    private static final long MIN_TIME_BW_UPDATES = 1;
+    public boolean isGPSEnabled = false;
+    public boolean isNetworkEnabled = false;
+    public boolean canGetLocation = false;
+
+    private Location getLocation() {
+        onLocationChanged(location);
+        return location;
+    }
+
+    public void startScan() {
+        getLocation();
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        locationManager = (LocationManager) ctx.getSystemService(Context.LOCATION_SERVICE);
+        isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+
+        Log.v(LOG + " gps", "=" + isGPSEnabled);
+
+        isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+        Log.v(LOG + " network", "=" + isNetworkEnabled);
+
+        if (isGPSEnabled == false && isNetworkEnabled == false) {
+            Log.d(LOG, "is not connected");
+            showSettingDialog();
+        } else {
+            canGetLocation = true;
+            if (isNetworkEnabled) {
+                location = null;
+                locationManager.requestLocationUpdates(
+                        LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES,
+                        MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                Log.d(LOG, "Network");
+                if (locationManager != null) {
+                    location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                    if (location != null) {
+                        setGPSLocation(location);
+                    }
+                }
+            }
+
+            if (isGPSEnabled) {
+                location = null;
+                if (location == null) {
+                    locationManager.requestLocationUpdates(
+                            LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES,
+                            MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                    Log.d(LOG, "GPs");
+                    if (locationManager != null) {
+                        location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                        if (location != null) {
+                            setGPSLocation(location);
+                        }
+                    }
+                }
+            }
+
+        }
+    }
+
+    private void setGPSLocation(Location loc) {
+        if (evaluationSite == null) {
+            evaluationSite = new EvaluationSiteDTO();
+        }
+        this.location = loc;
+
+        evaluationSite.setLatitude(location.getLatitude());
+        evaluationSite.setLongitude(location.getLongitude());
+        evaluationSite.setAccuracy(location.getAccuracy());
+
+        Log.w(LOG, "### Passing " + loc.getAccuracy());
+        if (loc.getAccuracy() <= ACCURACY_THRESHOLD) {
+            location = loc;
+            Log.w(LOG, "### Passing location2");
+            evaluationSite.setLatitude(location.getLatitude());
+            evaluationSite.setLongitude(location.getLongitude());
+            evaluationSite.setAccuracy(location.getAccuracy());
+            stopScan();
+            setEvaluationSite(evaluationSite);
+
+            //finish();
+            Log.e(LOG, "+++ best accuracy found: " + location.getAccuracy());
+        }
+    }
+
+    public void stopScan() {
+
+        if (locationManager != null) {
+            locationManager.removeUpdates(EvaluationActivity.this);
+        }
+
+    }
+
+
+    public void showSettingDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(EvaluationActivity.this);
+
+        builder.setTitle("GPS settings");
+        builder.setMessage("GPS is not enabled. Do you want to go to settings menu, to search for location?");
+        builder.setPositiveButton("Settings", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                startActivity(intent);
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
     }
 }

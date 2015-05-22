@@ -41,6 +41,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sifiso.codetribe.minisasslibrary.R;
+import com.sifiso.codetribe.minisasslibrary.adapters.PopupAdapter;
 import com.sifiso.codetribe.minisasslibrary.adapters.PopupInsectSelectedAdapter;
 import com.sifiso.codetribe.minisasslibrary.adapters.PopupListAdapter;
 import com.sifiso.codetribe.minisasslibrary.adapters.PopupRiverAdapter;
@@ -323,131 +324,42 @@ public class Util {
     }
 
 
-   /* public static Drawable getRandomHeroImageExec(Context ctx) {
-        random = new Random(System.currentTimeMillis());
-        int index = random.nextInt(17);
-        switch (index) {
-            case 0:
-                return ctx.getResources().getDrawable(R.drawable.banner_meeting);
-            case 1:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction3);
-            case 2:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction4);
-            case 3:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction5);
-            case 4:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_meeting3);
-            case 5:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction7);
-            case 6:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction8);
-            case 7:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction9);
-            case 8:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction10);
-            case 9:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction11);
-            case 10:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction13);
-            case 11:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction14);
-            case 12:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_report);
-            case 13:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_meeting3);
-            case 14:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_report2);
-            case 15:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_report);
-            case 16:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_meeting);
-            case 17:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_report3);
-
+    public static void showPopupBasicWithHeroImage(Context ctx, Activity act,
+                                                   List<String> list,
+                                                   View anchorView, String caption, final UtilPopupListener listener) {
+        final ListPopupWindow pop = new ListPopupWindow(act);
+        LayoutInflater inf = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View v = inf.inflate(R.layout.hero_image_popup, null);
+        TextView txt = (TextView) v.findViewById(R.id.HERO_caption);
+        if (caption != null) {
+            txt.setText(caption);
+        } else {
+            txt.setVisibility(View.GONE);
         }
-        return ctx.getResources().getDrawable(
-                R.drawable.banner_report2);
+        ImageView img = (ImageView) v.findViewById(R.id.HERO_image);
+        img.setImageDrawable(getRandomHeroImage(ctx));
+        Double b = new Double("" + getWindowWidth(act));
+        Double c = b / new Double("1.5");
+        //RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(getWindowWidth(act), 100);
+        //img.setLayoutParams(layoutParams);
+        pop.setPromptView(v);
+        pop.setPromptPosition(ListPopupWindow.POSITION_PROMPT_ABOVE);
+        pop.setAdapter(new PopupAdapter(ctx, R.layout.xxsimple_spinner_item,
+                list, false));
+        pop.setAnchorView(anchorView);
+        pop.setModal(true);
+        pop.setWidth(c.intValue());
+        pop.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                pop.dismiss();
+                if (listener != null) {
+                    listener.onItemSelected(position);
+                }
+            }
+        });
+        pop.show();
     }
-
-    public static Drawable getRandomHeroImage(Context ctx) {
-        random = new Random(System.currentTimeMillis());
-        int index = random.nextInt(17);
-        switch (index) {
-            case 0:
-                return ctx.getResources().getDrawable(R.drawable.banner_construction10);
-            case 1:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction3);
-            case 2:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction4);
-            case 3:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction5);
-            case 4:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction5);
-            case 5:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction7);
-            case 6:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction8);
-            case 7:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction9);
-            case 8:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction10);
-            case 9:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction11);
-            case 10:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction13);
-            case 11:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_construction14);
-            case 12:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_report);
-            case 13:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_report3);
-            case 14:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_report2);
-            case 15:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_report);
-            case 16:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_report2);
-            case 17:
-                return ctx.getResources().getDrawable(
-                        R.drawable.banner_report3);
-
-        }
-        return ctx.getResources().getDrawable(
-                R.drawable.banner_report2);
-    }*/
 
     public static double getElapsed(long start, long end) {
         BigDecimal m = new BigDecimal(end - start).divide(new BigDecimal(1000));

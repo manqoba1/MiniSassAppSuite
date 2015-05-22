@@ -41,6 +41,9 @@
             android:name=".EvaluationView"
             android:label="@string/title_activity_evaluation_view"></activity>
         <activity
+            android:name="com.sifiso.codetribe.minisasslibrary.activities.MapsActivity"
+            android:label="@string/title_activity_minisass_maps"></activity>
+        <activity
             android:name="com.sifiso.codetribe.minisasslibrary.activities.EvaluationActivity"
             android:label="@string/title_activity_evaluation"></activity>
 
