@@ -257,7 +257,7 @@ public class EvaluationView extends ActionBarActivity implements CreateEvaluatio
             }
 
             @Override
-            public void onDataCached() {
+            public void onDataCached(ResponseDTO r) {
 
             }
 
@@ -294,7 +294,7 @@ public class EvaluationView extends ActionBarActivity implements CreateEvaluatio
                         }
 
                         @Override
-                        public void onDataCached() {
+                        public void onDataCached(ResponseDTO r) {
                             //finish();
                         }
 

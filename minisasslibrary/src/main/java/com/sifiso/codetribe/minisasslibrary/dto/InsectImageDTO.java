@@ -6,6 +6,8 @@
 package com.sifiso.codetribe.minisasslibrary.dto;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -21,6 +23,15 @@ public class InsectImageDTO implements Serializable {
     private Integer insectID;
     private InsectDTO insect;
     private int sensitivityScore;
+    private List<InsectImageListDTO> insectimagelistList = new ArrayList<>();
+
+    public List<InsectImageListDTO> getInsectimagelistList() {
+        return insectimagelistList;
+    }
+
+    public void setInsectimagelistList(List<InsectImageListDTO> insectimagelistList) {
+        this.insectimagelistList = insectimagelistList;
+    }
 
     public InsectImageDTO() {
     }

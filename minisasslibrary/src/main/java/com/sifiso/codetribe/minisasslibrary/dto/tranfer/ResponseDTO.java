@@ -19,6 +19,8 @@ import com.sifiso.codetribe.minisasslibrary.dto.EvaluationSiteDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.GcmDeviceDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.InsectDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.InsectImageDTO;
+import com.sifiso.codetribe.minisasslibrary.dto.InsectImageListDTO;
+import com.sifiso.codetribe.minisasslibrary.dto.OrganisationtypeDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.ProvinceDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverTownDTO;
@@ -63,18 +65,33 @@ public class ResponseDTO implements Serializable {
     private List<TownDTO> townList = new ArrayList<>();
     private List<EvaluationInsectDTO> evaluationInsectList = new ArrayList<>();
     private List<ConditionsDTO> conditionsList;
-    private List<InsectImageDTO> insectImageList = new ArrayList<>();
+    private List<InsectImageDTO> insectimageDTOList = new ArrayList<>();
+    private List<InsectImageListDTO> insectImageListDTOs = new ArrayList<>();
     private List<String> evaluationImageFileName;
-    private List<ErrorStoreDTO> errorStoreList = new ArrayList<>();
-    private List<ErrorStoreAndroidDTO> errorStoreAndroidList = new ArrayList<>();
+    private List<OrganisationtypeDTO> organisationtypeList = new ArrayList<>();
 
-
-    public List<InsectImageDTO> getInsectImageList() {
-        return insectImageList;
+    public List<OrganisationtypeDTO> getOrganisationtypeList() {
+        return organisationtypeList;
     }
 
-    public void setInsectImageList(List<InsectImageDTO> insectImageList) {
-        this.insectImageList = insectImageList;
+    public void setOrganisationtypeList(List<OrganisationtypeDTO> organisationtypeList) {
+        this.organisationtypeList = organisationtypeList;
+    }
+
+    public List<InsectImageDTO> getInsectimageDTOList() {
+        return insectimageDTOList;
+    }
+
+    public void setInsectimageDTOList(List<InsectImageDTO> insectimageDTOList) {
+        this.insectimageDTOList = insectimageDTOList;
+    }
+
+    public List<InsectImageListDTO> getInsectImageListDTOs() {
+        return insectImageListDTOs;
+    }
+
+    public void setInsectImageListDTOs(List<InsectImageListDTO> insectImageListDTOs) {
+        this.insectImageListDTOs = insectImageListDTOs;
     }
 
     public List<String> getEvaluationImageFileName() {
@@ -349,20 +366,6 @@ public class ResponseDTO implements Serializable {
         this.elapsedRequestTimeInSeconds = elapsedRequestTimeInSeconds;
     }
 
-    public List<ErrorStoreDTO> getErrorStoreList() {
-        return errorStoreList;
-    }
 
-    public void setErrorStoreList(List<ErrorStoreDTO> errorStoreList) {
-        this.errorStoreList = errorStoreList;
-    }
-
-    public List<ErrorStoreAndroidDTO> getErrorStoreAndroidList() {
-        return errorStoreAndroidList;
-    }
-
-    public void setErrorStoreAndroidList(List<ErrorStoreAndroidDTO> errorStoreAndroidList) {
-        this.errorStoreAndroidList = errorStoreAndroidList;
-    }
 
 }

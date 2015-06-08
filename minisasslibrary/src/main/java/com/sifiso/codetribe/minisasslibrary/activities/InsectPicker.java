@@ -11,11 +11,15 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Toast;
 
 import com.sifiso.codetribe.minisasslibrary.R;
 import com.sifiso.codetribe.minisasslibrary.adapters.InsectSelectionAdapter;
 import com.sifiso.codetribe.minisasslibrary.dto.InsectImageDTO;
+import com.sifiso.codetribe.minisasslibrary.dto.InsectImageListDTO;
 import com.sifiso.codetribe.minisasslibrary.util.DividerItemDecoration;
+import com.sifiso.codetribe.minisasslibrary.util.SharedUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,9 +41,9 @@ public class InsectPicker extends ActionBarActivity {
         ctx = getApplicationContext();
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        Log.i(LOG,"onCreate select insect");
+        Log.i(LOG, "onCreate select insect");
         mSites = (List<InsectImageDTO>) getIntent().getSerializableExtra("insetImageList");
-        Log.i(LOG,"onCreate select insect " + mSites.size());
+        Log.i(LOG, "onCreate select insect " + mSites.size());
         setFields();
         setList();
     }
@@ -53,10 +57,18 @@ public class InsectPicker extends ActionBarActivity {
                 collectCheckedInsects(insect);
 
             }
+
+            @Override
+            public void onViewMoreImages(InsectImageDTO insect, int index) {
+                intent = new Intent(InsectPicker.this, ViewMoreImages.class);
+                intent.putExtra("insetImageList", (java.io.Serializable) mSites);
+                intent.putExtra("insect",  insect);
+                startActivityForResult(intent,RETURN_PICKER);
+            }
         });
         SD_list.setAdapter(adapter);
-    }
 
+    }
 
 
     private void collectCheckedInsects(InsectImageDTO mDtos) {
@@ -76,7 +88,7 @@ public class InsectPicker extends ActionBarActivity {
             total = total - mDtos.getSensitivityScore();
             mDtos.selected = false;
         }
-        Log.e(LOG, listCal.size() + "");
+        Log.e(LOG, listCal.size() + " count");
         intent = new Intent(InsectPicker.this, EvaluationActivity.class);
         intent.putExtra("overallInsect", (java.io.Serializable) mSites);
         intent.putExtra("selectedInsects", (java.io.Serializable) listCal);
@@ -86,11 +98,13 @@ public class InsectPicker extends ActionBarActivity {
 
     Intent intent;
     static final int INSECT_DATA = 103;
+
     @Override
     public void onPause() {
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
         super.onPause();
     }
+
     @Override
     public void onBackPressed() {
         intent = new Intent(InsectPicker.this, EvaluationActivity.class);
@@ -135,4 +149,8 @@ public class InsectPicker extends ActionBarActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+
+    static final int RETURN_PICKER = 300;
+
 }

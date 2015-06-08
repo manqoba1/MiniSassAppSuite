@@ -13,4 +13,5 @@
     <dimen name="circle_size_small">62dp</dimen>
     <dimen name="red_circle_size">78dp</dimen>
     <dimen name="mon_hero_height_medium_lite">200dp</dimen>
+    <dimen name="map_image_hight">80dp</dimen>
 </resources>

@@ -1,13 +1,18 @@
 package com.sifiso.codetribe.riverteamapp;
 
+import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -23,7 +28,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
+import com.android.volley.VolleyError;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.gson.Gson;
 import com.sifiso.codetribe.minisasslibrary.MiniSassApp;
 import com.sifiso.codetribe.minisasslibrary.activities.EvaluationActivity;
 import com.sifiso.codetribe.minisasslibrary.activities.GPSscanner;
@@ -39,6 +46,7 @@ import com.sifiso.codetribe.minisasslibrary.fragments.RiverListFragment;
 import com.sifiso.codetribe.minisasslibrary.fragments.TownListFragment;
 import com.sifiso.codetribe.minisasslibrary.services.CreateEvaluationListener;
 import com.sifiso.codetribe.minisasslibrary.services.RequestSyncService;
+import com.sifiso.codetribe.minisasslibrary.toolbox.BaseVolley;
 import com.sifiso.codetribe.minisasslibrary.toolbox.WebCheck;
 import com.sifiso.codetribe.minisasslibrary.toolbox.WebCheckResult;
 import com.sifiso.codetribe.minisasslibrary.util.CacheUtil;
@@ -55,7 +63,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainPagerActivity extends ActionBarActivity implements CreateEvaluationListener {
+public class MainPagerActivity extends ActionBarActivity implements LocationListener, CreateEvaluationListener {
     static final int NUM_ITEMS = 2;
     static final String LOG = MainPagerActivity.class.getSimpleName();
     Context ctx;
@@ -191,6 +199,7 @@ public class MainPagerActivity extends ActionBarActivity implements CreateEvalua
 
     @Override
     protected void onStart() {
+        //startScan();
         super.onStart();
         TimerUtil.killFlashTimer();
 
@@ -295,6 +304,7 @@ public class MainPagerActivity extends ActionBarActivity implements CreateEvalua
     @Override
     protected void onPause() {
         overridePendingTransition(com.sifiso.codetribe.minisasslibrary.R.anim.slide_in_left, com.sifiso.codetribe.minisasslibrary.R.anim.slide_out_right);
+        stopScan();
         super.onPause();
     }
 
@@ -382,6 +392,112 @@ public class MainPagerActivity extends ActionBarActivity implements CreateEvalua
         startActivity(intent);
     }
 
+    Location location;
+    LocationManager locationManager;
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 2;
+    private static final long MIN_TIME_BW_UPDATES = 1;
+    public boolean isGPSEnabled = false;
+    public boolean isNetworkEnabled = false;
+    public boolean canGetLocation = false;
+
+    private Location getLocation() {
+        onLocationChanged(location);
+        return location;
+    }
+
+    public void startScan() {
+        getLocation();
+    }
+
+
+    @Override
+    public void onLocationChanged(Location location) {
+        locationManager = (LocationManager) ctx.getSystemService(Context.LOCATION_SERVICE);
+        isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+
+        Log.v(LOG + " gps", "=" + isGPSEnabled);
+
+        isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+        Log.v(LOG + " network", "=" + isNetworkEnabled);
+
+        if (isGPSEnabled == false && isNetworkEnabled == false) {
+            Log.d(LOG, "is not connected");
+            showSettingDialog();
+        } else {
+            canGetLocation = true;
+            if (isNetworkEnabled) {
+                location = null;
+                locationManager.requestLocationUpdates(
+                        LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES,
+                        MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                Log.d(LOG, "Network");
+                if (locationManager != null) {
+                    location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                }
+            }
+
+            if (isGPSEnabled) {
+                location = null;
+                if (location == null) {
+                    locationManager.requestLocationUpdates(
+                            LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES,
+                            MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                    Log.d(LOG, "GPs");
+                    if (locationManager != null) {
+                        location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                    }
+                }
+            }
+
+        }
+
+    }
+
+    public void showSettingDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainPagerActivity.this);
+
+        builder.setTitle("GPS settings");
+        builder.setMessage("GPS is not enabled. Do you want to go to settings menu, to search for location?");
+        builder.setPositiveButton("Settings", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                startActivity(intent);
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
+    }
+
+    public void stopScan() {
+
+        if (locationManager != null) {
+            locationManager.removeUpdates(MainPagerActivity.this);
+        }
+
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
+
     private class PagerAdapter extends FragmentStatePagerAdapter implements PageFragment {
 
         public PagerAdapter(FragmentManager fm) {
@@ -434,7 +550,7 @@ public class MainPagerActivity extends ActionBarActivity implements CreateEvalua
 
                             buildPages();
                         }
-                        if (w.isWifiConnected()) {
+                        if (w.isWifiConnected() || w.isMobileConnected()) {
                             getData();
                         }
                     }
@@ -444,7 +560,7 @@ public class MainPagerActivity extends ActionBarActivity implements CreateEvalua
             }
 
             @Override
-            public void onDataCached() {
+            public void onDataCached(ResponseDTO r) {
 
             }
 
@@ -453,8 +569,8 @@ public class MainPagerActivity extends ActionBarActivity implements CreateEvalua
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if (w.isWifiConnected()) {
-                            getData();
+                        if (w.isWifiConnected() || w.isMobileConnected()) {
+                            getRiversAroundMe();
                         }
                     }
                 });
@@ -464,13 +580,118 @@ public class MainPagerActivity extends ActionBarActivity implements CreateEvalua
 
     }
 
+    boolean isBusy;
+    private void getCachedRiverData() {
+        final WebCheckResult w = WebCheck.checkNetworkAvailability(ctx);
+        CacheUtil.getCachedRiverData(ctx, CacheUtil.CACHE_RIVER_DATA, new CacheUtil.CacheUtilListener() {
+            @Override
+            public void onFileDataDeserialized(final ResponseDTO respond) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        response = respond;
+                        if (response != null) {
+
+                            buildPages();
+                        }
+                        if (w.isWifiConnected() || w.isMobileConnected()) {
+                            getRiversAroundMe();
+                        }
+                    }
+                });
+
+
+            }
+
+            @Override
+            public void onDataCached(ResponseDTO r) {
+
+            }
+
+            @Override
+            public void onError() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (w.isWifiConnected() || w.isMobileConnected()) {
+                            getRiversAroundMe();
+                        }
+                    }
+                });
+
+            }
+        });
+
+    }
+    private void getRiversAroundMe() {
+        if (location == null) {
+            return;
+        }
+        if (isBusy) {
+            Toast.makeText(ctx, "Busy...getting rivers ...", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+
+        RequestDTO w = new RequestDTO();
+        w.setRequestType(RequestDTO.LIST_DATA_WITH_RADIUS_RIVERS);
+        w.setLatitude(location.getLatitude());
+        w.setLongitude(location.getLongitude());
+        w.setRadius(10);
+        isBusy = true;
+
+        BaseVolley.getRemoteData(Statics.SERVLET_ENDPOINT, w, ctx, new BaseVolley.BohaVolleyListener() {
+            @Override
+            public void onResponseReceived(ResponseDTO r) {
+                isBusy = false;
+//                progressBar.setVisibility(View.GONE);
+                if (r.getStatusCode() > 0) {
+                    Toast.makeText(ctx, r.getMessage(), Toast.LENGTH_LONG).show();
+                    return;
+                }
+               /* if (r.getRiverList().isEmpty()) {
+                    Toast.makeText(ctx, "No rivers found within 20 km", Toast.LENGTH_LONG).show();
+                    return;
+                }*/
+
+                CacheUtil.cacheRiverData(ctx, r, CacheUtil.CACHE_RIVER, new CacheUtil.CacheUtilListener() {
+                    @Override
+                    public void onFileDataDeserialized(ResponseDTO response) {
+
+                    }
+
+                    @Override
+                    public void onDataCached(ResponseDTO r) {
+                        response = r;
+                        Log.d(LOG, new Gson().toJson(r));
+                        buildPages();
+                    }
+
+                    @Override
+                    public void onError() {
+
+                    }
+                });
+            }
+
+            @Override
+            public void onVolleyError(VolleyError error) {
+                isBusy = false;
+                Toast.makeText(ctx, "Problem: " + error.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+
+
+    }
+
     public void getData() {
-        RequestDTO req = new RequestDTO();
-        req.setRequestType(RequestDTO.GET_DATA);
-        req.setCountryCode("ZA");
+
+        RequestDTO w = new RequestDTO();
+        w.setRequestType(RequestDTO.GET_DATA);
+
         try {
 
-            WebSocketUtil.sendRequest(ctx, Statics.MINI_SASS_ENDPOINT, req, new WebSocketUtil.WebSocketListener() {
+            WebSocketUtil.sendRequest(ctx, Statics.MINI_SASS_ENDPOINT, w, new WebSocketUtil.WebSocketListener() {
                 @Override
                 public void onMessage(final ResponseDTO r) {
                     runOnUiThread(new Runnable() {
@@ -488,7 +709,7 @@ public class MainPagerActivity extends ActionBarActivity implements CreateEvalua
                                 }
 
                                 @Override
-                                public void onDataCached() {
+                                public void onDataCached(ResponseDTO r) {
                                     /*Intent intent = new Intent(getApplicationContext(), RequestSyncService.class);
                                     startService(intent);*/
                                     // getData();

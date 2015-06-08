@@ -37,8 +37,8 @@
 
             <ImageView
                 android:id="@+id/RLI_map_eval"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="@dimen/map_image_hight"
+                android:layout_height="@dimen/map_image_hight"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentTop="true"
                 android:layout_weight="1"
@@ -54,7 +54,7 @@
             android:layout_width="@dimen/image_margin"
             android:layout_height="@dimen/image_margin"
             android:scaleType="fitXY"
-            android:src="@drawable/limpoporiver" />
+            android:src="@drawable/ic_river" />
 
 
         <LinearLayout
@@ -63,8 +63,9 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:weightSum="2"
+            android:gravity="center_horizontal"
             android:layout_marginLeft="15dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="10dp"
             android:layout_below="@+id/hear_lay"
             android:layout_alignStart="@+id/hear_lay">
 
@@ -75,8 +76,8 @@
                 android:layout_height="wrap_content"
                 android:layout_alignStart="@+id/textView5"
                 android:layout_below="@+id/RLI_map_eval"
-                android:layout_marginTop="@dimen/spacer"
                 android:layout_weight="2"
+                style="@style/TextStyleLarge"
                 android:text="Evaluations"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="@color/SaddleBrown" />
@@ -100,6 +101,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:weightSum="2"
+            android:visibility="gone"
             android:layout_marginLeft="15dp"
             android:layout_marginTop="20dp"
             android:layout_alignEnd="@+id/hear_lay2"
@@ -138,6 +140,7 @@
             android:background="@color/AntiqueWhite"
             android:orientation="vertical"
             android:padding="8dp"
+            android:visibility="gone"
             android:layout_below="@+id/RLI_image"
             android:layout_alignEnd="@+id/hear_lay2"
             android:layout_marginTop="90dp">

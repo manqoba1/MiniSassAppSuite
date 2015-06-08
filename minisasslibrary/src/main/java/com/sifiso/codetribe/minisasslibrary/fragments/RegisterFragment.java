@@ -19,11 +19,14 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sifiso.codetribe.minisasslibrary.R;
+import com.sifiso.codetribe.minisasslibrary.dto.CountryDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.GcmDeviceDTO;
+import com.sifiso.codetribe.minisasslibrary.dto.OrganisationtypeDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.TeamDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.TeamMemberDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.TownDTO;
@@ -36,6 +39,7 @@ import com.sifiso.codetribe.minisasslibrary.util.Util;
 import com.sifiso.codetribe.minisasslibrary.util.WebSocketUtil;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class RegisterFragment extends Fragment implements PageFragment {
@@ -51,16 +55,13 @@ public class RegisterFragment extends Fragment implements PageFragment {
     Button rsRegister;
     EditText rsTeamName, rsMemberName, rsMemberSurname;
     EditText rsCellphone, rsPin;
-    TextView rsTown;
+    Spinner sp_org_type, sp_country;
     ViewStub viewStub;
     View v;
-    GcmDeviceDTO gcmDevice;
-    ProgressBar reg_progress;
-    String email, strTown;
-    TownDTO town;
-    Integer townID;
+    String email;
+    Integer countryID, orgaTypeID;
     AutoCompleteTextView rsMemberEmail;
-
+    ResponseDTO response;
     private RegisterFragmentListener mListener;
 
 
@@ -70,14 +71,14 @@ public class RegisterFragment extends Fragment implements PageFragment {
 
     static String LOG = RegisterFragment.class.getSimpleName();
 
-    public void updateTown(TownDTO t) {
+   /* public void updateTown(TownDTO t) {
         Log.d(LOG, t.getTownID() + " : " + t.getTownName());
         if (rsTown == null) {
             rsTown = (TextView) v.findViewById(R.id.edtTown);
         }
         rsTown.setText(t.getTownName());
         townID = t.getTownID();
-    }
+    }*/
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -93,42 +94,91 @@ public class RegisterFragment extends Fragment implements PageFragment {
         v = inflater.inflate(R.layout.fragment_register, container, false);
         activity = getActivity();
         ctx = getActivity().getApplicationContext();
+        response = (ResponseDTO) getArguments().getSerializable("response");
         setFields();
         getEmail();
 
         return v;
     }
 
-    List townList = new ArrayList<TownDTO>();
+    List<String> countrySpinner, orgTypeSpinner;
+
+    private void setSpinners() {
+        if (countrySpinner == null && orgTypeSpinner == null) {
+            countrySpinner = new ArrayList<>();
+            orgTypeSpinner = new ArrayList<>();
+        }
+        countrySpinner.add("Choose country");
+        for (CountryDTO c : response.getCountryList()) {
+            countrySpinner.add(c.getCountryName());
+        }
+        orgTypeSpinner.add("Choose organisation type");
+        for (OrganisationtypeDTO c : response.getOrganisationtypeList()) {
+            orgTypeSpinner.add(c.getOrganisationName());
+        }
+        ArrayAdapter<String> countryAdapter = new ArrayAdapter<String>(ctx, R.layout.xxsimple_spinner_dropdown_item, countrySpinner);
+        ArrayAdapter<String> orgtypeAdapter = new ArrayAdapter<String>(ctx, R.layout.xxsimple_spinner_dropdown_item, orgTypeSpinner);
+        sp_org_type.setAdapter(orgtypeAdapter);
+        sp_org_type.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String oName = "";
+                if (position > 0) {
+                    orgaTypeID = response.getOrganisationtypeList().get(position-1).getOrganisationTypeID();
+                    oName = response.getOrganisationtypeList().get(position-1).getOrganisationName();
+                } else {
+                    orgaTypeID = null;
+                }
+                Log.d(LOG, " the org id " + orgaTypeID + " : " + oName);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        sp_country.setAdapter(countryAdapter);
+        sp_country.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String cName = "";
+                if (position > 0) {
+                    countryID = response.getCountryList().get(position-1).getCountryID();
+                    cName = response.getCountryList().get(position-1).getCountryName();
+                } else {
+                    countryID = null;
+                }
+                Log.d(LOG, " the country id " + countryID + " : " + cName);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
 
 
     public void setFields() {
         rsRegister = (Button) v.findViewById(R.id.btnReg);
 
         rsTeamName = (EditText) v.findViewById(R.id.edtRegTeamName);
-        rsTown = (TextView) v.findViewById(R.id.edtTown);
+        sp_country = (Spinner) v.findViewById(R.id.sp_country);
+        sp_org_type = (Spinner) v.findViewById(R.id.sp_org_type);
         rsMemberName = (EditText) v.findViewById(R.id.edtMemberName);
         rsMemberSurname = (EditText) v.findViewById(R.id.edtMemberLastNAme);
+        rsPin = (EditText) v.findViewById(R.id.edtPassword);
         rsMemberEmail = (AutoCompleteTextView) v.findViewById(R.id.edtMemberEmail);
         rsCellphone = (EditText) v.findViewById(R.id.edtMemberPhone);
         viewStub = (ViewStub) v.findViewById(R.id.vTub);
-        rsTown.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mListener.onTownRequest();
-            }
-        });
+
         rsRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 sendRegistration();
             }
         });
-        rsTeamName.setError("Required field");
-        rsTown.setError("Required field");
-
-        rsMemberEmail.setError("Required field");
-        rsMemberName.setError("Required field");
+        setSpinners();
     }
 
     public void sendRegistration() {
@@ -139,15 +189,19 @@ public class RegisterFragment extends Fragment implements PageFragment {
             return;
         }
 
-        if (rsTown.getText().toString().isEmpty() && townID == null) {
-            rsTown.setError("Select town");
+        if (countryID == null) {
+            Util.showErrorToast(ctx, "Choose a country");
             //Toast.makeText(ctx, "Select Town", Toast.LENGTH_SHORT).show();
             return;
         }
 
-
-        if (rsMemberSurname.getText().toString().isEmpty()) {
-            rsMemberSurname.setError("Enter last name");
+        if (orgaTypeID == null) {
+            Util.showErrorToast(ctx, "Choose a Organisation type");
+            //Toast.makeText(ctx, "Select Town", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (rsMemberName.getText().toString().isEmpty()) {
+            rsMemberName.setError("Enter last name");
             // Toast.makeText(ctx, "Enter Last Name", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -156,21 +210,28 @@ public class RegisterFragment extends Fragment implements PageFragment {
             //Toast.makeText(ctx, "Enter Email Address", Toast.LENGTH_SHORT).show();
             return;
         }
-
+        if (rsPin.getText().toString().isEmpty()) {
+            rsPin.setError("Enter password");
+            //Toast.makeText(ctx, "Enter Email Address", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         TeamMemberDTO t = new TeamMemberDTO();
         t.setEmail(rsMemberEmail.getText().toString());
         t.setFirstName(rsMemberName.getText().toString());
         t.setLastName(rsMemberSurname.getText().toString());
         t.setCellphone(rsCellphone.getText().toString());
+        t.setPin(rsPin.getText().toString());
         t.setActiveFlag(0);
+        t.setDateRegistered(new Date().getTime());
 
 
         final TeamDTO g = new TeamDTO();
         g.setTeamName(rsTeamName.getText().toString());
-        g.setTownID(townID);
-        g.getTeamMemberList().add(t);
-
+        g.setCountryID(countryID);
+        g.setOrganisationTypeID(orgaTypeID);
+        g.getTeammemberList().add(t);
+        g.setDateRegistered(new Date().getTime());
         RequestDTO r = new RequestDTO();
         r.setRequestType(RequestDTO.REGISTER_TEAM);
         r.setTeam(g);

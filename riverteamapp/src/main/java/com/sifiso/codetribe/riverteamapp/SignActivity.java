@@ -196,7 +196,7 @@ public class SignActivity extends ActionBarActivity {
         RequestDTO w = new RequestDTO(RequestDTO.SIGN_IN_MEMBER);
         w.setEmail(esEmail.getText().toString());
         w.setPassword(esPin.getText().toString());
-        w.setGcmDevice(gcmDevice);
+        //w.setGcmDevice(gcmDevice);
         WebSocketUtil.sendRequest(ctx, Statics.MINI_SASS_ENDPOINT, w, new WebSocketUtil.WebSocketListener() {
             @Override
             public void onMessage(final ResponseDTO resp) {

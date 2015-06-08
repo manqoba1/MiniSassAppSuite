@@ -2,15 +2,21 @@ package com.sifiso.codetribe.minisasslibrary.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.google.gson.Gson;
 import com.sifiso.codetribe.minisasslibrary.R;
 import com.sifiso.codetribe.minisasslibrary.dto.InsectImageDTO;
+import com.sifiso.codetribe.minisasslibrary.dto.InsectImageListDTO;
+import com.sifiso.codetribe.minisasslibrary.util.Statics;
+import com.sifiso.codetribe.minisasslibrary.util.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,6 +72,16 @@ public class InsectSelectionAdapter extends RecyclerView.Adapter<InsectSelection
         int rID = mContext.getResources().getIdentifier(insect.getUri(), "drawable", mContext.getPackageName());
 
         h.INSC_image.setImageResource(rID);
+        h.INSC_image.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Log.d("TAG",new Gson().toJson(insect));
+                listener.onViewMoreImages(insect, position);
+                return false;
+            }
+        });
+        h.INSC_name.setText(insect.getGroupName());
+        Statics.setRobotoFontLight(mContext,h.INSC_name);
         h.INSC_box.setText(insect.getGroupName());
         h.INSC_box.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -96,16 +112,19 @@ public class InsectSelectionAdapter extends RecyclerView.Adapter<InsectSelection
     public interface InsectPopupAdapterListener {
         public void onInsectSelected(InsectImageDTO insect, int index);
 
+        public void onViewMoreImages(InsectImageDTO insect, int index);
     }
 
     public class Holder extends RecyclerView.ViewHolder {
         protected ImageView INSC_image;
         protected CheckBox INSC_box;
+        private TextView INSC_name;
 
         public Holder(View itemView) {
             super(itemView);
             INSC_box = (CheckBox) itemView.findViewById(R.id.INSC_box);
             INSC_image = (ImageView) itemView.findViewById(R.id.INSC_image);
+            INSC_name = (TextView) itemView.findViewById(R.id.INSC_name);
         }
     }
 }

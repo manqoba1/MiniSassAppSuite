@@ -105,7 +105,7 @@ public class RiverListFragment extends Fragment implements PageFragment {
         stringRiver = new ArrayList<>();
         for (int i = 0; i < response.getRiverList().size(); i++) {
             RiverDTO riverText = response.getRiverList().get(i);
-            stringRiver.add(riverText.getRiverName());
+            stringRiver.add(riverText.getRiverName().trim());
         }
         ArrayAdapter<String> riverSearchAdapter = new ArrayAdapter<String>(ctx, R.layout.xsimple_spinner_dropdown_item, stringRiver);
         SLT_editSearch.setAdapter(riverSearchAdapter);
@@ -119,6 +119,7 @@ public class RiverListFragment extends Fragment implements PageFragment {
         searchText = SLT_editSearch.getText().toString();
         for (int i = 0; i < response.getRiverList().size(); i++) {
             RiverDTO searchRiver = response.getRiverList().get(i);
+            String str = searchRiver.getRiverName() + " River";
             if (searchRiver.getRiverName().contains(searchText)) {
                 isFound = true;
                 break;

@@ -7,99 +7,37 @@ package com.sifiso.codetribe.minisasslibrary.dto;
 
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
  * @author aubreyM
  */
-public class RiverDTO implements Serializable {
+public class RiverDTO implements Serializable, Comparable<RiverDTO> {
 
     private static final long serialVersionUID = 1L;
     private Integer riverID;
-    private String riverName, originCountryName, endCountryName;
-    private Double originLatitude;
-    private Double originLongitude;
-    private Double endLatitude;
-    private Double endLongitude;
-    private long dateRegistered;
-    private String imageUri;
-    private List<RiverTownDTO> riverTownList;
-    private List<EvaluationSiteDTO> evaluationSiteList;
-    private List<ErrorStoreAndroidDTO> errorstoreandroidList;
-    private Integer originCountryID;
-    private Integer endCountryID;
-    private CountryDTO originCountry;
-    private CountryDTO endCountry;
+    private String riverName;
+    private Date dateAdded;
+    private Double nearestLatitude, nearestLongitude;
+    private float distanceFromMe;
+    private List<EvaluationSiteDTO> evaluationSiteList = new ArrayList<>();
+    private List<RiverPartDTO> riverpartList =new ArrayList<>();
 
     public RiverDTO() {
     }
 
-    public String getImageUri() {
-        return imageUri;
-    }
-
-    public void setImageUri(String imageUri) {
-        this.imageUri = imageUri;
-    }
-
-    public List<ErrorStoreAndroidDTO> getErrorstoreandroidList() {
-        return errorstoreandroidList;
-    }
-
-    public void setErrorstoreandroidList(List<ErrorStoreAndroidDTO> errorstoreandroidList) {
-        this.errorstoreandroidList = errorstoreandroidList;
-    }
-
-    public CountryDTO getOriginCountry() {
-        return originCountry;
-    }
-
-    public void setOriginCountry(CountryDTO originCountry) {
-        this.originCountry = originCountry;
-    }
-
-    public CountryDTO getEndCountry() {
-        return endCountry;
-    }
-
-    public void setEndCountry(CountryDTO endCountry) {
-        this.endCountry = endCountry;
-    }
-
-    public String getOriginCountryName() {
-        return originCountryName;
-    }
-
-    public void setOriginCountryName(String originCountryName) {
-        this.originCountryName = originCountryName;
-    }
-
-    public String getEndCountryName() {
-        return endCountryName;
-    }
-
-    public void setEndCountryName(String endCountryName) {
-        this.endCountryName = endCountryName;
-    }
-
-    public Integer getOriginCountryID() {
-        return originCountryID;
-    }
-
-    public void setOriginCountryID(Integer originCountryID) {
-        this.originCountryID = originCountryID;
-    }
-
-    public Integer getEndCountryID() {
-        return endCountryID;
-    }
-
-    public void setEndCountryID(Integer endCountryID) {
-        this.endCountryID = endCountryID;
-    }
-
     public Integer getRiverID() {
         return riverID;
+    }
+
+    public List<EvaluationSiteDTO> getEvaluationSiteList() {
+        return evaluationSiteList;
+    }
+
+    public void setEvaluationSiteList(List<EvaluationSiteDTO> evaluationSiteList) {
+        this.evaluationSiteList = evaluationSiteList;
     }
 
     public void setRiverID(Integer riverID) {
@@ -114,60 +52,44 @@ public class RiverDTO implements Serializable {
         this.riverName = riverName;
     }
 
-    public Double getOriginLatitude() {
-        return originLatitude;
+    public Date getDateAdded() {
+        return dateAdded;
     }
 
-    public void setOriginLatitude(Double originLatitude) {
-        this.originLatitude = originLatitude;
+    public void setDateAdded(Date dateAdded) {
+        this.dateAdded = dateAdded;
     }
 
-    public Double getOriginLongitude() {
-        return originLongitude;
+    public Double getNearestLatitude() {
+        return nearestLatitude;
     }
 
-    public void setOriginLongitude(Double originLongitude) {
-        this.originLongitude = originLongitude;
+    public void setNearestLatitude(Double nearestLatitude) {
+        this.nearestLatitude = nearestLatitude;
     }
 
-    public Double getEndLatitude() {
-        return endLatitude;
+    public Double getNearestLongitude() {
+        return nearestLongitude;
     }
 
-    public void setEndLatitude(Double endLatitude) {
-        this.endLatitude = endLatitude;
+    public void setNearestLongitude(Double nearestLongitude) {
+        this.nearestLongitude = nearestLongitude;
     }
 
-    public Double getEndLongitude() {
-        return endLongitude;
+    public float getDistanceFromMe() {
+        return distanceFromMe;
     }
 
-    public void setEndLongitude(Double endLongitude) {
-        this.endLongitude = endLongitude;
+    public void setDistanceFromMe(float distanceFromMe) {
+        this.distanceFromMe = distanceFromMe;
     }
 
-    public long getDateRegistered() {
-        return dateRegistered;
+    public List<RiverPartDTO> getRiverpartList() {
+        return riverpartList;
     }
 
-    public void setDateRegistered(long dateRegistered) {
-        this.dateRegistered = dateRegistered;
-    }
-
-    public List<RiverTownDTO> getRiverTownList() {
-        return riverTownList;
-    }
-
-    public void setRiverTownList(List<RiverTownDTO> riverTownList) {
-        this.riverTownList = riverTownList;
-    }
-
-    public List<EvaluationSiteDTO> getEvaluationSiteList() {
-        return evaluationSiteList;
-    }
-
-    public void setEvaluationSiteList(List<EvaluationSiteDTO> evaluationSiteList) {
-        this.evaluationSiteList = evaluationSiteList;
+    public void setRiverpartList(List<RiverPartDTO> riverpartList) {
+        this.riverpartList = riverpartList;
     }
 
     @Override
@@ -195,4 +117,14 @@ public class RiverDTO implements Serializable {
         return "com.boha.minisass.data.River[ riverID=" + riverID + " ]";
     }
 
+    @Override
+    public int compareTo(RiverDTO another) {
+        if (this.distanceFromMe < another.distanceFromMe) {
+            return -1;
+        }
+        if (this.distanceFromMe > another.distanceFromMe) {
+            return 1;
+        }
+        return 0;
+    }
 }

@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.sifiso.codetribe.minisasslibrary.R;
 import com.sifiso.codetribe.minisasslibrary.adapters.InsectSelectionAdapter;
 import com.sifiso.codetribe.minisasslibrary.dto.InsectImageDTO;
+import com.sifiso.codetribe.minisasslibrary.dto.InsectImageListDTO;
 import com.sifiso.codetribe.minisasslibrary.util.DividerItemDecoration;
 
 import java.util.ArrayList;
@@ -72,6 +73,11 @@ public class InsectSelectorFragment extends Fragment implements PageFragment {
             public void onInsectSelected(InsectImageDTO insect, int index) {
 
                 collectCheckedInsects(insect);
+
+            }
+
+            @Override
+            public void onViewMoreImages(InsectImageDTO insect, int index) {
 
             }
         });

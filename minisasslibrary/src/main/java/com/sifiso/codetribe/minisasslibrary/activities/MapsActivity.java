@@ -17,8 +17,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
@@ -47,17 +49,18 @@ import com.sifiso.codetribe.minisasslibrary.util.Util;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class MapsActivity extends FragmentActivity implements LocationListener
-        , GooglePlayServicesClient.ConnectionCallbacks,
-        GooglePlayServicesClient.OnConnectionFailedListener {
+public class MapsActivity extends FragmentActivity implements LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     GoogleMap googleMap;
     GoogleApiClient mGoogleApiClient;
     LocationRequest locationRequest;
     LocationClient mLocationClient;
+
+
     Location location;
     Context ctx;
     List<Marker> markers = new ArrayList<Marker>();
@@ -92,8 +95,11 @@ public class MapsActivity extends FragmentActivity implements LocationListener
         river = (RiverDTO) getIntent().getSerializableExtra("river");
         index = getIntent().getIntExtra("index", 0);
         int displayType = getIntent().getIntExtra("displayType", EVALUATION_VIEW);
-        mLocationClient = new LocationClient(getApplicationContext(), this,
-                this);
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
         //txtCount = (TextView) findViewById(R.id.count);
         //textMap = (TextView) findViewById(R.id.textMap);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
@@ -108,7 +114,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener
 //        progressBar.setVisibility(View.GONE);
         //Statics.setRobotoFontBold(ctx, text);
 
-          topLayout = findViewById(R.id.top);
+        topLayout = findViewById(R.id.top);
 
 
         googleMap = mapFragment.getMap();
@@ -121,8 +127,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener
 
         if (displayType == EVALUATION_VIEW) {
             setEvaluationMarkers();
-        } else if (displayType == RIVER_VIEW) {
-            MeasureRiverLength();
         }
 
         setGoogleMap();
@@ -133,50 +137,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener
 
     private List<Polyline> polylines = new ArrayList<Polyline>();
     private List<LatLng> iterateList = new ArrayList<LatLng>();
-
-    private void MeasureRiverLength() {
-        googleMap.clear();
-        if (river != null) {
-            iterateList.add(new LatLng(river.getOriginLatitude(), river.getOriginLongitude()));
-            iterateList.add(new LatLng(river.getEndLatitude(), river.getEndLongitude()));
-            final PolylineOptions options = new PolylineOptions();
-            options.width(5);
-            options.color(getResources().getColor(R.color.maroon));
-            options.addAll(iterateList);
-            double distance = DistanceCalculator.distance(new LatLng(river.getOriginLatitude(), river.getOriginLongitude()), new LatLng(river.getEndLatitude(), river.getEndLongitude()), "");
-
-            Marker marker1 = googleMap.addMarker(new MarkerOptions().position(new LatLng(river.getOriginLatitude(),
-                    river.getOriginLongitude())).title(river.getRiverName()));
-            marker1.setSnippet("The distance of " + river.getRiverName() + " is : " + Math.round(distance) + " Km");
-            marker1.showInfoWindow();
-
-            Marker marker2 = googleMap.addMarker(new MarkerOptions().position(new LatLng(river.getEndLatitude(),
-                    river.getEndLongitude())).title(river.getRiverName()));
-            markers.add(marker2);
-            markers.add(marker1);
-
-            googleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
-                @Override
-                public void onMapLoaded() {
-                    //ensure that all markers in bounds
-                    LatLngBounds.Builder builder = new LatLngBounds.Builder();
-
-                    for (Marker marker : markers) {
-                        builder.include(marker.getPosition());
-                    }
-
-                    LatLngBounds bounds = builder.build();
-                    int padding = 5; // offset from edges of the map in pixels
-                    CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
-                    googleMap.addPolyline(options);
-                    txtCount.setVisibility(View.GONE);
-                    //googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point, 1.0f));
-                    googleMap.animateCamera(cu);
-                    setTitle(river.getRiverName());
-                }
-            });
-        }
-    }
 
 
     private void setEvaluationMarkers() {
@@ -267,36 +227,41 @@ public class MapsActivity extends FragmentActivity implements LocationListener
     }
 
     private void setGoogleMap() {
-        googleMap.setMyLocationEnabled(true);
-        googleMap.setBuildingsEnabled(true);
-        googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-            @Override
-            public void onMapClick(LatLng latLng) {
-                location.setLatitude(latLng.latitude);
-                location.setLongitude(latLng.longitude);
-                Log.w(LOG, "********* onMapClick");
-            }
-        });
-        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                marker.showInfoWindow();
-                LatLng latLng = marker.getPosition();
-                Location loc = new Location(location);
-                loc.setLatitude(latLng.latitude);
-                loc.setLongitude(latLng.longitude);
+        try {
+            googleMap.setMyLocationEnabled(true);
+            googleMap.setBuildingsEnabled(true);
 
-                float f = location.distanceTo(loc);
-                Log.w(LOG, "distance" + f);
-                try {
-                    showPopup(latLng.latitude, latLng.longitude, marker.getTitle() + "\n" + marker.getSnippet());
-                } catch (Exception e) {
-                    Log.w(LOG, "{0}",e);
-                }
-                return true;
-            }
-        });
+                googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+                    @Override
+                    public void onMapClick(LatLng latLng) {
+                        location.setLatitude(latLng.latitude);
+                        location.setLongitude(latLng.longitude);
+                        Log.w(LOG, "********* onMapClick");
+                    }
+                });
+                googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(Marker marker) {
+                        marker.showInfoWindow();
+                        LatLng latLng = marker.getPosition();
+                        Location loc = new Location(location);
+                        loc.setLatitude(latLng.latitude);
+                        loc.setLongitude(latLng.longitude);
 
+                        float f = location.distanceTo(loc);
+                        Log.w(LOG, "distance" + f);
+                        try {
+                            showPopup(latLng.latitude, latLng.longitude, marker.getTitle() + "\n" + marker.getSnippet());
+                        } catch (Exception e) {
+                            Log.w(LOG, "{0}", e);
+                        }
+                        return true;
+                    }
+                });
+
+        } catch (Exception e) {
+            Log.e(LOG, "", e);
+        }
     }
 
     List<String> list;
@@ -343,6 +308,11 @@ public class MapsActivity extends FragmentActivity implements LocationListener
         startActivity(intent);
     }
 
+    @Override
+    protected void onPause() {
+        overridePendingTransition(com.sifiso.codetribe.minisasslibrary.R.anim.slide_in_left, com.sifiso.codetribe.minisasslibrary.R.anim.slide_out_right);
+        super.onPause();
+    }
 
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
@@ -367,9 +337,16 @@ public class MapsActivity extends FragmentActivity implements LocationListener
         mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
     }
 
+    static final int ACCURACY_LIMIT = 50;
+
     @Override
     public void onLocationChanged(Location location) {
-
+        this.location = location;
+        if (location.getAccuracy() <= ACCURACY_LIMIT) {
+            stopLocationUpdates();
+            //getRiversAroundMe();
+        }
+        Log.e(LOG, "####### onLocationChanged");
     }
 
 
@@ -382,9 +359,12 @@ public class MapsActivity extends FragmentActivity implements LocationListener
     @Override
     protected void onStart() {
         super.onStart();
+        Log.e(LOG, "################ onStart .... connect API and location clients ");
+        mGoogleApiClient.connect();
         if (!mResolvingError) {  // more about this later
-            //mGoogleApiClient.connect();
-            mLocationClient.connect();
+            mGoogleApiClient.connect();
+
+                    Log.e(LOG, "################ onStart .... connect API and location clients {0} "+mGoogleApiClient.isConnecting());
         }
 
     }
@@ -402,17 +382,48 @@ public class MapsActivity extends FragmentActivity implements LocationListener
 
     @Override
     public void onConnected(Bundle bundle) {
-        location = mLocationClient.getLastLocation();
+        Log.i(LOG, "+++  onConnected() -  requestLocationUpdates ...");
+        location = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+        if (location != null) {
+            Log.w(LOG, "## requesting location ....lastLocation: "
+                    + location.getLatitude() + " "
+                    + location.getLongitude() + " acc: "
+                    + location.getAccuracy());
+        }
+        locationRequest = LocationRequest.create();
+        locationRequest.setInterval(3000);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setFastestInterval(2000);
 
-        locationRequest = new LocationRequest();
-        locationRequest.setFastestInterval(FIVE_MINUTES);
-        locationRequest.setInterval(ONE_MINUTE);
+        if (location.getAccuracy() > ACCURACY_LIMIT) {
+            startLocationUpdates();
+        } else {
+            //  getRiversAroundMe();
+        }
+    }
 
-        mLocationClient.requestLocationUpdates(locationRequest, this);
+    boolean mRequestingLocationUpdates;
+
+    protected void startLocationUpdates() {
+        Log.w(LOG, "###### startLocationUpdates: " + new Date().toString());
+        if (mGoogleApiClient.isConnected()) {
+            mRequestingLocationUpdates = true;
+            LocationServices.FusedLocationApi.requestLocationUpdates(
+                    mGoogleApiClient, locationRequest, this);
+        }
+    }
+
+    protected void stopLocationUpdates() {
+        Log.e(LOG, "###### stopLocationUpdates - " + new Date().toString());
+        if (mGoogleApiClient.isConnected()) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(
+                    mGoogleApiClient, this);
+        }
     }
 
     @Override
-    public void onDisconnected() {
+    public void onConnectionSuspended(int i) {
 
     }
 

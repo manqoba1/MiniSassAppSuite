@@ -78,7 +78,7 @@ public class DataUtil {
                             }
 
                             @Override
-                            public void onDataCached() {
+                            public void onDataCached(ResponseDTO r) {
 
                             }
 
@@ -202,7 +202,7 @@ public class DataUtil {
                                 }
 
                                 @Override
-                                public void onDataCached() {
+                                public void onDataCached(ResponseDTO r) {
 
                                 }
 

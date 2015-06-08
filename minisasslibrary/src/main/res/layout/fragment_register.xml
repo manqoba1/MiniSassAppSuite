@@ -40,7 +40,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
 
-                android:text="Team Info"
+                android:text="Organisation Info"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
             <EditText
@@ -48,19 +48,29 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/imgTopLgo"
-                android:hint="Team Name" />
+                android:hint="Organisation Name" />
 
-            <TextView
-                android:id="@+id/edtTown"
-                style="@style/Title4TextStyleGray"
+            <Spinner
+                android:id="@+id/sp_org_type"
+                style="@style/TextStyleOrangeSmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/edtRegTeamName"
                 android:layout_marginTop="10dp"
                 android:focusable="false"
 
                 android:hint="Select Town"
                 android:textColorHint="@color/gray" />
+
+            <Spinner
+                android:id="@+id/sp_country"
+                style="@style/TextStyleOrangeSmall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:focusable="false"
+                android:hint="Select Town"
+                android:textColorHint="@color/gray" />
+
         </LinearLayout>
 
         <LinearLayout
@@ -107,9 +117,17 @@
                 android:id="@+id/edtMemberPhone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/edtMemberEmail"
                 android:hint="Cellphone Number"
-                android:inputType="number" />
+                android:inputType="number"
+                android:layout_below="@+id/edtMemberEmail" />
+
+            <EditText
+                android:id="@+id/edtPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/edtMemberEmail"
+                android:hint="Password"
+                android:inputType="numberPassword" />
 
             <ViewStub
                 android:id="@+id/vTub"
@@ -132,7 +150,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@color/OrangeRed"
+                android:background="@color/blue"
                 android:text="Register"
                 android:textColor="@color/white"
                 android:textStyle="bold" />

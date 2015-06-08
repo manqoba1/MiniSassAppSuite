@@ -16,57 +16,15 @@ import java.util.List;
 public class TeamDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    private Integer teamID, townID;
+    private Integer teamID, countryID, organisationTypeID;
     private String teamName;
     private long dateRegistered;
-    private String townName;
     private String teamImage;
-    private List<GcmDeviceDTO> gcmdeviceList;
-    private List<TeamMemberDTO> teamMemberList = new ArrayList<>();
-    private TownDTO town;
+    private CountryDTO country;
+    private OrganisationtypeDTO organisationType;
+    private List<TeamMemberDTO> teammemberList = new ArrayList<>();
 
     public TeamDTO() {
-    }
-
-
-    public TownDTO getTown() {
-        return town;
-    }
-
-    public void setTown(TownDTO town) {
-        this.town = town;
-    }
-
-    public Integer getTownID() {
-        return townID;
-    }
-
-    public void setTownID(Integer townID) {
-        this.townID = townID;
-    }
-
-    public String getTeamImage() {
-        return teamImage;
-    }
-
-    public void setTeamImage(String teamImage) {
-        this.teamImage = teamImage;
-    }
-
-    public List<GcmDeviceDTO> getGcmdeviceList() {
-        return gcmdeviceList;
-    }
-
-    public void setGcmdeviceList(List<GcmDeviceDTO> gcmdeviceList) {
-        this.gcmdeviceList = gcmdeviceList;
-    }
-
-    public String getTownName() {
-        return townName;
-    }
-
-    public void setTownName(String townName) {
-        this.townName = townName;
     }
 
     public Integer getTeamID() {
@@ -75,6 +33,22 @@ public class TeamDTO implements Serializable {
 
     public void setTeamID(Integer teamID) {
         this.teamID = teamID;
+    }
+
+    public Integer getCountryID() {
+        return countryID;
+    }
+
+    public void setCountryID(Integer countryID) {
+        this.countryID = countryID;
+    }
+
+    public Integer getOrganisationTypeID() {
+        return organisationTypeID;
+    }
+
+    public void setOrganisationTypeID(Integer organisationTypeID) {
+        this.organisationTypeID = organisationTypeID;
     }
 
     public String getTeamName() {
@@ -93,12 +67,36 @@ public class TeamDTO implements Serializable {
         this.dateRegistered = dateRegistered;
     }
 
-    public List<TeamMemberDTO> getTeamMemberList() {
-        return teamMemberList;
+    public String getTeamImage() {
+        return teamImage;
     }
 
-    public void setTeamMemberList(List<TeamMemberDTO> teamMemberList) {
-        this.teamMemberList = teamMemberList;
+    public void setTeamImage(String teamImage) {
+        this.teamImage = teamImage;
+    }
+
+    public CountryDTO getCountry() {
+        return country;
+    }
+
+    public void setCountry(CountryDTO country) {
+        this.country = country;
+    }
+
+    public OrganisationtypeDTO getOrganisationType() {
+        return organisationType;
+    }
+
+    public void setOrganisationType(OrganisationtypeDTO organisationType) {
+        this.organisationType = organisationType;
+    }
+
+    public List<TeamMemberDTO> getTeammemberList() {
+        return teammemberList;
+    }
+
+    public void setTeammemberList(List<TeamMemberDTO> teammemberList) {
+        this.teammemberList = teammemberList;
     }
 
     @Override

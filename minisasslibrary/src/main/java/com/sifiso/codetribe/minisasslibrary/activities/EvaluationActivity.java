@@ -29,7 +29,9 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.VolleyError;
 import com.google.gson.Gson;
 import com.sifiso.codetribe.minisasslibrary.R;
 import com.sifiso.codetribe.minisasslibrary.dto.CategoryDTO;
@@ -40,12 +42,15 @@ import com.sifiso.codetribe.minisasslibrary.dto.EvaluationSiteDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.InsectDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.InsectImageDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverDTO;
+import com.sifiso.codetribe.minisasslibrary.dto.RiverPartDTO;
+import com.sifiso.codetribe.minisasslibrary.dto.RiverPointDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.TeamMemberDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.RequestDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ResponseDTO;
 import com.sifiso.codetribe.minisasslibrary.fragments.PageFragment;
 import com.sifiso.codetribe.minisasslibrary.services.RequestCache;
 import com.sifiso.codetribe.minisasslibrary.services.RequestSyncService;
+import com.sifiso.codetribe.minisasslibrary.toolbox.BaseVolley;
 import com.sifiso.codetribe.minisasslibrary.toolbox.WebCheck;
 import com.sifiso.codetribe.minisasslibrary.toolbox.WebCheckResult;
 import com.sifiso.codetribe.minisasslibrary.util.CacheUtil;
@@ -61,7 +66,9 @@ import com.sifiso.codetribe.minisasslibrary.util.WebSocketUtil;
 import org.joda.time.DateTime;
 
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -107,8 +114,17 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
     RequestSyncService mService;
 
     private Context ctx;
+    RelativeLayout GPS_layout4;
+    private TextView txtAccuracy, txtLat, txtLng;
 
     private void setField() {
+        GPS_layout4 = (RelativeLayout) findViewById(R.id.GPS_layout4);
+        txtAccuracy = (TextView) findViewById(R.id.GPS_accuracy);
+        txtLat = (TextView) findViewById(R.id.GPS_latitude);
+        txtLng = (TextView) findViewById(R.id.GPS_longitude);
+        Statics.setRobotoFontBold(ctx, txtLat);
+        Statics.setRobotoFontBold(ctx, txtLng);
+
 
         WC_minus = (TextView) findViewById(R.id.WC_minus);
         WC_score = (EditText) findViewById(R.id.WC_score);
@@ -254,9 +270,13 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_evaluation, menu);
-        // WebCheckResult webCheckResult = WebCheck.checkNetworkAvailability(ctx);
+        WebCheckResult wr = WebCheck.checkNetworkAvailability(ctx);
+        if (wr.isMobileConnected() || wr.isWifiConnected()) {
+            getRiversAroundMe();
+        } else {
 
-        getLocalData();
+        }
+
         return true;
     }
 
@@ -316,10 +336,12 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
             case INSECT_DATA:
                 Log.w(LOG, "### insects ui has returned with data?");
                 if (resultCode == INSECT_DATA) {
-                    Log.w(LOG, "### insect ui has returned with data?");
+
                     insectImageList = (List<InsectImageDTO>) data.getSerializableExtra("overallInsect");
 
                     scoreUpdater((List<InsectImageDTO>) data.getSerializableExtra("selectedInsects"));
+                    List<InsectImageDTO> list = (List<InsectImageDTO>) data.getSerializableExtra("selectedInsects");
+                    Log.w(LOG, "### insect ui has returned with data?" + list.size());
                     result3.setVisibility(View.VISIBLE);
                     teamMember = SharedUtil.getTeamMember(ctx);
                 }
@@ -334,39 +356,81 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
 
     }
 
-    private void setSpinner(final ResponseDTO resp) {
+    static final DecimalFormat df = new DecimalFormat("###,###,###,###,##0.0");
+
+    private String getDistance(float mf) {
+        if (mf < 1000) {
+            return df.format(mf) + " metres";
+        }
+        Double m = Double.parseDouble("" + mf);
+        Double n = m / 1000;
+
+        return df.format(n) + " kilometres";
+
+    }
+
+    private void calculateDistances() {
+        if (location != null) {
+            List<RiverPointDTO> riverPoints = new ArrayList<>();
+            Location spot = new Location(LocationManager.GPS_PROVIDER);
+
+            for (RiverDTO w : response.getRiverList()) {
+                for (RiverPartDTO x : w.getRiverpartList()) {
+                    for (RiverPointDTO y : x.getRiverpointList()) {
+                        spot.setLatitude(y.getLatitude());
+                        spot.setLongitude(y.getLongitude());
+                        y.setDistanceFromMe(location.distanceTo(spot));
+                    }
+                    Collections.sort(x.getRiverpointList());
+                   /* x.setNearestLatitude(x.getRiverpointList().get(0).getLatitude());
+                    x.setNearestLongitude(x.getRiverpointList().get(0).getLongitude());
+                    x.setDistanceFromMe(x.getRiverpointList().get(0).getDistanceFromMe());*/
+                }
+                Collections.sort(w.getRiverpartList());
+                w.setNearestLatitude(w.getRiverpartList().get(0).getNearestLatitude());
+                w.setNearestLongitude(w.getRiverpartList().get(0).getNearestLongitude());
+                w.setDistanceFromMe(w.getRiverpartList().get(0).getDistanceFromMe());
 
 
+            }
+            Collections.sort(response.getRiverList());
+        }
+    }
+
+    private void setSpinner() {
+
+        calculateDistances();
+        Log.d(LOG, "category size " + response.getCategoryList().size());
         WT_sp_category.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(LOG, "category size " + resp.getCategoryList().size());
-                Util.showPopupCategoryBasicWithHeroImage(ctx, EvaluationActivity.this, resp.getCategoryList(), WT_sp_category, "", new Util.UtilPopupListener() {
+
+                Util.showPopupCategoryBasicWithHeroImage(ctx, EvaluationActivity.this, response.getCategoryList(), WT_sp_category, "", new Util.UtilPopupListener() {
                     @Override
                     public void onItemSelected(int index) {
                         indexCat = index;
-                        WT_sp_category.setText(resp.getCategoryList().get(indexCat).getCategoryName());
-                        categoryID = resp.getCategoryList().get(indexCat).getCategoryID();
-                        catType = (resp.getCategoryList().get(indexCat).getCategoryName());
+                        WT_sp_category.setText(response.getCategoryList().get(indexCat).getCategoryName());
+                        categoryID = response.getCategoryList().get(indexCat).getCategoryId();
+                        catType = (response.getCategoryList().get(indexCat).getCategoryName());
                         evaluationSite.setCategoryID(categoryID);
                         Log.e(LOG, categoryID + "");
                     }
                 });
             }
         });
-
+        Log.d(LOG, "river size " + response.getRiverList().size());
         WT_sp_river.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(LOG, "river size " + resp.getRiverList().size());
 
-                Util.showPopupRiverWithHeroImage(ctx, EvaluationActivity.this, resp.getRiverList(), WT_sp_river, "", new Util.UtilPopupListener() {
+
+                Util.showPopupRiverWithHeroImage(ctx, EvaluationActivity.this, response.getRiverList(), WT_sp_river, "", new Util.UtilPopupListener() {
                     @Override
                     public void onItemSelected(int ind) {
                         // WT_sp_river.setTextColor(getResources().getColor(R.color.gray));
                         indexRiv = ind;
-                        WT_sp_river.setText(resp.getRiverList().get(indexRiv).getRiverName());
-                        riverID = resp.getRiverList().get(indexRiv).getRiverID();
+                        WT_sp_river.setText(response.getRiverList().get(indexRiv).getRiverName());
+                        riverID = response.getRiverList().get(indexRiv).getRiverID();
                         evaluationSite.setRiverID(riverID);
                         Log.e(LOG, "" + riverID);
                     }
@@ -571,8 +635,9 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
                     return;
                 }
 
-                if (evaluationSite == null) {
-                    ToastUtil.toast(ctx, "Evaluation site not defined (Hint: Select insect group)");
+                if (evaluationSite == null && accuracy == null) {
+                    ToastUtil.toast(ctx, "Evaluation site not defined");
+                    GPS_layout4.setVisibility(View.VISIBLE);
                     return;
                 }
                 if (selectedInsects == null) {
@@ -591,14 +656,21 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
 
     }
 
+    private void setLocationTextviews(Location loc) {
+        txtLat.setText("" + loc.getLatitude());
+        txtLng.setText("" + loc.getLongitude());
+        txtAccuracy.setText("" + loc.getAccuracy());
+    }
+
     private void startSelectionDialog() {
 
 
         for (InsectDTO i : response.getInsectList()) {
+
             if (insectImageList == null) {
                 insectImageList = new ArrayList<InsectImageDTO>();
             }
-            for (InsectImageDTO ii : i.getInsectImageList()) {
+            for (InsectImageDTO ii : i.getInsectimageDTOList()) {
                 insectImageList.add(ii);
             }
         }
@@ -644,7 +716,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
                 TV_avg_score.setText("0.0");
                 IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.red_crap));
                 WT_sp_river.setText("What is the current river are you at?");
-                WT_sp_category.setText("hat type of environment are you at? Rocky or Sandy?");
+                WT_sp_category.setText("What environment are you at? Rocky or Sandy?");
                 EDT_comment.setText("");
                 AE_pin_point.setVisibility(View.GONE);
                 evaluationSite = new EvaluationSiteDTO();
@@ -670,7 +742,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
         Log.i(LOG, categorys.size() + " " + categoryID);
         for (CategoryDTO c : categorys) {
             Log.e(LOG, categorys.size() + " " + categoryID);
-            if (categoryID == c.getCategoryID()) {
+            if (categoryID == c.getCategoryId()) {
                 Log.d(LOG, categorys.size() + " " + categoryID);
                 for (ConditionsDTO cd : c.getConditionsList()) {
                     Log.w(LOG, categorys.size() + " " + cd.getConditionName() + " ");
@@ -697,7 +769,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
 
         } else {
             for (InsectImageDTO ii : dtos) {
-                total = total + ii.getSensitivityScore();
+                total = total + ii.getInsect().getSensitivityScore();
             }
             average = total / dtos.size();
         }
@@ -810,11 +882,13 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
 
     private double calculateScore(List<InsectImageDTO> dtos) {
         double score = 0.0;
+
         if (dtos == null || dtos.size() == 0) {
             return 0.0;
         } else {
             for (InsectImageDTO ii : dtos) {
-                score = score + ii.getSensitivityScore();
+
+                score = score + ii.getInsect().getSensitivityScore();
             }
         }
         return score;
@@ -826,7 +900,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
             return 0.0;
         }
         for (InsectImageDTO ii : dtos) {
-            total = total + ii.getSensitivityScore();
+            total = total + ii.getInsect().getSensitivityScore();
         }
         average = total / dtos.size();
         average = Math.round(average * 100.0) / 100.0;
@@ -834,7 +908,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
     }
 
     public void buildUI() {
-        setSpinner(response);
+        setSpinner();
         Log.d(LOG, "******* getting cached data");
         startSelectionDialog();
         addMinus();
@@ -944,7 +1018,8 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
         w.setEvaluation(evaluationDTO);
 
         //ToastUtil.errorToast(ctx, c.getTime().getTime() + " : " + c.getTime());
-        Log.i(LOG, (new Gson()).toJson(w));
+        //Log.i(LOG, (new Gson()).toJson(w));
+        System.out.println((new Gson()).toJson(w));
         WebCheckResult wcr = WebCheck.checkNetworkAvailability(ctx);
 
 
@@ -1071,7 +1146,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
             }
 
             @Override
-            public void onDataCached() {
+            public void onDataCached(ResponseDTO r) {
 
             }
 
@@ -1089,61 +1164,67 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
 
     }
 
-    public void getData() {
-        RequestDTO req = new RequestDTO();
-        req.setRequestType(RequestDTO.GET_DATA);
+    boolean isBusy;
 
-        try {
-
-            WebSocketUtil.sendRequest(ctx, Statics.MINI_SASS_ENDPOINT, req, new WebSocketUtil.WebSocketListener() {
-                @Override
-                public void onMessage(final ResponseDTO r) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Log.e(LOG, "## getStarterData responded...statusCode: " + r.getStatusCode());
-                            if (!ErrorUtil.checkServerError(ctx, r)) {
-                                return;
-                            }
-                            response = r;
-                            CacheUtil.cacheData(ctx, r, CacheUtil.CACHE_DATA, new CacheUtil.CacheUtilListener() {
-                                @Override
-                                public void onFileDataDeserialized(final ResponseDTO resp) {
-
-                                }
-
-                                @Override
-                                public void onDataCached() {
-
-                                }
-
-                                @Override
-                                public void onError() {
-
-                                }
-                            });
-                            /*Intent intent = new Intent(getApplicationContext(), RequestSyncService.class);
-                            startService(intent);*/
-                        }
-                    });
-
-
-                }
-
-                @Override
-                public void onClose() {
-
-                }
-
-                @Override
-                public void onError(final String message) {
-
-                }
-            });
-
-        } catch (Exception e) {
-
+    private void getRiversAroundMe() {
+        if (location == null) {
+            return;
         }
+        if (isBusy) {
+            Toast.makeText(ctx, "Busy...getting rivers ...", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+
+        RequestDTO w = new RequestDTO();
+        w.setRequestType(RequestDTO.LIST_DATA_WITH_RADIUS_RIVERS);
+        w.setLatitude(location.getLatitude());
+        w.setLongitude(location.getLongitude());
+        w.setRadius(40);
+        isBusy = true;
+
+        BaseVolley.getRemoteData(Statics.SERVLET_ENDPOINT, w, ctx, new BaseVolley.BohaVolleyListener() {
+            @Override
+            public void onResponseReceived(ResponseDTO r) {
+                isBusy = false;
+//                progressBar.setVisibility(View.GONE);
+                if (r.getStatusCode() > 0) {
+                    Toast.makeText(ctx, r.getMessage(), Toast.LENGTH_LONG).show();
+                    return;
+                }
+               /* if (r.getRiverList().isEmpty()) {
+                    Toast.makeText(ctx, "No rivers found within 20 km", Toast.LENGTH_LONG).show();
+                    return;
+                }*/
+
+                CacheUtil.cacheRiverData(ctx, r, CacheUtil.CACHE_RIVER, new CacheUtil.CacheUtilListener() {
+                    @Override
+                    public void onFileDataDeserialized(ResponseDTO response) {
+
+                    }
+
+                    @Override
+                    public void onDataCached(ResponseDTO r) {
+                        response = r;
+                        Log.d(LOG, new Gson().toJson(r));
+                        buildUI();
+                    }
+
+                    @Override
+                    public void onError() {
+
+                    }
+                });
+            }
+
+            @Override
+            public void onVolleyError(VolleyError error) {
+                isBusy = false;
+                //Toast.makeText(ctx, "Problem: " + error.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+
+
     }
 
     Location location;
@@ -1212,6 +1293,8 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
         }
     }
 
+    Float accuracy = null;
+
     private void setGPSLocation(Location loc) {
         if (evaluationSite == null) {
             evaluationSite = new EvaluationSiteDTO();
@@ -1221,14 +1304,17 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
         evaluationSite.setLatitude(location.getLatitude());
         evaluationSite.setLongitude(location.getLongitude());
         evaluationSite.setAccuracy(location.getAccuracy());
-
+        setLocationTextviews(loc);
         Log.w(LOG, "### Passing " + loc.getAccuracy());
         if (loc.getAccuracy() <= ACCURACY_THRESHOLD) {
+
             location = loc;
+            setLocationTextviews(loc);
             Log.w(LOG, "### Passing location2");
             evaluationSite.setLatitude(location.getLatitude());
             evaluationSite.setLongitude(location.getLongitude());
             evaluationSite.setAccuracy(location.getAccuracy());
+            accuracy = location.getAccuracy();
             stopScan();
             setEvaluationSite(evaluationSite);
 

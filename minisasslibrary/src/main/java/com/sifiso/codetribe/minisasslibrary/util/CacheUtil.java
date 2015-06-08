@@ -6,6 +6,7 @@ import android.util.Log;
 
 
 import com.google.gson.Gson;
+import com.sifiso.codetribe.minisasslibrary.dto.RiverDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ResponseDTO;
 import com.sifiso.codetribe.minisasslibrary.services.RequestCache;
 
@@ -28,7 +29,7 @@ public class CacheUtil implements Serializable {
     public interface CacheUtilListener {
         public void onFileDataDeserialized(ResponseDTO response);
 
-        public void onDataCached();
+        public void onDataCached(ResponseDTO response);
 
         public void onError();
     }
@@ -44,16 +45,17 @@ public class CacheUtil implements Serializable {
 
     static CacheUtilListener utilListener;
     static CacheRequestListener cacheListener;
-    public static final int CACHE_DATA = 1, CACHE_TOWN_DATA = 2, CACHE_COUNTRIES = 3, CACHE_EVALUATION = 4, CACHE_REQUEST = 5;
+    public static final int CACHE_DATA = 1, CACHE_REGISTER_DATA = 2, CACHE_COUNTRIES = 3, CACHE_EVALUATION = 4, CACHE_REQUEST = 5, CACHE_RIVER = 6, CACHE_RIVER_DATA = 7;
     static int dataType;
     static Integer projectID;
     static ResponseDTO response;
+    static RiverDTO river;
     static String countryCode;
     static Context ctx;
     static RequestCache requestCache;
     static final String JSON_DATA = "data.json", JSON_COUNTRIES = "countries.json",
-            JSON_EVALUATION_DATA = "evaluation_data", JSON_TOWN_DATA = "town_data",
-            JSON_REQUEST = "requestCache.json";
+            JSON_EVALUATION_DATA = "evaluation_data", JSON_REGISTER_DATA = "register_data.json",
+            JSON_REQUEST = "requestCache.json", JSON_RIVER = "river_data.json";
 
 
     public static void cacheRequest(Context context, RequestCache cache, CacheRequestListener listener) {
@@ -64,25 +66,39 @@ public class CacheUtil implements Serializable {
         new CacheTask().execute();
     }
 
-    public static void cacheTownData(Context context, ResponseDTO r, String id, int type, CacheUtilListener cacheUtilListener) {
+    public static void cacheRegisterData(Context context, ResponseDTO r,int type, CacheUtilListener cacheUtilListener) {
         dataType = type;
         response = r;
-        countryCode= id;
         response.setLastCacheDate(new Date());
         utilListener = cacheUtilListener;
         ctx = context;
         new CacheTask().execute();
     }
 
-    public static void getCachedTownData(Context context, String id, int type, CacheUtilListener cacheUtilListener) {
+    public static void getCachedRegisterData(Context context, int type, CacheUtilListener cacheUtilListener) {
         dataType = type;
         utilListener = cacheUtilListener;
         ctx = context;
-        countryCode = id;
         new CacheRetrieveTask().execute();
     }
 
     public static void cacheData(Context context, ResponseDTO r, int type, CacheUtilListener cacheUtilListener) {
+        dataType = type;
+        response = r;
+        response.setLastCacheDate(new Date());
+        utilListener = cacheUtilListener;
+        ctx = context;
+        new CacheTask().execute();
+    }
+
+    public static void getCachedRiverData(Context context, int type, CacheUtilListener cacheUtilListener) {
+        dataType = type;
+        utilListener = cacheUtilListener;
+        ctx = context;
+        new CacheRetrieveTask().execute();
+    }
+
+    public static void cacheRiverData(Context context, ResponseDTO r, int type, CacheUtilListener cacheUtilListener) {
         dataType = type;
         response = r;
         response.setLastCacheDate(new Date());
@@ -132,11 +148,21 @@ public class CacheUtil implements Serializable {
                         json = gson.toJson(response);
 
                         break;
-                    case CACHE_TOWN_DATA:
+                    case CACHE_RIVER:
                         json = gson.toJson(response);
-                        outputStream = ctx.openFileOutput(JSON_TOWN_DATA + countryCode + ".json", Context.MODE_PRIVATE);
+                        outputStream = ctx.openFileOutput(JSON_RIVER, Context.MODE_PRIVATE);
                         write(outputStream, json);
-                        file = ctx.getFileStreamPath(JSON_TOWN_DATA + countryCode + ".json");
+                        file = ctx.getFileStreamPath(JSON_RIVER);
+                        if (file != null) {
+                            Log.e(LOG, "Data cache written, path: " + file.getAbsolutePath() +
+                                    " - length: " + file.length());
+                        }
+                        break;
+                    case CACHE_REGISTER_DATA:
+                        json = gson.toJson(response);
+                        outputStream = ctx.openFileOutput(JSON_REGISTER_DATA, Context.MODE_PRIVATE);
+                        write(outputStream, json);
+                        file = ctx.getFileStreamPath(JSON_REGISTER_DATA);
                         if (file != null) {
                             Log.e(LOG, "Data cache written, path: " + file.getAbsolutePath() +
                                     " - length: " + file.length());
@@ -185,7 +211,8 @@ public class CacheUtil implements Serializable {
                 if (v > 0) {
                     utilListener.onError();
                 } else
-                    utilListener.onDataCached();
+
+                    utilListener.onDataCached(response);
             }
             if (cacheListener != null) {
                 if (v > 0) {
@@ -213,12 +240,16 @@ public class CacheUtil implements Serializable {
             FileInputStream stream;
             try {
                 switch (dataType) {
-
+                    case CACHE_RIVER:
+                        stream = ctx.openFileInput(JSON_RIVER);
+                        response = getData(stream);
+                        Log.i(LOG, "++ river data cache retrieved");
+                        break;
                     case CACHE_EVALUATION:
 
                         break;
-                    case CACHE_TOWN_DATA:
-                        stream = ctx.openFileInput(JSON_TOWN_DATA + countryCode + ".json");
+                    case CACHE_REGISTER_DATA:
+                        stream = ctx.openFileInput(JSON_REGISTER_DATA);
                         response = getData(stream);
                         Log.i(LOG, "++ company data cache retrieved");
                         break;
@@ -238,6 +269,12 @@ public class CacheUtil implements Serializable {
                         response = getData(stream);
                         Log.i(LOG, "++ country cache retrieved");
                         break;
+
+                   /* case CACHE_RIVER_DATA:
+                        stream = ctx.openFileInput(JSON_COUNTRIES);
+                        response = getData(stream);
+                        Log.i(LOG, "++ country cache retrieved");
+                        break;*/
 
                 }
                 response.setStatusCode(0);

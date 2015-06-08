@@ -141,29 +141,6 @@ public class EvaluationFragment extends Fragment implements PageFragment {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   /* public void setResponse(ResponseDTO response) {
-        this.response = response;
-    }*/
-
-
     @Override
     public void animateCounts() {
 

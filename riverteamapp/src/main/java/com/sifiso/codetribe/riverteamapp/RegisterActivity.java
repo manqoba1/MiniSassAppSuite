@@ -195,7 +195,7 @@ public class RegisterActivity extends ActionBarActivity implements SearchTownFra
     private void getCachedData() {
         final WebCheckResult wcr = WebCheck.checkNetworkAvailability(ctx);
 
-        CacheUtil.getCachedTownData(getApplicationContext(), countryCode, CacheUtil.CACHE_TOWN_DATA, new CacheUtil.CacheUtilListener() {
+        CacheUtil.getCachedRegisterData(getApplicationContext(), CacheUtil.CACHE_REGISTER_DATA, new CacheUtil.CacheUtilListener() {
 
             @Override
             public void onFileDataDeserialized(ResponseDTO r) {
@@ -209,8 +209,8 @@ public class RegisterActivity extends ActionBarActivity implements SearchTownFra
             }
 
             @Override
-            public void onDataCached() {
-
+            public void onDataCached(ResponseDTO r) {
+                buildPages();
             }
 
             @Override
@@ -226,8 +226,7 @@ public class RegisterActivity extends ActionBarActivity implements SearchTownFra
     public void getRegistrationData() {
 
         RequestDTO req = new RequestDTO();
-        req.setRequestType(RequestDTO.LIST_ALL_TOWNS_BY_COUNTRY);
-        req.setCountryCode(countryCode);
+        req.setRequestType(RequestDTO.LIST_REGISTER_DATA);
         try {
 
             WebSocketUtil.sendRequest(ctx, Statics.MINI_SASS_ENDPOINT, req, new WebSocketUtil.WebSocketListener() {
@@ -238,7 +237,7 @@ public class RegisterActivity extends ActionBarActivity implements SearchTownFra
                     if (!ErrorUtil.checkServerError(ctx, r)) {
                         return;
                     }
-                    CacheUtil.cacheTownData(ctx, r, countryCode, CacheUtil.CACHE_TOWN_DATA, new CacheUtil.CacheUtilListener() {
+                    CacheUtil.cacheRegisterData(ctx, r, CacheUtil.CACHE_REGISTER_DATA, new CacheUtil.CacheUtilListener() {
                         @Override
                         public void onFileDataDeserialized(final ResponseDTO resp) {
 
@@ -246,8 +245,9 @@ public class RegisterActivity extends ActionBarActivity implements SearchTownFra
                         }
 
                         @Override
-                        public void onDataCached() {
-
+                        public void onDataCached(ResponseDTO r) {
+                            response = r;
+                            buildPages();
                         }
 
                         @Override
@@ -293,7 +293,7 @@ public class RegisterActivity extends ActionBarActivity implements SearchTownFra
 
     @Override
     public void onTownSelected(TownDTO town) {
-        registerFragment.updateTown(town);
+
         pageFragmentList.remove(searchTownFragment);
         adapter.notifyDataSetChanged();
         currentViewPager = 0;

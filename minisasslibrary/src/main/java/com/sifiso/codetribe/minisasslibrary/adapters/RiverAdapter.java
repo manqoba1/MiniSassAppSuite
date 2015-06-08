@@ -16,6 +16,7 @@ import com.sifiso.codetribe.minisasslibrary.dto.EvaluationSiteDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverTownDTO;
 import com.sifiso.codetribe.minisasslibrary.util.ToastUtil;
+import com.sifiso.codetribe.minisasslibrary.util.Util;
 import com.sifiso.codetribe.minisasslibrary.viewsUtil.CircleTransform;
 import com.squareup.picasso.Picasso;
 
@@ -52,7 +53,7 @@ public class RiverAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View v, ViewGroup parent) {
-        Holder h;
+        final Holder h;
         if (v == null) {
             h = new Holder();
             LayoutInflater inflater = (LayoutInflater) mCtx
@@ -71,11 +72,11 @@ public class RiverAdapter extends BaseAdapter {
             h = (Holder) v.getTag();
         }
         final RiverDTO dto = mList.get(position);
-        h.RLI_river_name.setText(dto.getRiverName());
-        h.RLI_end.setText(dto.getEndCountryName());
-        h.RLI_start.setText(dto.getOriginCountryName());
-        h.RLI_town.setText("" + dto.getRiverTownList().size());
-        h.RLI_town.setOnClickListener(new View.OnClickListener() {
+        h.RLI_river_name.setText(dto.getRiverName().trim()+ " River");
+        // h.RLI_end.setText(dto.getEndCountryName());
+        // h.RLI_start.setText(dto.getOriginCountryName());
+        //h.RLI_town.setText("" + dto.getRiverTownList().size());
+       /* h.RLI_town.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (dto.getRiverTownList() != null) {
@@ -84,7 +85,7 @@ public class RiverAdapter extends BaseAdapter {
                     ToastUtil.toast(mCtx, "No town yet");
                 }
             }
-        });
+        });*/
 
         h.RLI_evaluation.setText("" + dto.getEvaluationSiteList().size());
         h.RLI_evaluation.setOnClickListener(new View.OnClickListener() {
@@ -98,18 +99,24 @@ public class RiverAdapter extends BaseAdapter {
                 }
             }
         });
-        if(dto.getImageUri() ==null){
+       /* if(dto.getImageUri() ==null){
             h.RLI_image.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.greatfishriver));
         }else{
             int rID = mCtx.getResources().getIdentifier(dto.getImageUri(), "drawable", mCtx.getPackageName());
             h.RLI_image.setImageResource(rID);
-        }
+        }*/
 
-       // h.RLI_image.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.greatfishriver));
+        // h.RLI_image.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.greatfishriver));
         h.RLI_image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.onMapRequest(dto, RIVER_VIEW);
+                Util.flashOnce(h.RLI_image, 200, new Util.UtilAnimationListener() {
+                    @Override
+                    public void onAnimationEnded() {
+                        mListener.onMapRequest(dto, RIVER_VIEW);
+                    }
+                });
+
             }
         });
         CircleTransform transform = new CircleTransform();
@@ -117,7 +124,13 @@ public class RiverAdapter extends BaseAdapter {
         h.RLI_map_eval.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.onMapRequest(dto, EVALUATION_VIEW);
+                Util.flashOnce(h.RLI_map_eval, 200, new Util.UtilAnimationListener() {
+                    @Override
+                    public void onAnimationEnded() {
+                        mListener.onMapRequest(dto, EVALUATION_VIEW);
+                    }
+                });
+
             }
         });
         //animateView(v);

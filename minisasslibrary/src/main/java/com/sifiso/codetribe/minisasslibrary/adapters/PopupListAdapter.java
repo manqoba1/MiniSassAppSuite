@@ -77,7 +77,7 @@ public class PopupListAdapter extends ArrayAdapter<CategoryDTO> {
         item.score_weight.setVisibility(View.GONE);
 
         final CategoryDTO p = mList.get(position);
-        if (p.getCategoryID() == 8) {
+        if (p.getCategoryId() == 8) {
             item.image.setImageDrawable(ctx.getResources().getDrawable(R.drawable.ic_sand));
 
         } else {

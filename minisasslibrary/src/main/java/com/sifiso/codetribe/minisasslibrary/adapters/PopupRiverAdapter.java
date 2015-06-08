@@ -12,6 +12,7 @@ import com.sifiso.codetribe.minisasslibrary.R;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverDTO;
 import com.sifiso.codetribe.minisasslibrary.util.Statics;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 /**
@@ -79,14 +80,14 @@ public class PopupRiverAdapter extends ArrayAdapter<RiverDTO> {
         //final TownDTO p = mList.get(position);
         //String string = mStrings[position];
         final RiverDTO river = mList.get(position);
-
-        item.txtString.setText(river.getRiverName());
+        item.txtString.setText(river.getRiverName().trim());
         Statics.setRobotoFontLight(ctx, item.txtString);
         return (convertView);
     }
 
+
     static class ViewHolderItem {
-        TextView txtString,score_weight;
+        TextView txtString, score_weight;
         ImageView image;
     }
 }

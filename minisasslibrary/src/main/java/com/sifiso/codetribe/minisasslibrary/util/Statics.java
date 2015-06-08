@@ -11,16 +11,19 @@ import com.sifiso.codetribe.minisasslibrary.R;
 public class Statics {
 
 
-    public static final String WEBSOCKET_URL = "ws://69.89.15.29:8080/ms/";
-  //  public static final String WEBSOCKET_URL = "ws://10.50.75.33:8080/ms/";
-    public static final String URL = "http://69.89.15.29:8080/ms/";
+    public static final String WEBSOCKET_URL = "ws://69.89.15.29:8080/ms2/";
+    //  public static final String WEBSOCKET_URL = "ws://10.50.75.33:8080/ms/";
+    //public static final String URL = "http://69.89.15.29:8080/ms/";
+    public static final String URL = "http://69.89.15.29:8080/ms2/";
     public static final String CRASH_REPORTS_URL = URL + "crash?";
     public static final String IMAGE_URL = "http://69.89.15.29:8080/";
-   // public static final String IMAGE_URL = "http://10.50.75.33:8080/";
+    // public static final String IMAGE_URL = "http://10.50.75.33:8080/";
     public static final String UPLOAD_URL_REQUEST = "uploadUrl?";
     public static final String
             REQUEST_ENDPOINT = "wsrequest",
-            MINI_SASS_ENDPOINT = "wsmini";
+            MINI_SASS_ENDPOINT = "wsmini",
+            SERVLET_ENDPOINT = "list?JSON=",
+            SERVLET_TEST = "test1?JSON=";
 
     public static final String SESSION_ID = "sessionID";
     public static final int CRASH_STRING = R.string.crash_toast;

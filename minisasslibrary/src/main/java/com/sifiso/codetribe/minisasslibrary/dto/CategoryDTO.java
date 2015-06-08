@@ -16,7 +16,7 @@ import java.util.List;
 public class CategoryDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    private Integer categoryID;
+    private Integer categoryId;
     private String categoryName;
     private List<EvaluationSiteDTO> evaluationSiteList;
     private List<ConditionsDTO> conditionsList;
@@ -25,12 +25,12 @@ public class CategoryDTO implements Serializable {
     }
 
 
-    public Integer getCategoryID() {
-        return categoryID;
+    public Integer getCategoryId() {
+        return categoryId;
     }
 
-    public void setCategoryID(Integer categoryID) {
-        this.categoryID = categoryID;
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
     }
 
     public List<ConditionsDTO> getConditionsList() {
@@ -60,7 +60,7 @@ public class CategoryDTO implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (categoryID != null ? categoryID.hashCode() : 0);
+        hash += (categoryId != null ? categoryId.hashCode() : 0);
         return hash;
     }
 
@@ -71,7 +71,7 @@ public class CategoryDTO implements Serializable {
             return false;
         }
         CategoryDTO other = (CategoryDTO) object;
-        if ((this.categoryID == null && other.categoryID != null) || (this.categoryID != null && !this.categoryID.equals(other.categoryID))) {
+        if ((this.categoryId == null && other.categoryId != null) || (this.categoryId != null && !this.categoryId.equals(other.categoryId))) {
             return false;
         }
         return true;
@@ -79,7 +79,7 @@ public class CategoryDTO implements Serializable {
 
     @Override
     public String toString() {
-        return "com.boha.minisass.data.Category[ categoryId=" + categoryID + " ]";
+        return "com.boha.minisass.data.Category[ categoryId=" + categoryId + " ]";
     }
 
 }

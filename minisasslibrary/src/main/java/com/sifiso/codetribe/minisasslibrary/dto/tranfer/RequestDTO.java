@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * @author aubreyM
  */
-public class RequestDTO implements Serializable{
+public class RequestDTO implements Serializable {
 
     public static final int REGISTER_TEAM = 1,
             GENERATE_TEAM = 100,
@@ -71,7 +71,7 @@ public class RequestDTO implements Serializable{
             LIST_TEAMS = 44,
             LIST_EVALUATION_SITE_BY_RIVER = 45,
             LIST_PROVINCE_BY_COUNTRY = 46,
-            LIST_ALL_PROVINCES = 50,
+            LIST_REGISTER_DATA = 50,
 
     LIST_EVALUATION_BY_TEAM_MEMBER = 60,
             LIST_EVALUATION_BY_CONDITIONS = 61,
@@ -87,14 +87,16 @@ public class RequestDTO implements Serializable{
             LIST_RIVERS = 71,
             GET_DATA = 72,
             CONFIRM_LOCATION = 73,
-            LIST_ALL_TOWNS_BY_COUNTRY =74;;
+            LIST_ALL_TOWNS_BY_COUNTRY = 74,
+            LIST_DATA_WITH_RADIUS_RIVERS = 75;
+
 
     public static final String SAMPLE_DIR = "company";
     public static final String EVALUATION_DIR = "evaluation";
     public static final String INSECTS_DIR = "insert";
     public static final String TEAM_DIR = "team";
     public static final String TEAM_MEMBER_DIR = "teamMember";
-    private int requestType;
+    private int requestType,radius;
     private String email, password;
     private String countryCode;
     private Integer countryID, categoryID, commentID, conditionsID, evaluationID, evaluationInsectID,
@@ -122,6 +124,15 @@ public class RequestDTO implements Serializable{
     private CountryDTO country;
     private TownDTO town;
     private ProvinceDTO province;
+
+    public int getRadius() {
+        return radius;
+    }
+
+    public void setRadius(int radius) {
+        this.radius = radius;
+    }
+
     private List<TeamMemberDTO> members;
 
     public String getCountryCode() {

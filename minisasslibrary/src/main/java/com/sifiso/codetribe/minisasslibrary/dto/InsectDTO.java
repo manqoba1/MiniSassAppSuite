@@ -19,7 +19,7 @@ public class InsectDTO implements Serializable {
     private Integer insectID;
     private String groupName;
     private int sensitivityScore;
-    private List<InsectImageDTO> insectImageList = new ArrayList<>();
+    private List<InsectImageDTO> insectimageDTOList = new ArrayList<>();
     private List<EvaluationInsectDTO> evaluationInsectList = new ArrayList<>();
 
     public InsectDTO() {
@@ -57,12 +57,12 @@ public class InsectDTO implements Serializable {
         this.sensitivityScore = sensitivityScore;
     }
 
-    public List<InsectImageDTO> getInsectImageList() {
-        return insectImageList;
+    public List<InsectImageDTO> getInsectimageDTOList() {
+        return insectimageDTOList;
     }
 
-    public void setInsectImageList(List<InsectImageDTO> insectImageList) {
-        this.insectImageList = insectImageList;
+    public void setInsectimageDTOList(List<InsectImageDTO> insectimageDTOList) {
+        this.insectimageDTOList = insectimageDTOList;
     }
 
     public List<EvaluationInsectDTO> getEvaluationInsectList() {
