@@ -70,7 +70,7 @@ public class PictureRecyclerGridActivity extends ActionBarActivity {
 
         evaluation = (EvaluationDTO) getIntent().getSerializableExtra("evaluation");
         if (evaluationImage != null) {
-            if (evaluation.getEvaluationImageList() == null || evaluation.getEvaluationImageList().isEmpty()) {
+            if (evaluation.getEvaluationimageList() == null || evaluation.getEvaluationimageList().isEmpty()) {
                 Util.showErrorToast(ctx, getString(R.string.no_photos));
                 finish();
             }

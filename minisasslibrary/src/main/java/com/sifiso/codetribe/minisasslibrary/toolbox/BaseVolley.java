@@ -11,11 +11,11 @@ import com.android.volley.Response;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
-
 import com.google.gson.Gson;
 import com.sifiso.codetribe.minisasslibrary.MiniSassApp;
 import com.sifiso.codetribe.minisasslibrary.R;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.RequestDTO;
+import com.sifiso.codetribe.minisasslibrary.dto.tranfer.RequestList;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ResponseDTO;
 import com.sifiso.codetribe.minisasslibrary.util.Statics;
 import com.sifiso.codetribe.minisasslibrary.util.Util;
@@ -136,6 +136,35 @@ public class BaseVolley {
         requestQueue.add(bohaRequest);
     }
 
+    public static void getRemoteData(String suffix, RequestList request,
+                                     Context context, BohaVolleyListener listener) {
+
+        ctx = context;
+        bohaVolleyListener = listener;
+        if (requestQueue == null) {
+            Log.w(LOG, "getRemoteData requestQueue is null, getting it ...: ");
+            requestQueue = BohaVolley.getRequestQueue(ctx);
+        } else {
+            Log.e(LOG, "********** getRemoteData requestQueue is NOT NULL - Kool");
+        }
+        String json = null, jj = null;
+
+        Gson gson = new Gson();
+        try {
+            jj = gson.toJson(request);
+            json = URLEncoder.encode(jj, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        retries = 0;
+        String x = Statics.URL + suffix + json;
+        Log.i(LOG, "...sending remote request: ....size: "+ x.length() +"...>\n"  + Statics.URL + suffix + jj);
+        bohaRequest = new BohaRequest(Method.POST, x,
+                onSuccessListener(), onErrorListener());
+        bohaRequest.setRetryPolicy(new DefaultRetryPolicy((int) TimeUnit.SECONDS.toMillis(120),
+                0, 0));
+        requestQueue.add(bohaRequest);
+    }
     public static void getUploadUrl(Context context, BohaVolleyListener listener) {
 
         ctx = context;

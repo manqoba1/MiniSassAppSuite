@@ -18,8 +18,6 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
@@ -34,7 +32,6 @@ import android.view.animation.OvershootInterpolator;
 import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListPopupWindow;
 import android.widget.TextView;
@@ -45,11 +42,12 @@ import com.sifiso.codetribe.minisasslibrary.adapters.PopupAdapter;
 import com.sifiso.codetribe.minisasslibrary.adapters.PopupInsectSelectedAdapter;
 import com.sifiso.codetribe.minisasslibrary.adapters.PopupListAdapter;
 import com.sifiso.codetribe.minisasslibrary.adapters.PopupRiverAdapter;
+import com.sifiso.codetribe.minisasslibrary.adapters.PopupSiteAdapter;
 import com.sifiso.codetribe.minisasslibrary.dto.CategoryDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationInsectDTO;
+import com.sifiso.codetribe.minisasslibrary.dto.EvaluationSiteDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.InsectDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverDTO;
-import com.sifiso.codetribe.minisasslibrary.dto.TownDTO;
 
 import org.joda.time.DateTime;
 
@@ -628,6 +626,42 @@ public class Util {
                 pop.dismiss();
                 if (listener != null) {
                     listener.onInsectSelected(list.get(position).getInsect());
+                }
+            }
+        });
+        pop.show();
+    }
+    public static void showPopupEvaluationSite(Context ctx, Activity act,
+                                                final List<EvaluationSiteDTO> list,
+                                                View anchorView, String caption, final PopupSiteListener listener) {
+        final ListPopupWindow pop = new ListPopupWindow(ctx);
+        LayoutInflater inf = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View v = inf.inflate(R.layout.insect_popup, null);
+        TextView txt = (TextView) v.findViewById(R.id.HERO_caption);
+        if (caption != null) {
+            txt.setText(caption);
+        } else {
+            txt.setVisibility(View.GONE);
+        }
+        ImageView img = (ImageView) v.findViewById(R.id.HERO_image);
+        img.setImageDrawable(getRandomHeroImage(ctx));
+
+        pop.setPromptView(v);
+
+        pop.setPromptPosition(ListPopupWindow.POSITION_PROMPT_ABOVE);
+        pop.setAdapter(new PopupSiteAdapter(ctx, R.layout.xxsimple_spinner_item,
+                list, true));
+        Log.d(LOG, list.size() + " pop up length");
+        pop.setAnchorView(anchorView);
+        pop.setHorizontalOffset(getPopupHorizontalOffset(act));
+        pop.setModal(true);
+        pop.setWidth(getWindowWidth(act));
+        pop.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                pop.dismiss();
+                if (listener != null) {
+                    listener.onEvaluationClicked(list.get(position));
                 }
             }
         });
@@ -1483,5 +1517,8 @@ public class Util {
     }
     public interface UtilPopupInsectListener{
         public void onInsectSelected(InsectDTO insect);
+    }
+    public interface PopupSiteListener{
+        public void onEvaluationClicked(EvaluationSiteDTO evaluation);
     }
 }

@@ -22,7 +22,7 @@ public class RiverDTO implements Serializable, Comparable<RiverDTO> {
     private Date dateAdded;
     private Double nearestLatitude, nearestLongitude;
     private float distanceFromMe;
-    private List<EvaluationSiteDTO> evaluationSiteList = new ArrayList<>();
+    private List<EvaluationSiteDTO> evaluationsiteList = new ArrayList<>();
     private List<RiverPartDTO> riverpartList =new ArrayList<>();
 
     public RiverDTO() {
@@ -32,12 +32,12 @@ public class RiverDTO implements Serializable, Comparable<RiverDTO> {
         return riverID;
     }
 
-    public List<EvaluationSiteDTO> getEvaluationSiteList() {
-        return evaluationSiteList;
+    public List<EvaluationSiteDTO> getEvaluationsiteList() {
+        return evaluationsiteList;
     }
 
-    public void setEvaluationSiteList(List<EvaluationSiteDTO> evaluationSiteList) {
-        this.evaluationSiteList = evaluationSiteList;
+    public void setEvaluationsiteList(List<EvaluationSiteDTO> evaluationsiteList) {
+        this.evaluationsiteList = evaluationsiteList;
     }
 
     public void setRiverID(Integer riverID) {

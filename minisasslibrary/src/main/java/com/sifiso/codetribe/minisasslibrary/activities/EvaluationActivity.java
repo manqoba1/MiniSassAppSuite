@@ -21,13 +21,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewStub;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -55,16 +52,13 @@ import com.sifiso.codetribe.minisasslibrary.toolbox.WebCheck;
 import com.sifiso.codetribe.minisasslibrary.toolbox.WebCheckResult;
 import com.sifiso.codetribe.minisasslibrary.util.CacheUtil;
 import com.sifiso.codetribe.minisasslibrary.util.Constants;
-import com.sifiso.codetribe.minisasslibrary.util.ErrorUtil;
 import com.sifiso.codetribe.minisasslibrary.util.RequestCacheUtil;
 import com.sifiso.codetribe.minisasslibrary.util.SharedUtil;
 import com.sifiso.codetribe.minisasslibrary.util.Statics;
 import com.sifiso.codetribe.minisasslibrary.util.ToastUtil;
 import com.sifiso.codetribe.minisasslibrary.util.Util;
-import com.sifiso.codetribe.minisasslibrary.util.WebSocketUtil;
 
 import org.joda.time.DateTime;
-
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -87,7 +81,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
     //layouts
     RelativeLayout result2, result3;
     EvaluationDTO evaluationDTO;
-    Integer teamMemberID, conditionID;
+    Integer teamMemberID, conditionID = null;
     double wc = 0.0, wt = 0.0, we = 0.0, wp = 0.0, wo = 0.0;
     private Activity activity;
     List<String> categoryStr;
@@ -126,21 +120,21 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
         Statics.setRobotoFontBold(ctx, txtLng);
 
 
-        WC_minus = (TextView) findViewById(R.id.WC_minus);
+        //  WC_minus = (TextView) findViewById(R.id.WC_minus);
         WC_score = (EditText) findViewById(R.id.WC_score);
-        WC_add = (TextView) findViewById(R.id.WC_add);
-        WT_minus = (TextView) findViewById(R.id.WT_minus);
+        //  WC_add = (TextView) findViewById(R.id.WC_add);
+        //WT_minus = (TextView) findViewById(R.id.WT_minus);
         WT_score = (EditText) findViewById(R.id.WT_score);
-        WT_add = (TextView) findViewById(R.id.WT_add);
-        WP_minus = (TextView) findViewById(R.id.WP_minus);
+        //WT_add = (TextView) findViewById(R.id.WT_add);
+        //WP_minus = (TextView) findViewById(R.id.WP_minus);
         WP_score = (EditText) findViewById(R.id.WP_score);
-        WP_add = (TextView) findViewById(R.id.WP_add);
-        WO_minus = (TextView) findViewById(R.id.WO_minus);
+        // WP_add = (TextView) findViewById(R.id.WP_add);
+        //WO_minus = (TextView) findViewById(R.id.WO_minus);
         WO_score = (EditText) findViewById(R.id.WO_score);
-        WO_add = (TextView) findViewById(R.id.WO_add);
-        WE_minus = (TextView) findViewById(R.id.WE_minus);
+        // WO_add = (TextView) findViewById(R.id.WO_add);
+        // WE_minus = (TextView) findViewById(R.id.WE_minus);
         WE_score = (EditText) findViewById(R.id.WE_score);
-        WE_add = (TextView) findViewById(R.id.WE_add);
+        // WE_add = (TextView) findViewById(R.id.WE_add);
         result3 = (RelativeLayout) findViewById(R.id.result3);
         result3.setVisibility(View.GONE);
         result2 = (RelativeLayout) findViewById(R.id.result2);
@@ -174,7 +168,16 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
             }
         });
         AE_find_near_sites = (Button) findViewById(R.id.AE_find_near_sites);
-
+        AE_find_near_sites.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (riverID == null) {
+                    Toast.makeText(ctx, "Please choose the river first", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                getEvaluationsByRiver();
+            }
+        });
         viewStub = (ViewStub) findViewById(R.id.viewStub);
         if (codeStatus == CREATE_EVALUATION) {
             river = (RiverDTO) getIntent().getSerializableExtra("riverCreate");
@@ -235,7 +238,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setSubtitle(Util.getLongerDate(new DateTime()));
         ctx = getApplicationContext();
-        //activity = EvaluationActivity.this;
+        activity = this;
         teamMember = SharedUtil.getTeamMember(ctx);
         setTitle("Create Evaluations");
 
@@ -341,7 +344,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
 
                     scoreUpdater((List<InsectImageDTO>) data.getSerializableExtra("selectedInsects"));
                     List<InsectImageDTO> list = (List<InsectImageDTO>) data.getSerializableExtra("selectedInsects");
-                    Log.w(LOG, "### insect ui has returned with data?" + list.size());
+                    //Log.w(LOG, "### insect ui has returned with data?" + list.size());
                     result3.setVisibility(View.VISIBLE);
                     teamMember = SharedUtil.getTeamMember(ctx);
                 }
@@ -350,10 +353,19 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
     }
 
     public void setRiverField(RiverDTO r) {
-        ToastUtil.toast(ctx, "yes");
+       // ToastUtil.toast(ctx, "yes");
         riverID = r.getRiverID();
         WT_sp_river.setText(r.getRiverName());
 
+    }
+
+    public void setFieldsFromVisitedSites(EvaluationSiteDTO r) {
+        riverID = r.getRiverID();
+        WT_sp_river.setText(r.getRiver().getRiverName());
+        WT_sp_river.setEnabled(false);
+        categoryID = r.getCategoryID();
+        WT_sp_category.setText(r.getCategory().getCategoryName());
+        WT_sp_category.setEnabled(false);
     }
 
     static final DecimalFormat df = new DecimalFormat("###,###,###,###,##0.0");
@@ -444,7 +456,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
     private int indexCat, indexRiv;
 
 
-    private void addMinus() {
+    /*private void addMinus() {
         WO_add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -604,7 +616,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
         });
 
 
-    }
+    }*/
 
     private void startGPSDialog() {
 
@@ -641,7 +653,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
                     return;
                 }
                 if (selectedInsects == null) {
-                    selectedInsects = new ArrayList<>();
+                    //selectedInsects = new ArrayList<>();
                     ToastUtil.toast(ctx, "Select insect group found, to score evaluation (Hint: Select insect group)");
                     return;
                 }
@@ -692,8 +704,10 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
     }
 
     public void scoreUpdater(List<InsectImageDTO> insectImages) {
+        selectedInsects = new ArrayList<>();
         if (insectImages == null) {
             result3.setVisibility(View.GONE);
+            return;
         } else {
             result3.setVisibility(View.VISIBLE);
         }
@@ -714,7 +728,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
                 TV_total_score.setText("0.0");
                 TV_average_score.setText("0.0");
                 TV_avg_score.setText("0.0");
-                IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.red_crap));
+                IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.gray_crap));
                 WT_sp_river.setText("What is the current river are you at?");
                 WT_sp_category.setText("What environment are you at? Rocky or Sandy?");
                 EDT_comment.setText("");
@@ -722,8 +736,8 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
                 evaluationSite = new EvaluationSiteDTO();
 
                 TV_score_status.setText("not specified");
-                TV_score_status.setTextColor(getResources().getColor(R.color.red));
-                IMG_score_icon.setColorFilter(getResources().getColor(R.color.red), PorterDuff.Mode.MULTIPLY);
+                TV_score_status.setTextColor(getResources().getColor(R.color.gray));
+                IMG_score_icon.setColorFilter(getResources().getColor(R.color.gray), PorterDuff.Mode.MULTIPLY);
                 WE_score.setText("0.0");
                 WO_score.setText("0.0");
                 WC_score.setText("0.0");
@@ -780,9 +794,9 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
             if (average > 6.9) {
                 status = "Unmodified(NATURAL condition)";
                 statusCondition = Constants.UNMODIFIED_NATURAL_SAND;
-                TV_score_status.setTextColor(getResources().getColor(R.color.purple));
-                TV_avg_score.setTextColor(getResources().getColor(R.color.purple));
-                IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.purple_crap));
+                TV_score_status.setTextColor(getResources().getColor(R.color.dark_blue));
+                TV_avg_score.setTextColor(getResources().getColor(R.color.dark_blue));
+                IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.blue_crap));
                 //IMG_score_icon.setColorFilter(getResources().getColor(R.color.purple), PorterDuff.Mode.MULTIPLY);
             } else if (average > 5.8 && average < 6.9) {
                 status = "Largely natural/few modifications(GOOD condition)";
@@ -794,39 +808,41 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
             } else if (average > 4.9 && average < 5.8) {
                 status = "Moderately modified(FAIR condition)";
                 statusCondition = Constants.MODERATELY_MODIFIED_SAND;
-                TV_score_status.setTextColor(getResources().getColor(R.color.blue));
-                TV_avg_score.setTextColor(getResources().getColor(R.color.blue));
-                IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.blue_crap));
+                TV_score_status.setTextColor(getResources().getColor(R.color.orange));
+                TV_avg_score.setTextColor(getResources().getColor(R.color.orange));
+                IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.orange_crap));
                 // IMG_score_icon.setColorFilter(getResources().getColor(R.color.yellow_dark), PorterDuff.Mode.MULTIPLY);
             } else if (average > 4.3 && average < 4.9) {
                 status = "Largely modified(POOR condition)";
                 statusCondition = Constants.LARGELY_MODIFIED_SAND;
-                TV_score_status.setTextColor(getResources().getColor(R.color.Chocolate));
-                TV_avg_score.setTextColor(getResources().getColor(R.color.Chocolate));
-                IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.orange_crap));
+                TV_score_status.setTextColor(getResources().getColor(R.color.red));
+                TV_avg_score.setTextColor(getResources().getColor(R.color.red));
+                IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.red_crap));
                 // IMG_score_icon.setColorFilter(getResources().getColor(R.color.orange), PorterDuff.Mode.MULTIPLY);
             } else if (average < 4.3) {
                 status = "Seriously/critically modified";
                 statusCondition = Constants.CRITICALLY_MODIFIED_SAND;
-                TV_score_status.setTextColor(getResources().getColor(R.color.red));
-                TV_avg_score.setTextColor(getResources().getColor(R.color.red));
-                IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.red_crap));
+                TV_score_status.setTextColor(getResources().getColor(R.color.purple));
+                TV_avg_score.setTextColor(getResources().getColor(R.color.purple));
+                IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.purple_crap));
                 //IMG_score_icon.setColorFilter(getResources().getColor(R.color.red), PorterDuff.Mode.MULTIPLY);
             } else {
                 status = "Not specified";
                 statusCondition = Constants.NOT_SPECIFIED;
                 TV_score_status.setTextColor(getResources().getColor(R.color.gray));
                 TV_avg_score.setTextColor(getResources().getColor(R.color.gray));
-                IMG_score_icon.setColorFilter(getResources().getColor(R.color.gray), PorterDuff.Mode.MULTIPLY);
+                IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.gray_crap));
+                //IMG_score_icon.setColorFilter(getResources().getColor(R.color.gray), PorterDuff.Mode.MULTIPLY);
+
             }
         } else if (categoryName.equalsIgnoreCase("Rocky Type")) {
             categoryID = 9;
             if (average > 7.9) {
                 status = "Unmodified(NATURAL condition)";
                 statusCondition = Constants.UNMODIFIED_NATURAL_ROCK;
-                TV_score_status.setTextColor(getResources().getColor(R.color.purple));
-                TV_avg_score.setTextColor(getResources().getColor(R.color.purple));
-                IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.purple_crap));
+                TV_score_status.setTextColor(getResources().getColor(R.color.dark_blue));
+                TV_avg_score.setTextColor(getResources().getColor(R.color.dark_blue));
+                IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.blue_crap));
                 //IMG_score_icon.setColorFilter(getResources().getColor(R.color.purple), PorterDuff.Mode.MULTIPLY);
             } else if (average > 6.8 && average < 7.9) {
                 status = "Largely natural/few modifications(GOOD condition)";
@@ -838,45 +854,37 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
             } else if (average > 6.1 && average < 6.8) {
                 status = "Moderately modified(FAIR condition)";
                 statusCondition = Constants.MODERATELY_MODIFIED_ROCK;
-                TV_score_status.setTextColor(getResources().getColor(R.color.blue));
-                TV_avg_score.setTextColor(getResources().getColor(R.color.blue));
-                IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.blue_crap));
+                TV_score_status.setTextColor(getResources().getColor(R.color.orange));
+                TV_avg_score.setTextColor(getResources().getColor(R.color.orange));
+                IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.orange_crap));
                 // IMG_score_icon.setColorFilter(getResources().getColor(R.color.yellow_dark), PorterDuff.Mode.MULTIPLY);
             } else if (average > 5.1 && average < 6.1) {
                 status = "Largely modified(POOR condition)";
                 statusCondition = Constants.LARGELY_MODIFIED_ROCK;
-                TV_score_status.setTextColor(getResources().getColor(R.color.Chocolate));
-                TV_avg_score.setTextColor(getResources().getColor(R.color.Chocolate));
-                IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.orange_crap));
+                TV_score_status.setTextColor(getResources().getColor(R.color.red));
+                TV_avg_score.setTextColor(getResources().getColor(R.color.red));
+                IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.red_crap));
                 // IMG_score_icon.setColorFilter(getResources().getColor(R.color.orange), PorterDuff.Mode.MULTIPLY);
             } else if (average < 5.1) {
                 status = "Seriously/critically modified";
                 statusCondition = Constants.CRITICALLY_MODIFIED_ROCK;
-                TV_score_status.setTextColor(getResources().getColor(R.color.red));
-                TV_avg_score.setTextColor(getResources().getColor(R.color.red));
-                IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.red_crap));
+                TV_score_status.setTextColor(getResources().getColor(R.color.purple));
+                TV_avg_score.setTextColor(getResources().getColor(R.color.purple));
+                IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.purple_crap));
                 //IMG_score_icon.setColorFilter(getResources().getColor(R.color.red), PorterDuff.Mode.MULTIPLY);
             } else {
                 status = "Not specified";
                 statusCondition = Constants.NOT_SPECIFIED;
                 TV_score_status.setTextColor(getResources().getColor(R.color.gray));
                 TV_avg_score.setTextColor(getResources().getColor(R.color.gray));
-                IMG_score_icon.setColorFilter(getResources().getColor(R.color.gray), PorterDuff.Mode.MULTIPLY);
+                IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.gray_crap));
             }
         }
-
         TV_score_status.setText(status);
-        if (statusCondition == Constants.NOT_SPECIFIED) {
-            conditionID = null;
 
-        } else {
 
-            conditionID = conditionIDFunc(response.getCategoryList(), statusCondition, categoryID);
-        }
-        if (dtos == null || dtos.size() == 0) {
-            conditionID = null;
+        conditionID = conditionIDFunc(response.getCategoryList(), statusCondition, categoryID);
 
-        }
         Log.e(LOG, "Check conditionID : " + conditionID);
     }
 
@@ -911,13 +919,34 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
         setSpinner();
         Log.d(LOG, "******* getting cached data");
         startSelectionDialog();
-        addMinus();
+        //addMinus();
         startGPSDialog();
     }
 
 
     private void sendRequest(final RequestDTO request) {
-        WebSocketUtil.sendRequest(ctx, Statics.MINI_SASS_ENDPOINT, request, new WebSocketUtil.WebSocketListener() {
+        BaseVolley.getRemoteData(Statics.SERVLET_TEST, request, ctx, new BaseVolley.BohaVolleyListener() {
+            @Override
+            public void onResponseReceived(ResponseDTO response) {
+                if (response.getStatusCode() > 0) {
+                    addRequestToCache(request);
+                } else {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            // cleanForm();
+                            showImageDialog();
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onVolleyError(VolleyError error) {
+                //addRequestToCache(request);
+            }
+        });
+       /* WebSocketUtil.sendRequest(ctx, Statics.MINI_SASS_ENDPOINT, request, new WebSocketUtil.WebSocketListener() {
             @Override
             public void onMessage(ResponseDTO response) {
                 if (response.getStatusCode() > 0) {
@@ -942,7 +971,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
             public void onError(String message) {
                 addRequestToCache(request);
             }
-        });
+        });*/
     }
 
     private void addRequestToCache(RequestDTO request) {
@@ -1012,7 +1041,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
         evaluationDTO.setEvaluationDate(new Date().getTime());
         evaluationDTO.setScore(Double.parseDouble(TV_avg_score.getText().toString()));
         Log.i(LOG, new Date(evaluationDTO.getEvaluationDate()).toString());
-        evaluationDTO.setEvaluationImageList(takenImages);
+        evaluationDTO.setEvaluationimageList(takenImages);
 
         w.setInsectImages(selectedInsects);
         w.setEvaluation(evaluationDTO);
@@ -1024,8 +1053,8 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
 
 
         if (wcr.isWifiConnected() || wcr.isMobileConnected()) {
-            //sendRequest(w);
-            addRequestToCache(w);
+            sendRequest(w);
+            //addRequestToCache(w);
         } else {
             addRequestToCache(w);
         }
@@ -1044,11 +1073,12 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
     @Override
     public void onStart() {
         startScan();
-        super.onStart();
+
         Log.i(LOG,
                 "### onStart, binding RequestSyncService and PhotoUploadService");
         Intent intent = new Intent(this, RequestSyncService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        super.onStart();
     }
 
     @Override
@@ -1128,6 +1158,71 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
 
     }
 
+    private void showEvaluationDialog() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                        EvaluationActivity.this);
+
+                // set title
+                alertDialogBuilder.setTitle("Upload Results");
+
+                // set dialog message
+                alertDialogBuilder
+                        .setMessage("Create a new Evaluation!!")
+                        .setCancelable(false)
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                // Intent intent = new Intent(ctx, PictureActivity.class);
+                                // intent.putExtra("takenImages", )
+                                // startActivityForResult(intent, CAPTURE_IMAGE);
+                                cleanForm();
+                                dialog.cancel();
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                // if this button is clicked, just close
+                                // the dialog box and do nothing
+                                finish();
+                                dialog.cancel();
+                            }
+                        });
+                                alertDialogBuilder
+                                        .setMessage("Contribute to Existing Site!!")
+                                        .setCancelable(false)
+                                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int id) {
+                                                // Intent intent = new Intent(ctx, PictureActivity.class);
+                                                // intent.putExtra("takenImages", )
+                                                // startActivityForResult(intent, CAPTURE_IMAGE);
+                                                cleanForm();
+                                                dialog.cancel();
+                                            }
+                                        })
+                                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int id) {
+                                                        // if this button is clicked, just close
+                                                        // the dialog box and do nothing
+                                                        finish();
+                                                        dialog.cancel();
+                                                    }
+                                                }
+
+                                        );
+
+                // create alert dialog
+                AlertDialog alertDialog = alertDialogBuilder.create();
+
+                // show it
+                alertDialog.show();
+            }
+        });
+
+
+    }
+
     private void getLocalData() {
         final WebCheckResult w = WebCheck.checkNetworkAvailability(ctx);
         CacheUtil.getCachedData(ctx, CacheUtil.CACHE_DATA, new CacheUtil.CacheUtilListener() {
@@ -1168,6 +1263,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
 
     private void getRiversAroundMe() {
         if (location == null) {
+            Toast.makeText(ctx, "Busy...getting rivers ...", Toast.LENGTH_SHORT).show();
             return;
         }
         if (isBusy) {
@@ -1180,7 +1276,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
         w.setRequestType(RequestDTO.LIST_DATA_WITH_RADIUS_RIVERS);
         w.setLatitude(location.getLatitude());
         w.setLongitude(location.getLongitude());
-        w.setRadius(40);
+        w.setRadius(10);
         isBusy = true;
 
         BaseVolley.getRemoteData(Statics.SERVLET_ENDPOINT, w, ctx, new BaseVolley.BohaVolleyListener() {
@@ -1366,5 +1462,71 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
     @Override
     public void onProviderDisabled(String provider) {
 
+    }
+
+    //getting evaluations by distance
+    boolean isBusy2;
+
+
+    private void getEvaluationsByRiver() {
+        if (isBusy2) {
+            Toast.makeText(ctx, "Busy...getting rivers ...", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        RequestDTO w = new RequestDTO();
+        w.setRequestType(RequestDTO.LIST_EVALUATION_BY_RIVER_ID);
+        w.setRiverID(riverID);
+        isBusy2 = true;
+
+        BaseVolley.getRemoteData(Statics.SERVLET_TEST, w, ctx, new BaseVolley.BohaVolleyListener() {
+            @Override
+            public void onResponseReceived(ResponseDTO r) {
+                isBusy2 = false;
+//                progressBar.setVisibility(View.GONE);
+                if (r.getStatusCode() > 0) {
+                    Toast.makeText(ctx, r.getMessage(), Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                setPopupList(r);
+
+            }
+
+            @Override
+            public void onVolleyError(VolleyError error) {
+                isBusy2 = false;
+                //Toast.makeText(ctx, "Problem: " + error.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void setPopupList(ResponseDTO r) {
+        resp = r;
+        calculateDistancesForSite();
+        Util.showPopupEvaluationSite(ctx, activity, resp.getEvaluationSiteList(), AE_find_near_sites, "Near Evaluated Site", new Util.PopupSiteListener() {
+            @Override
+            public void onEvaluationClicked(EvaluationSiteDTO evaluation) {
+                showEvaluationDialog();
+                Log.i(LOG,new Gson().toJson(evaluation));
+                setFieldsFromVisitedSites(evaluation);
+            }
+        });
+    }
+
+    ResponseDTO resp;
+
+    private void calculateDistancesForSite() {
+        if (location != null) {
+            List<EvaluationSiteDTO> riverPoints = new ArrayList<>();
+            Location spot = new Location(LocationManager.GPS_PROVIDER);
+
+            for (EvaluationSiteDTO w : resp.getEvaluationSiteList()) {
+                spot.setLatitude(w.getLatitude());
+                spot.setLongitude(w.getLongitude());
+                w.setDistanceFromMe(location.distanceTo(spot));
+            }
+            Collections.sort(resp.getEvaluationSiteList());
+        }
     }
 }

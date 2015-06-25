@@ -90,4 +90,5 @@ public class PopupRiverAdapter extends ArrayAdapter<RiverDTO> {
         TextView txtString, score_weight;
         ImageView image;
     }
+
 }

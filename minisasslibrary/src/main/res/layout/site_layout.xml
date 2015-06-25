@@ -13,8 +13,8 @@
         android:focusable="false"
         android:hint="What is the current river are you at?"
         android:padding="10dp"
-        android:textColor="@color/red"
-     android:textColorHint="@color/red" />
+        android:textColor="@color/teal"
+        android:textColorHint="@color/teal" />
 
     <RelativeLayout
         android:id="@+id/GPS_layout4"
@@ -111,6 +111,7 @@
             android:layout_toEndOf="@+id/GPS_accLayout" />
 
     </RelativeLayout>
+
     <TextView
         android:id="@+id/WT_sp_category"
         android:background="@drawable/xborder"

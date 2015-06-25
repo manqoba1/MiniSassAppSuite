@@ -8,6 +8,7 @@
     <string name="action_grid">grid view</string>
     <string name="action_settings">Settings</string>
     <string name="action_add_member">Add member</string>
+    <string name="action_log_out">Log out</string>
     <string name="done_label">Done</string>
     <string name="map_unavailable">Map Unavailable, please try again</string>
     <string name="evaluation_map">Evaluation Map</string>
@@ -121,4 +122,6 @@
     <string name="title_activity_insect_browser">InsectBrowser</string>
     <string name="title_activity_minnisass_maps">MinisassMap</string>
     <string name="title_activity_view_more_images">ViewMoreImages</string>
+    <string name="title_activity_just">Map</string>
+    <string name="title_activity_visited_sites">VisitedSitesActivity</string>
 </resources>

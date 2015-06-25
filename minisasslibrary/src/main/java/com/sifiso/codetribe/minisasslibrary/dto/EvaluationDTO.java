@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * @author aubreyM
  */
-public class EvaluationDTO implements Serializable {
+public class EvaluationDTO implements Serializable{
 
     private static final long serialVersionUID = 1L;
     private Integer evaluationID, teamMemberID, conditionsID, evaluationSiteID;
@@ -26,13 +26,13 @@ public class EvaluationDTO implements Serializable {
     private Double oxygen;
     private Double waterClarity;
     private Double electricityConductivity;
-    private List<EvaluationImageDTO> evaluationImageList;
+    private List<EvaluationImageDTO> evaluationimageList;
     private TeamMemberDTO teamMember;
     private List<ImagesDTO> imagesList;
     private EvaluationSiteDTO evaluationSite;
     private ConditionsDTO conditions;
-    private List<EvaluationInsectDTO> evaluationInsectList;
-    private List<EvaluationCommentDTO> evaluationCommentList;
+    private List<EvaluationInsectDTO> evaluationinsectList;
+    private List<EvaluationCommentDTO> evaluationcommentList;
 
     public List<ImagesDTO> getImagesList() {
         return imagesList;
@@ -165,13 +165,6 @@ public class EvaluationDTO implements Serializable {
         this.waterClarity = waterClarity;
     }
 
-    public List<EvaluationImageDTO> getEvaluationImageList() {
-        return evaluationImageList;
-    }
-
-    public void setEvaluationImageList(List<EvaluationImageDTO> evaluationImageList) {
-        this.evaluationImageList = evaluationImageList;
-    }
 
     public TeamMemberDTO getTeamMember() {
         return teamMember;
@@ -197,20 +190,28 @@ public class EvaluationDTO implements Serializable {
         this.conditions = conditions;
     }
 
-    public List<EvaluationInsectDTO> getEvaluationInsectList() {
-        return evaluationInsectList;
+    public List<EvaluationImageDTO> getEvaluationimageList() {
+        return evaluationimageList;
     }
 
-    public void setEvaluationInsectList(List<EvaluationInsectDTO> evaluationInsectList) {
-        this.evaluationInsectList = evaluationInsectList;
+    public void setEvaluationimageList(List<EvaluationImageDTO> evaluationimageList) {
+        this.evaluationimageList = evaluationimageList;
     }
 
-    public List<EvaluationCommentDTO> getEvaluationCommentList() {
-        return evaluationCommentList;
+    public List<EvaluationInsectDTO> getEvaluationinsectList() {
+        return evaluationinsectList;
     }
 
-    public void setEvaluationCommentList(List<EvaluationCommentDTO> evaluationCommentList) {
-        this.evaluationCommentList = evaluationCommentList;
+    public void setEvaluationinsectList(List<EvaluationInsectDTO> evaluationinsectList) {
+        this.evaluationinsectList = evaluationinsectList;
+    }
+
+    public List<EvaluationCommentDTO> getEvaluationcommentList() {
+        return evaluationcommentList;
+    }
+
+    public void setEvaluationcommentList(List<EvaluationCommentDTO> evaluationcommentList) {
+        this.evaluationcommentList = evaluationcommentList;
     }
 
     @Override
@@ -237,5 +238,6 @@ public class EvaluationDTO implements Serializable {
     public String toString() {
         return "com.boha.minisass.data.Evaluation[ evaluationID=" + evaluationID + " ]";
     }
+
 
 }

@@ -8,6 +8,13 @@
         <item name="android:textColorPrimary">@color/transparent_black</item>
     </style>
 
+    <style name="Title1TextStyleGreen" parent="@android:style/TextAppearance.Large">
+        <item name="android:textColor">@color/green</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:padding">5dp</item>
+        <item name="android:textSize">30sp</item>
+    </style>
+
     <style name="actionBarStyle" parent="@android:style/TextAppearance.Small">
         <item name="android:textColor">@color/white</item>
 
@@ -243,6 +250,18 @@
         <item name="android:textColor">@color/white</item>
 
         <item name="android:background">@drawable/xred_oval_large</item>
+
+        <item name="android:gravity">center</item>
+
+        <item name="android:textSize">48sp</item>
+
+    </style>
+
+    <style name="GreenCircleLarge" parent="@android:style/TextAppearance.Small">
+
+        <item name="android:textColor">@color/white</item>
+
+        <item name="android:background">@drawable/xgreen_oval_large</item>
 
         <item name="android:gravity">center</item>
 

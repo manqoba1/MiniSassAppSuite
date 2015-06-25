@@ -40,7 +40,7 @@ public class FullPhotoActivity extends ActionBarActivity {
 
         int index = 0;
         for (ImagesDTO ei : evaluation.getImagesList()) {
-            ei.setIndex(evaluation.getEvaluationImageList().size() - index);
+            ei.setIndex(evaluation.getEvaluationimageList().size() - index);
             index++;
         }
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext(),LinearLayoutManager.HORIZONTAL, false));

@@ -14,13 +14,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.sifiso.codetribe.minisasslibrary.R;
-import com.sifiso.codetribe.minisasslibrary.activities.EvaluationActivity;
 import com.sifiso.codetribe.minisasslibrary.activities.InsectBrowser;
-import com.sifiso.codetribe.minisasslibrary.activities.MapsActivity;
 import com.sifiso.codetribe.minisasslibrary.adapters.EvaluationAdapter;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationInsectDTO;
@@ -158,9 +154,9 @@ public class EvaluationListFragment extends Fragment implements PageFragment {
                     @Override
                     public void onInsectSelected(InsectDTO insect) {
                         Intent intent = new Intent(activity.getApplicationContext(), InsectBrowser.class);
-                        intent.putExtra("insect",insect);
+                        intent.putExtra("insect", insect);
                         startActivity(intent);
-                       // Toast.makeText(ctx, insect.getGroupName(), Toast.LENGTH_LONG).show();
+                        // Toast.makeText(ctx, insect.getGroupName(), Toast.LENGTH_LONG).show();
                     }
                 });
             }
@@ -197,7 +193,7 @@ public class EvaluationListFragment extends Fragment implements PageFragment {
      * fragment to allow an interaction in this fragment to be communicated
      * to the activity and potentially other fragments contained in that
      * activity.
-     * <p/>
+     * <p>
      * See the Android Training lesson <a href=
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.

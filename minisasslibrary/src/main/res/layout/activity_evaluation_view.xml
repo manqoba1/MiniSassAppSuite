@@ -31,7 +31,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="+"
-        style="@style/RedCircleLarge"
+        style="@style/GreenCircleLarge"
         android:elevation="10dp"
         android:id="@+id/RL_add"
         android:layout_margin="30dp"

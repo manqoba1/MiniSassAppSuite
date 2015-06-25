@@ -1,60 +1,15 @@
 package com.sifiso.codetribe.minisasslibrary.fragments;
 
 import android.app.Activity;
-
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.graphics.PorterDuff;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewStub;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.Spinner;
-import android.widget.TextView;
 
-import com.google.gson.Gson;
 import com.sifiso.codetribe.minisasslibrary.R;
-import com.sifiso.codetribe.minisasslibrary.dialogs.InsectSelectionDialog;
-import com.sifiso.codetribe.minisasslibrary.dto.CategoryDTO;
-import com.sifiso.codetribe.minisasslibrary.dto.ConditionsDTO;
-import com.sifiso.codetribe.minisasslibrary.dto.EvaluationDTO;
-import com.sifiso.codetribe.minisasslibrary.dto.EvaluationImageDTO;
-import com.sifiso.codetribe.minisasslibrary.dto.EvaluationSiteDTO;
-import com.sifiso.codetribe.minisasslibrary.dto.InsectDTO;
-import com.sifiso.codetribe.minisasslibrary.dto.InsectImageDTO;
-import com.sifiso.codetribe.minisasslibrary.dto.RiverDTO;
-import com.sifiso.codetribe.minisasslibrary.dto.tranfer.RequestDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ResponseDTO;
-import com.sifiso.codetribe.minisasslibrary.services.RequestCache;
-import com.sifiso.codetribe.minisasslibrary.toolbox.WebCheck;
-import com.sifiso.codetribe.minisasslibrary.toolbox.WebCheckResult;
-import com.sifiso.codetribe.minisasslibrary.util.CacheUtil;
-import com.sifiso.codetribe.minisasslibrary.util.RequestCacheUtil;
-import com.sifiso.codetribe.minisasslibrary.util.Statics;
-import com.sifiso.codetribe.minisasslibrary.util.ToastUtil;
-import com.sifiso.codetribe.minisasslibrary.util.Util;
-import com.sifiso.codetribe.minisasslibrary.util.WebSocketUtil;
-
-import org.joda.time.DateTime;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
 
 
 public class EvaluationFragment extends Fragment implements PageFragment {

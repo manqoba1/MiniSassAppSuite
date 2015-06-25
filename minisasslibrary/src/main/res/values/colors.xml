@@ -2,6 +2,10 @@
 <resources>
 
     <color name="white">#ffffffff</color>
+    <color name="blue_gray_700">#455A64</color>
+    <color name="light_blue_800">#0277BD</color>
+    <color name="pink_500">#E91E63</color>
+    <color name="blue_gray_300">#90A4AE</color>
     <color name="circle_background">#fff2f2f2</color>
     <color name="line_background">#ffcccccc</color>
     <color name="done_text_color_normal">#ff333333</color>

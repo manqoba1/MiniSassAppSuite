@@ -14,23 +14,22 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-
-
             <Button
+                android:layout_below="@+id/result1"
                 android:id="@+id/AE_find_near_sites"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/gradient_find_site"
-                android:text="Find sites visited before"
+                android:background="@color/blue"
+                android:text="Do you want find sites visited before?"
+                android:textStyle="bold"
                 android:textColor="@color/white" />
-
 
             <RelativeLayout
                 android:id="@+id/result1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
 
-                android:layout_below="@+id/AE_find_near_sites">
+               >
 
                 <include
 
@@ -38,7 +37,7 @@
                     layout="@layout/site_layout"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="0dp"
 
                     />
 
@@ -49,7 +48,7 @@
                     android:layout_marginRight="10dp"
                     android:backgroundTint="@color/blue"
                     android:src="@drawable/ic_point"
-                    android:tint="@color/red"
+                    android:tint="@color/blue"
                     android:visibility="gone"
                     android:layout_alignParentTop="true"
                     android:layout_alignParentEnd="true" />
@@ -59,13 +58,15 @@
                 android:id="@+id/AE_down_up"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/result1"
+                android:layout_below="@+id/AE_find_near_sites"
                 android:layout_marginTop="10dp"
-                android:background="@color/gray"
+                android:background="@color/blue"
                 android:drawableRight="@android:drawable/arrow_up_float"
-                android:padding="1dp"
+                android:padding="10dp"
                 android:text="Do you have testing equipments? If yes tab here."
-                android:textColor="@color/White" />
+                android:textStyle="bold"
+                android:textColor="@color/White"
+                />
 
             <RelativeLayout
                 android:id="@+id/result2"
@@ -93,8 +94,9 @@
                     android:id="@+id/SL_show_insect"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/xsquare_animal_colors"
-                    android:text="Which insects group did you find"
+                    android:background="@color/blue"
+                    android:text="Which insects group did you find?"
+                    android:textStyle="bold"
                     android:textColor="@color/white" />
             </LinearLayout>
 
@@ -136,10 +138,10 @@
                 android:layout_below="@+id/result4"
                 android:layout_centerHorizontal="true"
                 android:layout_marginBottom="10dp"
-                android:background="@drawable/xsquare_blue"
+                android:background="@drawable/xsquare_green"
                 android:drawablePadding="10dp"
-                android:drawableRight="@android:drawable/ic_menu_save"
-                android:text="Submit"
+                android:text="Submit Results"
+                android:textStyle="bold"
                 android:textColor="@color/white" />
 
 

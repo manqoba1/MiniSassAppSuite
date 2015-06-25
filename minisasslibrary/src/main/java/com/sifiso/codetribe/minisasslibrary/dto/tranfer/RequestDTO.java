@@ -36,22 +36,22 @@ public class RequestDTO implements Serializable {
             REGISTER_TEAM_MEMBER = 2,
             SIGN_IN_MEMBER = 3,
             IMPORT_MEMBERS = 4;
-    public static final int
-            ADD_RIVER = 10,
+
+    public static final int ADD_RIVER = 10,
             ADD_RIVER_TOWN = 11,
             ADD_EVALUATION_SITE = 12,
             ADD_INSECT = 13,
             ADD_INSECT_IMAGE = 14,
             ADD_EVALUATION = 15,
             ADD_COMMENT = 16,
+            ADD_EVALUATION_INSECT = 17,
+            ADD_ORGANISATION_TYPE = 18;
 
-    ADD_EVALUATION_INSECT = 17;
     public static final int ADD_COUNTRY = 21,
             ADD_PROVINCE = 22,
-            ADD_TOWN = 23,
-            ADD_GCM_DEVICE = 75;
-    public static final int
-            UPDATE_RIVER = 30,
+            ADD_TOWN = 23;
+
+    public static final int UPDATE_RIVER = 30,
             UPDATE_RIVER_TOWN = 31,
             UPDATE_EVALUATION_SITE = 32,
             UPDATE_INSECT = 33,
@@ -63,8 +63,8 @@ public class RequestDTO implements Serializable {
             UPDATE_CATEGORY = 39,
             UPDATE_CONDITIONS = 55,
             UPDATE_EVALUATION_IMAGE = 56;
-    public static final int
-            LIST_RIVERS_IN_COUNTRY = 40,
+
+    public static final int LIST_RIVERS_IN_COUNTRY = 40,
             LIST_RIVER_TOWNS = 41,
             LIST_EVALUATION_SITES = 42,
             LIST_INSECTS = 43,
@@ -72,8 +72,7 @@ public class RequestDTO implements Serializable {
             LIST_EVALUATION_SITE_BY_RIVER = 45,
             LIST_PROVINCE_BY_COUNTRY = 46,
             LIST_REGISTER_DATA = 50,
-
-    LIST_EVALUATION_BY_TEAM_MEMBER = 60,
+            LIST_EVALUATION_BY_TEAM_MEMBER = 60,
             LIST_EVALUATION_BY_CONDITIONS = 61,
             LIST_EVALUATION_SITE_BY_CATEGORY = 62,
             LIST_EVALUATION_INSECT_BY_EVALUATION = 63,
@@ -86,17 +85,19 @@ public class RequestDTO implements Serializable {
             LIST_EVALUATIONS = 70,
             LIST_RIVERS = 71,
             GET_DATA = 72,
-            CONFIRM_LOCATION = 73,
-            LIST_ALL_TOWNS_BY_COUNTRY = 74,
-            LIST_DATA_WITH_RADIUS_RIVERS = 75;
-
+            LIST_ALL_RIVER_TOWNS=73,
+            LIST_DATA_WITH_RADIUS_RIVERS=75,
+            LIST_EVALUATION_SITE_WITH_RADIUS = 76,
+            LIST_OF_INSECTS_IMAGES = 77,
+            LIST_EVALUATION_BY_RIVER_ID = 78,
+            ADD_GCM_DEVICE = 79;
 
     public static final String SAMPLE_DIR = "company";
     public static final String EVALUATION_DIR = "evaluation";
     public static final String INSECTS_DIR = "insert";
     public static final String TEAM_DIR = "team";
     public static final String TEAM_MEMBER_DIR = "teamMember";
-    private int requestType,radius;
+    private int requestType, radius;
     private String email, password;
     private String countryCode;
     private Integer countryID, categoryID, commentID, conditionsID, evaluationID, evaluationInsectID,

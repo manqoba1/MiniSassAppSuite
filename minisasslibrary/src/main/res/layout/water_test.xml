@@ -16,47 +16,27 @@
             android:id="@+id/textView1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/WC_add"
             android:layout_alignParentStart="true"
             android:text="Water clarity"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
-        <TextView
-            android:id="@+id/WC_add"
-            style="@style/GreenCircleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentTop="true"
-            android:text="+"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+
 
         <EditText
             android:id="@+id/WC_score"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginRight="5dp"
-            android:layout_toStartOf="@+id/WC_add"
+            android:layout_marginLeft="300dp"
             android:ems="4"
             android:textColor="@color/gray"
-            android:focusable="false"
             android:gravity="center"
             android:hint="0"
             android:inputType="number"
             android:text="0.0"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
-        <TextView
-            android:id="@+id/WC_minus"
-            style="@style/RedCircleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/WC_add"
-            android:layout_marginRight="5dp"
-            android:layout_toStartOf="@+id/WC_score"
-            android:text="-"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+
     </RelativeLayout>
 
     <RelativeLayout
@@ -70,47 +50,27 @@
             android:id="@+id/textView2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/WT_add"
             android:layout_alignParentStart="true"
             android:text="Water Temperature"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
-        <TextView
-            android:id="@+id/WT_add"
-            style="@style/GreenCircleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentTop="true"
-            android:text="+"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+
 
         <EditText
             android:id="@+id/WT_score"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginRight="5dp"
-            android:layout_toStartOf="@+id/WT_add"
+            android:layout_marginLeft="300dp"
             android:ems="4"
             android:textColor="@color/gray"
-            android:focusable="false"
             android:gravity="center"
             android:hint="0"
             android:inputType="numberDecimal"
             android:text="0.0"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
-        <TextView
-            android:id="@+id/WT_minus"
-            style="@style/RedCircleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/WT_add"
-            android:layout_marginRight="5dp"
-            android:layout_toStartOf="@+id/WT_score"
-            android:text="-"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+
     </RelativeLayout>
 
     <RelativeLayout
@@ -124,47 +84,26 @@
             android:id="@+id/textView3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/WP_add"
             android:layout_alignParentStart="true"
             android:text="pH"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
-        <TextView
-            android:id="@+id/WP_add"
-            style="@style/GreenCircleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentTop="true"
-            android:text="+"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <EditText
             android:id="@+id/WP_score"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginRight="5dp"
-            android:layout_toStartOf="@+id/WP_add"
+            android:layout_marginLeft="300dp"
             android:ems="4"
             android:textColor="@color/gray"
-            android:focusable="false"
             android:gravity="center"
             android:hint="0"
             android:inputType="numberDecimal"
             android:text="0.0"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
-        <TextView
-            android:id="@+id/WP_minus"
-            style="@style/RedCircleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/WP_add"
-            android:layout_marginRight="5dp"
-            android:layout_toStartOf="@+id/WP_score"
-            android:text="-"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+
     </RelativeLayout>
 
     <RelativeLayout
@@ -178,19 +117,8 @@
             android:id="@+id/textView4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/WO_add"
             android:layout_alignParentStart="true"
             android:text="Oxygen Level"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
-
-        <TextView
-            android:id="@+id/WO_add"
-            style="@style/GreenCircleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentTop="true"
-            android:text="+"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <EditText
@@ -198,27 +126,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginRight="5dp"
-            android:layout_toStartOf="@+id/WO_add"
+            android:layout_marginLeft="300dp"
             android:ems="4"
             android:textColor="@color/gray"
-            android:focusable="false"
             android:gravity="center"
             android:hint="0"
             android:inputType="numberDecimal"
             android:text="0.0"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
-        <TextView
-            android:id="@+id/WO_minus"
-            style="@style/RedCircleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/WO_add"
-            android:layout_marginRight="5dp"
-            android:layout_toStartOf="@+id/WO_score"
-            android:text="-"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+
     </RelativeLayout>
 
     <RelativeLayout
@@ -232,30 +149,19 @@
             android:id="@+id/textView5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/WE_add"
             android:layout_alignParentStart="true"
             android:text="Conductivity"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
-        <TextView
-            android:id="@+id/WE_add"
-            style="@style/GreenCircleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentTop="true"
-            android:text="+"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+
 
         <EditText
             android:id="@+id/WE_score"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginRight="5dp"
-            android:layout_toStartOf="@+id/WE_add"
+            android:layout_marginLeft="300dp"
             android:ems="4"
-            android:focusable="false"
             android:gravity="center"
             android:textColor="@color/gray"
             android:hint="0"
@@ -263,15 +169,6 @@
             android:text="0.0"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
-        <TextView
-            android:id="@+id/WE_minus"
-            style="@style/RedCircleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/WE_add"
-            android:layout_marginRight="5dp"
-            android:layout_toStartOf="@+id/WE_score"
-            android:text="-"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+
     </RelativeLayout>
 </RelativeLayout>

@@ -11,13 +11,13 @@ import java.util.List;
 /**
  * @author aubreyM
  */
-public class EvaluationSiteDTO implements Serializable {
+public class EvaluationSiteDTO implements Serializable, Comparable<EvaluationSiteDTO> {
 
     private static final long serialVersionUID = 1L;
     private Integer evaluationSiteID, locationConfirmed;
     private Double latitude;
     private Double longitude;
-    private Float accuracy;
+    private Float accuracy, distanceFromMe;
     private long dateRegistered;
     private Integer categoryID;
     private Integer riverID;
@@ -26,23 +26,26 @@ public class EvaluationSiteDTO implements Serializable {
     private RiverDTO river;
     private CategoryDTO category;
 
+    @Override
+    public int compareTo(EvaluationSiteDTO another) {
+        if (this.distanceFromMe < another.distanceFromMe) {
+            return -1;
+        }
+        if (this.distanceFromMe > another.distanceFromMe) {
+            return 1;
+        }
+        return 0;
+    }
+
     public EvaluationSiteDTO() {
     }
 
-    public RiverDTO getRiver() {
-        return river;
+    public Integer getEvaluationSiteID() {
+        return evaluationSiteID;
     }
 
-    public void setRiver(RiverDTO river) {
-        this.river = river;
-    }
-
-    public CategoryDTO getCategory() {
-        return category;
-    }
-
-    public void setCategory(CategoryDTO category) {
-        this.category = category;
+    public void setEvaluationSiteID(Integer evaluationSiteID) {
+        this.evaluationSiteID = evaluationSiteID;
     }
 
     public Integer getLocationConfirmed() {
@@ -53,12 +56,44 @@ public class EvaluationSiteDTO implements Serializable {
         this.locationConfirmed = locationConfirmed;
     }
 
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
+
     public Float getAccuracy() {
         return accuracy;
     }
 
     public void setAccuracy(Float accuracy) {
         this.accuracy = accuracy;
+    }
+
+    public Float getDistanceFromMe() {
+        return distanceFromMe;
+    }
+
+    public void setDistanceFromMe(Float distanceFromMe) {
+        this.distanceFromMe = distanceFromMe;
+    }
+
+    public long getDateRegistered() {
+        return dateRegistered;
+    }
+
+    public void setDateRegistered(long dateRegistered) {
+        this.dateRegistered = dateRegistered;
     }
 
     public Integer getCategoryID() {
@@ -93,44 +128,28 @@ public class EvaluationSiteDTO implements Serializable {
         this.categoryName = categoryName;
     }
 
-    public Integer getEvaluationSiteID() {
-        return evaluationSiteID;
-    }
-
-    public void setEvaluationSiteID(Integer evaluationSiteID) {
-        this.evaluationSiteID = evaluationSiteID;
-    }
-
-    public Double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(Double latitude) {
-        this.latitude = latitude;
-    }
-
-    public Double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(Double longitude) {
-        this.longitude = longitude;
-    }
-
-    public long getDateRegistered() {
-        return dateRegistered;
-    }
-
-    public void setDateRegistered(long dateRegistered) {
-        this.dateRegistered = dateRegistered;
-    }
-
     public List<EvaluationDTO> getEvaluationList() {
         return evaluationList;
     }
 
     public void setEvaluationList(List<EvaluationDTO> evaluationList) {
         this.evaluationList = evaluationList;
+    }
+
+    public RiverDTO getRiver() {
+        return river;
+    }
+
+    public void setRiver(RiverDTO river) {
+        this.river = river;
+    }
+
+    public CategoryDTO getCategory() {
+        return category;
+    }
+
+    public void setCategory(CategoryDTO category) {
+        this.category = category;
     }
 
     @Override

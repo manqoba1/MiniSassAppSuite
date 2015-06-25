@@ -1,16 +1,17 @@
 package com.sifiso.codetribe.minisasslibrary.adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.BaseAdapter;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
 import com.sifiso.codetribe.minisasslibrary.R;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationSiteDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverDTO;
@@ -18,7 +19,6 @@ import com.sifiso.codetribe.minisasslibrary.dto.RiverTownDTO;
 import com.sifiso.codetribe.minisasslibrary.util.ToastUtil;
 import com.sifiso.codetribe.minisasslibrary.util.Util;
 import com.sifiso.codetribe.minisasslibrary.viewsUtil.CircleTransform;
-import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -86,14 +86,14 @@ public class RiverAdapter extends BaseAdapter {
                 }
             }
         });*/
-
-        h.RLI_evaluation.setText("" + dto.getEvaluationSiteList().size());
+        Log.d("RiverAdapter", "Mentor 2" + new Gson().toJson(dto.getEvaluationsiteList()));
+        h.RLI_evaluation.setText("" + dto.getEvaluationsiteList().size());
         h.RLI_evaluation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //ToastUtil.toast(mCtx,dto.getRiverName());
-                if (dto.getEvaluationSiteList() != null) {
-                    mListener.onEvaluationRequest(dto.getEvaluationSiteList());
+                if (dto.getEvaluationsiteList() != null) {
+                    mListener.onEvaluationRequest(dto.getEvaluationsiteList());
                 } else {
                     ToastUtil.toast(mCtx, "No evaluations yet");
                 }

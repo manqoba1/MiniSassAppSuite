@@ -101,6 +101,31 @@ public class CachedSyncService extends IntentService {
                 return;
             }
             Log.w(LOG, "### sending list of cached requests: " + list.getRequests().size());
+            /*ServletsForRequests.sendRequest(getApplicationContext(), list, new ServletsForRequests.ServletsListener() {
+                @Override
+                public void onResponse(ResponseDTO response) {
+                    if (!ErrorUtil.checkServerError(getApplicationContext(), response)) {
+                        return;
+                    }
+                    Log.i(LOG, "** cached requests sent up! good responses: " + response.getGoodCount() +
+                            " bad responses: " + response.getBadCount());
+                    for (RequestCacheEntry e : requestCache.getRequestCacheEntryList()) {
+                        e.setDateUploaded(new Date());
+                    }
+                    cleanupCache();
+                    requestSyncListener.onTasksSynced(response.getGoodCount(), response.getBadCount());
+                }
+
+                @Override
+                public void onClose() {
+
+                }
+
+                @Override
+                public void onError(String message) {
+                    requestSyncListener.onError(message);
+                }
+            });*/
             WebSocketUtilForRequests.sendRequest(getApplicationContext(), list, new WebSocketUtilForRequests.WebSocketListener() {
                 @Override
                 public void onMessage(ResponseDTO response) {

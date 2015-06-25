@@ -11,12 +11,10 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.sifiso.codetribe.minisasslibrary.R;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationInsectDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationSiteDTO;
-import com.sifiso.codetribe.minisasslibrary.dto.InsectImageDTO;
 import com.sifiso.codetribe.minisasslibrary.util.Constants;
 import com.sifiso.codetribe.minisasslibrary.util.Util;
 
@@ -49,7 +47,7 @@ public class EvaluationAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
-        return mList.get(position).getEvaluationSiteID();
+        return mList.get(position).getEvaluationID();
     }
 
     @Override
@@ -94,7 +92,7 @@ public class EvaluationAdapter extends BaseAdapter {
                 Util.flashOnce(h.ELI_score, 200, new Util.UtilAnimationListener() {
                     @Override
                     public void onAnimationEnded() {
-                        mListener.onViewInsect(site.getEvaluationInsectList());
+                        mListener.onViewInsect(site.getEvaluationinsectList());
                     }
                 });
 
@@ -103,10 +101,10 @@ public class EvaluationAdapter extends BaseAdapter {
         h.ELI_remarks.setText(site.getRemarks());
         switch (site.getConditionsID()) {
             case Constants.UNMODIFIED_NATURAL_SAND:
-                h.ELI_condition.setTextColor(mCtx.getResources().getColor(R.color.purple));
-                h.ELI_score.setTextColor(mCtx.getResources().getColor(R.color.purple));
-                h.ELI_condition_image.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.purple_crap));
-                h.ELI_condition_image.setColorFilter(mCtx.getResources().getColor(R.color.purple), PorterDuff.Mode.MULTIPLY);
+                h.ELI_condition.setTextColor(mCtx.getResources().getColor(R.color.dark_blue));
+                h.ELI_score.setTextColor(mCtx.getResources().getColor(R.color.dark_blue));
+                h.ELI_condition_image.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.blue_crap));
+                h.ELI_condition_image.setColorFilter(mCtx.getResources().getColor(R.color.dark_blue), PorterDuff.Mode.MULTIPLY);
                 break;
             case Constants.LARGELY_NATURAL_SAND:
                 h.ELI_condition.setTextColor(mCtx.getResources().getColor(R.color.green));
@@ -115,29 +113,35 @@ public class EvaluationAdapter extends BaseAdapter {
                 h.ELI_condition_image.setColorFilter(mCtx.getResources().getColor(R.color.green), PorterDuff.Mode.MULTIPLY);
                 break;
             case Constants.MODERATELY_MODIFIED_SAND:
-                h.ELI_condition.setTextColor(mCtx.getResources().getColor(R.color.blue));
-                h.ELI_score.setTextColor(mCtx.getResources().getColor(R.color.blue));
-                h.ELI_condition_image.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.blue_crap));
-                h.ELI_condition_image.setColorFilter(mCtx.getResources().getColor(R.color.blue), PorterDuff.Mode.MULTIPLY);
+                h.ELI_condition.setTextColor(mCtx.getResources().getColor(R.color.orange));
+                h.ELI_score.setTextColor(mCtx.getResources().getColor(R.color.orange));
+                h.ELI_condition_image.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.orange_crap));
+                h.ELI_condition_image.setColorFilter(mCtx.getResources().getColor(R.color.orange), PorterDuff.Mode.MULTIPLY);
                 break;
             case Constants.LARGELY_MODIFIED_SAND:
-                h.ELI_condition.setTextColor(mCtx.getResources().getColor(R.color.Chocolate));
-                h.ELI_score.setTextColor(mCtx.getResources().getColor(R.color.Chocolate));
-                h.ELI_condition_image.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.orange_crap));
-                h.ELI_condition_image.setColorFilter(mCtx.getResources().getColor(R.color.Chocolate), PorterDuff.Mode.MULTIPLY);
-
-                break;
-            case Constants.CRITICALLY_MODIFIED_SAND:
                 h.ELI_condition.setTextColor(mCtx.getResources().getColor(R.color.red));
                 h.ELI_score.setTextColor(mCtx.getResources().getColor(R.color.red));
                 h.ELI_condition_image.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.red_crap));
                 h.ELI_condition_image.setColorFilter(mCtx.getResources().getColor(R.color.red), PorterDuff.Mode.MULTIPLY);
+
                 break;
-            case Constants.UNMODIFIED_NATURAL_ROCK:
+            case Constants.CRITICALLY_MODIFIED_SAND:
                 h.ELI_condition.setTextColor(mCtx.getResources().getColor(R.color.purple));
                 h.ELI_score.setTextColor(mCtx.getResources().getColor(R.color.purple));
                 h.ELI_condition_image.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.purple_crap));
                 h.ELI_condition_image.setColorFilter(mCtx.getResources().getColor(R.color.purple), PorterDuff.Mode.MULTIPLY);
+                break;
+            case Constants.NOT_SPECIFIED:
+                h.ELI_condition.setTextColor(mCtx.getResources().getColor(R.color.gray));
+                h.ELI_score.setTextColor(mCtx.getResources().getColor(R.color.gray));
+                h.ELI_condition_image.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.gray_crap));
+                h.ELI_condition_image.setColorFilter(mCtx.getResources().getColor(R.color.gray), PorterDuff.Mode.MULTIPLY);
+                break;
+           /* case Constants.UNMODIFIED_NATURAL_ROCK:
+                h.ELI_condition.setTextColor(mCtx.getResources().getColor(R.color.dark_blue));
+                h.ELI_score.setTextColor(mCtx.getResources().getColor(R.color.dark_blue));
+                h.ELI_condition_image.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.blue_crap));
+                h.ELI_condition_image.setColorFilter(mCtx.getResources().getColor(R.color.dark_blue), PorterDuff.Mode.MULTIPLY);
                 break;
             case Constants.LARGELY_NATURAL_ROCK:
                 h.ELI_condition.setTextColor(mCtx.getResources().getColor(R.color.green));
@@ -146,24 +150,29 @@ public class EvaluationAdapter extends BaseAdapter {
                 h.ELI_condition_image.setColorFilter(mCtx.getResources().getColor(R.color.green), PorterDuff.Mode.MULTIPLY);
                 break;
             case Constants.MODERATELY_MODIFIED_ROCK:
-                h.ELI_condition.setTextColor(mCtx.getResources().getColor(R.color.blue));
-                h.ELI_score.setTextColor(mCtx.getResources().getColor(R.color.blue));
-                h.ELI_condition_image.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.blue_crap));
-                h.ELI_condition_image.setColorFilter(mCtx.getResources().getColor(R.color.blue), PorterDuff.Mode.MULTIPLY);
+                h.ELI_condition.setTextColor(mCtx.getResources().getColor(R.color.orange));
+                h.ELI_score.setTextColor(mCtx.getResources().getColor(R.color.orange));
+                h.ELI_condition_image.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.orange_crap));
+                h.ELI_condition_image.setColorFilter(mCtx.getResources().getColor(R.color.orange), PorterDuff.Mode.MULTIPLY);
                 break;
             case Constants.LARGELY_MODIFIED_ROCK:
-                h.ELI_condition.setTextColor(mCtx.getResources().getColor(R.color.Chocolate));
-                h.ELI_score.setTextColor(mCtx.getResources().getColor(R.color.Chocolate));
-                h.ELI_condition_image.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.orange_crap));
-                h.ELI_condition_image.setColorFilter(mCtx.getResources().getColor(R.color.Chocolate), PorterDuff.Mode.MULTIPLY);
-                break;
-            case Constants.CRITICALLY_MODIFIED_ROCK:
                 h.ELI_condition.setTextColor(mCtx.getResources().getColor(R.color.red));
                 h.ELI_score.setTextColor(mCtx.getResources().getColor(R.color.red));
                 h.ELI_condition_image.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.red_crap));
                 h.ELI_condition_image.setColorFilter(mCtx.getResources().getColor(R.color.red), PorterDuff.Mode.MULTIPLY);
                 break;
-
+            case Constants.CRITICALLY_MODIFIED_ROCK:
+                h.ELI_condition.setTextColor(mCtx.getResources().getColor(R.color.purple));
+                h.ELI_score.setTextColor(mCtx.getResources().getColor(R.color.purple));
+                h.ELI_condition_image.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.purple_crap));
+                h.ELI_condition_image.setColorFilter(mCtx.getResources().getColor(R.color.purple), PorterDuff.Mode.MULTIPLY);
+                break;
+                case Constants.NOT_SPECIFIED:
+                h.ELI_condition.setTextColor(mCtx.getResources().getColor(R.color.gray));
+                h.ELI_score.setTextColor(mCtx.getResources().getColor(R.color.gray));
+                h.ELI_condition_image.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.gray_crap));
+                h.ELI_condition_image.setColorFilter(mCtx.getResources().getColor(R.color.gray), PorterDuff.Mode.MULTIPLY);
+                break;*/
         }
 
         h.ELI_condition.setText(site.getConditionName());

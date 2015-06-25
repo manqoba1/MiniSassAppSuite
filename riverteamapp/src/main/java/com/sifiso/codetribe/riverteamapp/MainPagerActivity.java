@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.res.Configuration;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -26,14 +25,10 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
 import com.android.volley.VolleyError;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.gson.Gson;
-import com.sifiso.codetribe.minisasslibrary.MiniSassApp;
+import com.sifiso.codetribe.minisasslibrary.R;
 import com.sifiso.codetribe.minisasslibrary.activities.EvaluationActivity;
-import com.sifiso.codetribe.minisasslibrary.activities.GPSscanner;
 import com.sifiso.codetribe.minisasslibrary.activities.MapsActivity;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationSiteDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverDTO;
@@ -51,13 +46,10 @@ import com.sifiso.codetribe.minisasslibrary.toolbox.WebCheck;
 import com.sifiso.codetribe.minisasslibrary.toolbox.WebCheckResult;
 import com.sifiso.codetribe.minisasslibrary.util.CacheUtil;
 import com.sifiso.codetribe.minisasslibrary.util.ErrorUtil;
+import com.sifiso.codetribe.minisasslibrary.util.SharedUtil;
 import com.sifiso.codetribe.minisasslibrary.util.Statics;
 import com.sifiso.codetribe.minisasslibrary.util.TimerUtil;
-import com.sifiso.codetribe.minisasslibrary.util.ToastUtil;
 import com.sifiso.codetribe.minisasslibrary.util.Util;
-import com.sifiso.codetribe.minisasslibrary.util.WebSocketUtil;
-import com.sifiso.codetribe.minisasslibrary.R;
-import com.sifiso.codetribe.minisasslibrary.viewsUtil.ZoomOutPageTransformerImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -127,7 +119,7 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
                     @Override
                     public void onTasksSynced(int goodResponses, int badResponses) {
                         Log.w(LOG, "@@ cached requests done, good: " + goodResponses + " bad: " + badResponses);
-                        getData();
+                        // getRiversAroundMe();
                     }
 
                     @Override
@@ -164,7 +156,7 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
             unbindService(mConnection);
             mBound = false;
         }
-
+        stopScan();
     }
 
 
@@ -199,15 +191,15 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
 
     @Override
     protected void onStart() {
-        //startScan();
-        super.onStart();
+        startScan();
+
         TimerUtil.killFlashTimer();
 
         Intent intent = new Intent(MainPagerActivity.this, RequestSyncService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
         Log.d(LOG,
                 "#################### onStart");
-
+        super.onStart();
     }
 
     private void initializeAdapter() {
@@ -277,7 +269,8 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
         getMenuInflater().inflate(R.menu.menu_main, menu);
         mMenu = menu;
         //TimerUtil.killFlashTimer();
-        getLocalData();
+        // getLocalData();
+        getCachedRiverData();
         // startActivity(new Intent(MainPagerActivity.this, SplashActivity.class));
 
         return true;
@@ -291,11 +284,26 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.add_member) {
+        switch (id) {
+            case R.id.add_member:
             /*Intent intent = new Intent(MainPagerActivity.this, TeamMemberActivity.class);
             startActivity(intent);*/
-            return true;
+                return true;
+            case R.id.log_out:
+                SharedUtil.clearTeam(ctx);
+                Intent intent = new Intent(MainPagerActivity.this, SignActivity.class);
+                startActivity(intent);
+                finish();
+                return true;
         }
+       /* switch (id) {
+            case R.id.add_member:
+                break;
+            case R.id.log_out:
+                break;
+            default:
+
+        };*/
 
 
         return super.onOptionsItemSelected(item);
@@ -423,7 +431,7 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
 
         if (isGPSEnabled == false && isNetworkEnabled == false) {
             Log.d(LOG, "is not connected");
-            showSettingDialog();
+
         } else {
             canGetLocation = true;
             if (isNetworkEnabled) {
@@ -434,6 +442,7 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
                 Log.d(LOG, "Network");
                 if (locationManager != null) {
                     location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                    setLoc(location);
                 }
             }
 
@@ -443,15 +452,21 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
                     locationManager.requestLocationUpdates(
                             LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES,
                             MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-                    Log.d(LOG, "GPs");
+
                     if (locationManager != null) {
+                        Log.d(LOG, "GPs");
                         location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                        setLoc(location);
                     }
                 }
             }
 
         }
 
+    }
+
+    void setLoc(Location loc) {
+        location = loc;
     }
 
     public void showSettingDialog() {
@@ -570,7 +585,7 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
                     @Override
                     public void run() {
                         if (w.isWifiConnected() || w.isMobileConnected()) {
-                            getRiversAroundMe();
+                            //  getRiversAroundMe();
                         }
                     }
                 });
@@ -581,9 +596,10 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
     }
 
     boolean isBusy;
+
     private void getCachedRiverData() {
         final WebCheckResult w = WebCheck.checkNetworkAvailability(ctx);
-        CacheUtil.getCachedRiverData(ctx, CacheUtil.CACHE_RIVER_DATA, new CacheUtil.CacheUtilListener() {
+        CacheUtil.getCachedData(ctx, CacheUtil.CACHE_DATA, new CacheUtil.CacheUtilListener() {
             @Override
             public void onFileDataDeserialized(final ResponseDTO respond) {
                 runOnUiThread(new Runnable() {
@@ -622,9 +638,13 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
             }
         });
 
+
     }
+
     private void getRiversAroundMe() {
         if (location == null) {
+            Toast.makeText(ctx, "Busy...getting rivers ...", Toast.LENGTH_SHORT).show();
+            // getRiversAroundMe();
             return;
         }
         if (isBusy) {
@@ -637,33 +657,30 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
         w.setRequestType(RequestDTO.LIST_DATA_WITH_RADIUS_RIVERS);
         w.setLatitude(location.getLatitude());
         w.setLongitude(location.getLongitude());
-        w.setRadius(10);
+        w.setRadius(40);
         isBusy = true;
 
-        BaseVolley.getRemoteData(Statics.SERVLET_ENDPOINT, w, ctx, new BaseVolley.BohaVolleyListener() {
+        BaseVolley.getRemoteData(Statics.SERVLET_TEST, w, ctx, new BaseVolley.BohaVolleyListener() {
             @Override
             public void onResponseReceived(ResponseDTO r) {
                 isBusy = false;
-//                progressBar.setVisibility(View.GONE);
-                if (r.getStatusCode() > 0) {
-                    Toast.makeText(ctx, r.getMessage(), Toast.LENGTH_LONG).show();
+//              progressBar.setVisibility(View.GONE);
+                Log.e(LOG, "## getStarterData responded...statusCode: " + r.getStatusCode());
+                if (!ErrorUtil.checkServerError(ctx, r)) {
                     return;
                 }
-               /* if (r.getRiverList().isEmpty()) {
-                    Toast.makeText(ctx, "No rivers found within 20 km", Toast.LENGTH_LONG).show();
-                    return;
-                }*/
-
-                CacheUtil.cacheRiverData(ctx, r, CacheUtil.CACHE_RIVER, new CacheUtil.CacheUtilListener() {
+                response = r;
+                CacheUtil.cacheData(ctx, r, CacheUtil.CACHE_DATA, new CacheUtil.CacheUtilListener() {
                     @Override
-                    public void onFileDataDeserialized(ResponseDTO response) {
+                    public void onFileDataDeserialized(final ResponseDTO resp) {
 
                     }
 
                     @Override
                     public void onDataCached(ResponseDTO r) {
-                        response = r;
-                        Log.d(LOG, new Gson().toJson(r));
+                                    /*Intent intent = new Intent(getApplicationContext(), RequestSyncService.class);
+                                    startService(intent);*/
+                        // getData();
                         buildPages();
                     }
 
@@ -685,6 +702,56 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
     }
 
     public void getData() {
+        RequestDTO w = new RequestDTO();
+        w.setRequestType(RequestDTO.GET_DATA);
+
+        BaseVolley.getRemoteData(Statics.SERVLET_TEST, w, ctx, new BaseVolley.BohaVolleyListener() {
+            @Override
+            public void onResponseReceived(final ResponseDTO r) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.e(LOG, "## getStarterData responded...statusCode: " + r.getStatusCode());
+                        if (!ErrorUtil.checkServerError(ctx, r)) {
+                            return;
+                        }
+                        response = r;
+                        CacheUtil.cacheData(ctx, r, CacheUtil.CACHE_DATA, new CacheUtil.CacheUtilListener() {
+                            @Override
+                            public void onFileDataDeserialized(final ResponseDTO resp) {
+
+                            }
+
+                            @Override
+                            public void onDataCached(ResponseDTO r) {
+                                    /*Intent intent = new Intent(getApplicationContext(), RequestSyncService.class);
+                                    startService(intent);*/
+                                // getData();
+                                buildPages();
+                            }
+
+                            @Override
+                            public void onError() {
+
+                            }
+                        });
+                            /*Intent intent = new Intent(getApplicationContext(), RequestSyncService.class);
+                            startService(intent);*/
+                    }
+                });
+            }
+
+            @Override
+            public void onVolleyError(VolleyError error) {
+                isBusy = false;
+                Toast.makeText(ctx, "Problem: " + error.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+
+
+    }
+
+   /* public void getData() {
 
         RequestDTO w = new RequestDTO();
         w.setRequestType(RequestDTO.GET_DATA);
@@ -710,8 +777,8 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
 
                                 @Override
                                 public void onDataCached(ResponseDTO r) {
-                                    /*Intent intent = new Intent(getApplicationContext(), RequestSyncService.class);
-                                    startService(intent);*/
+                                    Intent intent = new Intent(getApplicationContext(), RequestSyncService.class);
+                                    startService(intent);
                                     // getData();
                                     buildPages();
                                 }
@@ -721,8 +788,8 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
 
                                 }
                             });
-                            /*Intent intent = new Intent(getApplicationContext(), RequestSyncService.class);
-                            startService(intent);*/
+                            Intent intent = new Intent(getApplicationContext(), RequestSyncService.class);
+                            startService(intent);
                         }
                     });
 
@@ -743,7 +810,7 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
         } catch (Exception e) {
 
         }
-    }
+    }*/
 
     boolean isBack = false;
 

@@ -69,7 +69,7 @@ public class ImageActivity extends ActionBarActivity {
         StringBuilder sb = new StringBuilder();
         sb.append(Statics.IMAGE_URL);
         if (evaluation != null) {
-            photoCache.setImageUploadList(evaluation.getEvaluationImageList());
+            photoCache.setImageUploadList(evaluation.getEvaluationimageList());
             EvaluationImageDTO dto = photoCache.getImageUploadList().get(index);
             sb.append(dto.getFileName());
             txtTitle.setText(evaluationImage.getEvaluationImageID());

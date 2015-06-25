@@ -3,14 +3,10 @@ package com.sifiso.codetribe.minisasslibrary.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
-import android.graphics.Point;
-import android.graphics.PointF;
-import android.graphics.PorterDuff;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -18,9 +14,6 @@ import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
@@ -36,15 +29,12 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
-import com.google.android.gms.maps.model.PolylineOptions;
 import com.sifiso.codetribe.minisasslibrary.R;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationImageDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationSiteDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverDTO;
 import com.sifiso.codetribe.minisasslibrary.util.Constants;
-import com.sifiso.codetribe.minisasslibrary.util.DistanceCalculator;
-import com.sifiso.codetribe.minisasslibrary.util.Statics;
 import com.sifiso.codetribe.minisasslibrary.util.Util;
 
 import java.text.SimpleDateFormat;
@@ -142,9 +132,9 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
     private void setEvaluationMarkers() {
         googleMap.clear();
 
-        if (!river.getEvaluationSiteList().isEmpty()) {
+        if (!river.getEvaluationsiteList().isEmpty()) {
             int index = 0;
-            for (EvaluationSiteDTO es : river.getEvaluationSiteList()) {
+            for (EvaluationSiteDTO es : river.getEvaluationsiteList()) {
                 BitmapDescriptor desc = BitmapDescriptorFactory.fromResource(R.drawable.dot_black);
                 Integer conditionColor = null;
                 for (EvaluationDTO eva : es.getEvaluationList()) {
