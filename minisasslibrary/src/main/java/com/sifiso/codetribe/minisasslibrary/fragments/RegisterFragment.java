@@ -9,7 +9,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
@@ -17,13 +22,18 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sifiso.codetribe.minisasslibrary.R;
+import com.sifiso.codetribe.minisasslibrary.adapters.MemberToBeAddedAdapter;
 import com.sifiso.codetribe.minisasslibrary.dto.CountryDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.GcmDeviceDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.OrganisationtypeDTO;
@@ -35,6 +45,7 @@ import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ResponseDTO;
 import com.sifiso.codetribe.minisasslibrary.util.ErrorUtil;
 import com.sifiso.codetribe.minisasslibrary.util.SharedUtil;
 import com.sifiso.codetribe.minisasslibrary.util.Statics;
+import com.sifiso.codetribe.minisasslibrary.util.ToastUtil;
 import com.sifiso.codetribe.minisasslibrary.util.Util;
 import com.sifiso.codetribe.minisasslibrary.util.WebSocketUtil;
 
@@ -55,6 +66,7 @@ public class RegisterFragment extends Fragment implements PageFragment {
     Button rsRegister;
     EditText rsTeamName, rsMemberName, rsMemberSurname;
     EditText rsCellphone, rsPin;
+    CheckBox cbMoreMember;
     Spinner sp_org_type, sp_country;
     ViewStub viewStub;
     View v;
@@ -62,6 +74,9 @@ public class RegisterFragment extends Fragment implements PageFragment {
     Integer countryID, orgaTypeID;
     AutoCompleteTextView rsMemberEmail;
     ResponseDTO response;
+    ListView lsMember;
+    LinearLayout llMember;
+    TextView textView13;
     private RegisterFragmentListener mListener;
 
 
@@ -83,6 +98,7 @@ public class RegisterFragment extends Fragment implements PageFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         if (getArguments() != null) {
 
         }
@@ -124,8 +140,8 @@ public class RegisterFragment extends Fragment implements PageFragment {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String oName = "";
                 if (position > 0) {
-                    orgaTypeID = response.getOrganisationtypeList().get(position-1).getOrganisationTypeID();
-                    oName = response.getOrganisationtypeList().get(position-1).getOrganisationName();
+                    orgaTypeID = response.getOrganisationtypeList().get(position - 1).getOrganisationTypeID();
+                    oName = response.getOrganisationtypeList().get(position - 1).getOrganisationName();
                 } else {
                     orgaTypeID = null;
                 }
@@ -143,8 +159,8 @@ public class RegisterFragment extends Fragment implements PageFragment {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String cName = "";
                 if (position > 0) {
-                    countryID = response.getCountryList().get(position-1).getCountryID();
-                    cName = response.getCountryList().get(position-1).getCountryName();
+                    countryID = response.getCountryList().get(position - 1).getCountryID();
+                    cName = response.getCountryList().get(position - 1).getCountryName();
                 } else {
                     countryID = null;
                 }
@@ -158,10 +174,13 @@ public class RegisterFragment extends Fragment implements PageFragment {
         });
     }
 
+    boolean isMoreMember;
+    MemberToBeAddedAdapter memberToBeAddedAdapter;
 
     public void setFields() {
         rsRegister = (Button) v.findViewById(R.id.btnReg);
-
+        textView13 = (TextView) v.findViewById(R.id.textView13);
+        llMember = (LinearLayout) v.findViewById(R.id.llMember);
         rsTeamName = (EditText) v.findViewById(R.id.edtRegTeamName);
         sp_country = (Spinner) v.findViewById(R.id.sp_country);
         sp_org_type = (Spinner) v.findViewById(R.id.sp_org_type);
@@ -171,14 +190,51 @@ public class RegisterFragment extends Fragment implements PageFragment {
         rsMemberEmail = (AutoCompleteTextView) v.findViewById(R.id.edtMemberEmail);
         rsCellphone = (EditText) v.findViewById(R.id.edtMemberPhone);
         viewStub = (ViewStub) v.findViewById(R.id.vTub);
-
+        lsMember = (ListView) v.findViewById(R.id.lsMember);
+        lsMember.setOnTouchListener(new View.OnTouchListener() {
+            public boolean onTouch(View v, MotionEvent event) {
+                return (event.getAction() == MotionEvent.ACTION_MOVE);
+            }
+        });
+        cbMoreMember = (CheckBox) v.findViewById(R.id.cbMoreMember);
+        cbMoreMember.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    isMoreMember = isChecked;
+                    onCreateOptionsMenu(menu, inflater);
+                    disableWhenMoreIsChecked();
+                } else {
+                    isMoreMember = isChecked;
+                    onCreateOptionsMenu(menu, inflater);
+                    enableWhenMoreIsNotChecked();
+                }
+            }
+        });
         rsRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 sendRegistration();
+
             }
         });
         setSpinners();
+    }
+
+    private void disableWhenMoreIsChecked() {
+        rsTeamName.setEnabled(false);
+        sp_country.setEnabled(false);
+        sp_org_type.setEnabled(false);
+        textView13.setText(rsTeamName.getText().toString().toUpperCase() + " Team members");
+        rsRegister.setText("Add Member");
+    }
+
+    private void enableWhenMoreIsNotChecked() {
+        rsTeamName.setEnabled(true);
+        sp_country.setEnabled(true);
+        sp_org_type.setEnabled(true);
+        rsRegister.setText("REGISTER");
     }
 
     public void sendRegistration() {
@@ -224,14 +280,47 @@ public class RegisterFragment extends Fragment implements PageFragment {
         t.setPin(rsPin.getText().toString());
         t.setActiveFlag(0);
         t.setDateRegistered(new Date().getTime());
+        memberToBeRegistered.add(0, t);
+        if (isMoreMember) {
+            ToastUtil.toast(ctx, "Member is add to " + rsTeamName.getText().toString().toUpperCase() + ".");
+            llMember.setVisibility(View.VISIBLE);
+            memberToBeAddedAdapter = new MemberToBeAddedAdapter(ctx, memberToBeRegistered, new MemberToBeAddedAdapter.MemberToBeAddedAdapterListener() {
+                @Override
+                public void onRemoveMember(TeamMemberDTO dto) {
+                    memberToBeRegistered.remove(dto);
+                    memberToBeAddedAdapter.notifyDataSetChanged();
+                    if (memberToBeRegistered.size() == 0) {
+                        llMember.setVisibility(View.GONE);
+                    }
+                }
+            });
+            lsMember.setAdapter(memberToBeAddedAdapter);
+            clearMemberInput();
+            return;
+        }
+        registerRequest(memberToBeRegistered);
 
+    }
 
+    private void clearMemberInput() {
+        ToastUtil.toast(ctx, "Next member please.");
+        rsMemberEmail.setText(null);
+        rsMemberName.setText(null);
+        rsMemberSurname.setText(null);
+        rsCellphone.setText(null);
+        rsPin.setText(null);
+    }
+
+    private List<TeamMemberDTO> memberToBeRegistered = new ArrayList<>();
+
+    private void registerRequest(List<TeamMemberDTO> t) {
         final TeamDTO g = new TeamDTO();
         g.setTeamName(rsTeamName.getText().toString());
         g.setCountryID(countryID);
         g.setOrganisationTypeID(orgaTypeID);
-        g.getTeammemberList().add(t);
+        g.setTeammemberList(t);
         g.setDateRegistered(new Date().getTime());
+
         RequestDTO r = new RequestDTO();
         r.setRequestType(RequestDTO.REGISTER_TEAM);
         r.setTeam(g);
@@ -264,7 +353,6 @@ public class RegisterFragment extends Fragment implements PageFragment {
 
     }
 
-
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -274,6 +362,41 @@ public class RegisterFragment extends Fragment implements PageFragment {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
         }
+    }
+
+    Menu menu;
+    MenuInflater inflater;
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        this.menu = menu;
+        this.inflater = inflater;
+        if (isMoreMember) {
+            inflater.inflate(R.menu.menu_registration, menu);
+        } else {
+            menu.clear();
+        }
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    private void checkEmpty() {
+        if (memberToBeRegistered.size() == 0) {
+            ToastUtil.toast(ctx, "Add member to group");
+            return;
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.doneAddingMember) {
+            checkEmpty();
+            registerRequest(memberToBeRegistered);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

@@ -90,7 +90,9 @@ public class RequestDTO implements Serializable {
             LIST_EVALUATION_SITE_WITH_RADIUS = 76,
             LIST_OF_INSECTS_IMAGES = 77,
             LIST_EVALUATION_BY_RIVER_ID = 78,
-            ADD_GCM_DEVICE = 79;
+            ADD_GCM_DEVICE = 79,
+            GET_RIVERS_BY_RADIUS = 100;
+
 
     public static final String SAMPLE_DIR = "company";
     public static final String EVALUATION_DIR = "evaluation";

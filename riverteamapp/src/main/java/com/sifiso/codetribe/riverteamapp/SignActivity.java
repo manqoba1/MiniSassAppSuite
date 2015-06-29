@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.sifiso.codetribe.minisasslibrary.R;
+import com.sifiso.codetribe.minisasslibrary.activities.RiverMapActivity;
 import com.sifiso.codetribe.minisasslibrary.dto.GcmDeviceDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.TeamMemberDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.RequestDTO;

@@ -1,24 +1,17 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.sifiso.codetribe.minisasslibrary.activities.Registration">
-    tools:context="com.sifiso.codetribe.riverteamapp.Registration">
+    tools:context="com.sifiso.codetribe.minisasslibrary.activities.Registration">>
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
-        app:showAsAction="never"
-        android:title="@string/action_settings" />
+        android:title="@string/action_settings"
+        app:showAsAction="never" />
 
     <item
-        android:id="@+id/addMember"
-        android:title="Add member"
-        android:icon="@drawable/ic_action_add_person"
+        android:id="@+id/doneAddingMember"
+        android:title="Done"
+        app:showAsAction="ifRoom" />
 
-        app:showAsAction="ifRoom" />
-    <item
-        android:id="@+id/addTeam"
-        android:title="Add team"
-        android:icon="@drawable/ic_action_new"
-        app:showAsAction="ifRoom" />
 
 </menu>

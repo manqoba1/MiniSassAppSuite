@@ -7,7 +7,7 @@
         android:startColor="@color/green" />
 
     <size
-        android:width="48dp"
-        android:height="48dp" />
+        android:width="@dimen/red_circle_size"
+        android:height="@dimen/red_circle_size" />
 
 </shape>

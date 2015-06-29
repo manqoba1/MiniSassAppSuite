@@ -71,6 +71,31 @@
                 android:hint="Select Town"
                 android:textColorHint="@color/gray" />
 
+            <LinearLayout
+                android:id="@+id/llMember"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/textView13"
+                    style="@style/TextStyleOrangeSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:text="Team Members"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                <ListView
+                    android:id="@+id/lsMember"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:isScrollContainer="true"
+                    android:layout_gravity="center_horizontal" />
+            </LinearLayout>
+
+
         </LinearLayout>
 
         <LinearLayout
@@ -83,14 +108,30 @@
             android:padding="8dp">
 
 
-            <TextView
-                android:id="@+id/textView15"
-                style="@style/TextStyleOrangeSmall"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="2">
 
-                android:text="Member Info"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
+                <TextView
+                    android:id="@+id/textView15"
+                    style="@style/TextStyleOrangeSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:text="Member Info"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                <CheckBox
+                    android:id="@+id/cbMoreMember"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Add more members" />
+
+
+            </LinearLayout>
 
             <EditText
                 android:id="@+id/edtMemberName"
@@ -117,9 +158,9 @@
                 android:id="@+id/edtMemberPhone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/edtMemberEmail"
                 android:hint="Cellphone Number"
-                android:inputType="number"
-                android:layout_below="@+id/edtMemberEmail" />
+                android:inputType="number" />
 
             <EditText
                 android:id="@+id/edtPassword"
@@ -151,7 +192,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@color/blue"
-                android:text="Register"
+                android:text="REGISTER"
                 android:textColor="@color/white"
                 android:textStyle="bold" />
         </LinearLayout>

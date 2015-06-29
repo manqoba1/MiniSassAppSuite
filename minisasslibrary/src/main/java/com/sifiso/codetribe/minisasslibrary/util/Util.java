@@ -18,6 +18,7 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v7.app.ActionBar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
@@ -95,6 +96,21 @@ public class Util {
     static int maxFlashes, count;
     private static int MAX_IMAGE_DIMENSION = 720;
 
+    public static void setCustomActionBar( Context ctx,
+                                           ActionBar actionBar, String text, Drawable image) {
+        actionBar.setDisplayShowCustomEnabled(true);
+
+        LayoutInflater inflator = (LayoutInflater)
+                ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View v = inflator.inflate(R.layout.action_bar_logo, null);
+        TextView txt = (TextView) v.findViewById(R.id.ACTION_BAR_text);
+        ImageView logo = (ImageView) v.findViewById(R.id.ACTION_BAR_logo);
+        txt.setText(text);
+        //
+        logo.setImageDrawable(image);
+        actionBar.setCustomView(v);
+        actionBar.setTitle("");
+    }
     public static int getPopupWidth(Activity activity) {
         DisplayMetrics displaymetrics = new DisplayMetrics();
         activity.getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);

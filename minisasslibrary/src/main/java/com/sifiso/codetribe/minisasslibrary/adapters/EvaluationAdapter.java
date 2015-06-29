@@ -131,13 +131,7 @@ public class EvaluationAdapter extends BaseAdapter {
                 h.ELI_condition_image.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.purple_crap));
                 h.ELI_condition_image.setColorFilter(mCtx.getResources().getColor(R.color.purple), PorterDuff.Mode.MULTIPLY);
                 break;
-            case Constants.NOT_SPECIFIED:
-                h.ELI_condition.setTextColor(mCtx.getResources().getColor(R.color.gray));
-                h.ELI_score.setTextColor(mCtx.getResources().getColor(R.color.gray));
-                h.ELI_condition_image.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.gray_crap));
-                h.ELI_condition_image.setColorFilter(mCtx.getResources().getColor(R.color.gray), PorterDuff.Mode.MULTIPLY);
-                break;
-           /* case Constants.UNMODIFIED_NATURAL_ROCK:
+            case Constants.UNMODIFIED_NATURAL_ROCK:
                 h.ELI_condition.setTextColor(mCtx.getResources().getColor(R.color.dark_blue));
                 h.ELI_score.setTextColor(mCtx.getResources().getColor(R.color.dark_blue));
                 h.ELI_condition_image.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.blue_crap));
@@ -172,7 +166,7 @@ public class EvaluationAdapter extends BaseAdapter {
                 h.ELI_score.setTextColor(mCtx.getResources().getColor(R.color.gray));
                 h.ELI_condition_image.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.gray_crap));
                 h.ELI_condition_image.setColorFilter(mCtx.getResources().getColor(R.color.gray), PorterDuff.Mode.MULTIPLY);
-                break;*/
+                break;
         }
 
         h.ELI_condition.setText(site.getConditionName());

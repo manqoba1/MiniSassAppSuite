@@ -144,12 +144,19 @@ public class RegisterActivity extends ActionBarActivity implements SearchTownFra
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
+
         getMenuInflater().inflate(R.menu.menu_register, menu);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Team member");
-        getCachedData();
+       // getCachedData();
         return true;
+    }
+
+    @Override
+    protected void onStart() {
+        getCachedData();
+        super.onStart();
     }
 
     @Override

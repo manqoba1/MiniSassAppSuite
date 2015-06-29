@@ -192,7 +192,7 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
     @Override
     protected void onStart() {
         startScan();
-
+        getCachedRiverData();
         TimerUtil.killFlashTimer();
 
         Intent intent = new Intent(MainPagerActivity.this, RequestSyncService.class);
@@ -442,7 +442,9 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
                 Log.d(LOG, "Network");
                 if (locationManager != null) {
                     location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                    setLoc(location);
+                    if (location != null) {
+                        setLoc(location);
+                    }
                 }
             }
 
@@ -456,7 +458,9 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
                     if (locationManager != null) {
                         Log.d(LOG, "GPs");
                         location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                        setLoc(location);
+                        if (location != null) {
+                            setLoc(location);
+                        }
                     }
                 }
             }
@@ -466,7 +470,9 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
     }
 
     void setLoc(Location loc) {
-        location = loc;
+        this.location = loc;
+       // Log.v(LOG + " network",location.getLongitude()+ " = " + isNetworkEnabled);
+       // getCachedRiverData();
     }
 
     public void showSettingDialog() {
@@ -643,12 +649,12 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
 
     private void getRiversAroundMe() {
         if (location == null) {
-            Toast.makeText(ctx, "Busy...getting rivers ...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ctx, "Busy...getting rivers ...t", Toast.LENGTH_SHORT).show();
             // getRiversAroundMe();
             return;
         }
         if (isBusy) {
-            Toast.makeText(ctx, "Busy...getting rivers ...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ctx, "Busy...getting rivers2 ...", Toast.LENGTH_SHORT).show();
             return;
         }
 
