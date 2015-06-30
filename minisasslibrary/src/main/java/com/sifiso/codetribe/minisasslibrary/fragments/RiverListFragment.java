@@ -153,7 +153,9 @@ public class RiverListFragment extends Fragment implements PageFragment {
     EvaluationListDialog evaluationListDialog;
     static String LOG = RiverListFragment.class.getSimpleName();
 
+
     private void setListView() {
+
         Log.d(LOG, "Mentor " + new Gson().toJson(response.getRiverList()));
         riverAdapter = new RiverAdapter(response.getRiverList(), ctx, new RiverAdapter.RiverAdapterListener() {
             @Override

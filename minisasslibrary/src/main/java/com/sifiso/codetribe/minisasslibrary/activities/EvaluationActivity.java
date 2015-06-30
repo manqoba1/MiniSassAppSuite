@@ -6,14 +6,13 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.ServiceConnection;
 import android.graphics.PorterDuff;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.provider.Settings;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -29,6 +28,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.VolleyError;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.ErrorDialogFragment;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.gson.Gson;
 import com.sifiso.codetribe.minisasslibrary.R;
 import com.sifiso.codetribe.minisasslibrary.dto.CategoryDTO;
@@ -68,7 +73,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 
-public class EvaluationActivity extends ActionBarActivity implements LocationListener {
+public class EvaluationActivity extends ActionBarActivity implements LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     static final String LOG = EvaluationActivity.class.getSimpleName();
     private TextView WC_minus, WC_add, WT_minus, WT_add,
             WP_minus, WP_add, WO_minus, WO_add, WE_minus, WE_add;
@@ -100,6 +105,16 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
 
     static final int GPS_DATA = 102;
 
+    GoogleApiClient mGoogleApiClient;
+    LocationRequest locationRequest;
+    Location location;
+    boolean mResolvingError;
+    static final long ONE_MINUTE = 1000 * 60;
+    static final long FIVE_MINUTES = 1000 * 60 * 5;
+    private static final int REQUEST_RESOLVE_ERROR = 1001;
+    // Unique tag for the error dialog fragment
+    private static final String DIALOG_ERROR = "dialog_error";
+
     ViewPager mPager;
     Menu mMenu;
     List<PageFragment> pageFragmentList;
@@ -118,7 +133,11 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
         txtLng = (TextView) findViewById(R.id.GPS_longitude);
         Statics.setRobotoFontBold(ctx, txtLat);
         Statics.setRobotoFontBold(ctx, txtLng);
-
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
 
         //  WC_minus = (TextView) findViewById(R.id.WC_minus);
         WC_score = (EditText) findViewById(R.id.WC_score);
@@ -296,7 +315,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
         }
         if (id == android.R.id.home) {
             finish();
-            stopScan();
+            stopLocationUpdates();
 
         }
         return super.onOptionsItemSelected(item);
@@ -345,6 +364,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
                     scoreUpdater((List<InsectImageDTO>) data.getSerializableExtra("selectedInsects"));
                     List<InsectImageDTO> list = (List<InsectImageDTO>) data.getSerializableExtra("selectedInsects");
                     //Log.w(LOG, "### insect ui has returned with data?" + list.size());
+                    isInsectsPickerBack = true;
                     result3.setVisibility(View.VISIBLE);
                     teamMember = SharedUtil.getTeamMember(ctx);
                 }
@@ -353,7 +373,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
     }
 
     public void setRiverField(RiverDTO r) {
-       // ToastUtil.toast(ctx, "yes");
+        // ToastUtil.toast(ctx, "yes");
         riverID = r.getRiverID();
         WT_sp_river.setText(r.getRiverName());
 
@@ -394,9 +414,9 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
                         y.setDistanceFromMe(location.distanceTo(spot));
                     }
                     Collections.sort(x.getRiverpointList());
-                   /* x.setNearestLatitude(x.getRiverpointList().get(0).getLatitude());
+                    x.setNearestLatitude(x.getRiverpointList().get(0).getLatitude());
                     x.setNearestLongitude(x.getRiverpointList().get(0).getLongitude());
-                    x.setDistanceFromMe(x.getRiverpointList().get(0).getDistanceFromMe());*/
+                    x.setDistanceFromMe(x.getRiverpointList().get(0).getDistanceFromMe());
                 }
                 Collections.sort(w.getRiverpartList());
                 w.setNearestLatitude(w.getRiverpartList().get(0).getNearestLatitude());
@@ -424,7 +444,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
                         WT_sp_category.setText(response.getCategoryList().get(indexCat).getCategoryName());
                         categoryID = response.getCategoryList().get(indexCat).getCategoryId();
                         catType = (response.getCategoryList().get(indexCat).getCategoryName());
-                        evaluationSite.setCategoryID(categoryID);
+                       // evaluationSite.setCategoryID(categoryID);
                         Log.e(LOG, categoryID + "");
                     }
                 });
@@ -443,7 +463,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
                         indexRiv = ind;
                         WT_sp_river.setText(response.getRiverList().get(indexRiv).getRiverName());
                         riverID = response.getRiverList().get(indexRiv).getRiverID();
-                        evaluationSite.setRiverID(riverID);
+                        //evaluationSite.setRiverID(riverID);
                         Log.e(LOG, "" + riverID);
                     }
                 });
@@ -454,169 +474,6 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
     }
 
     private int indexCat, indexRiv;
-
-
-    /*private void addMinus() {
-        WO_add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                wo = Double.parseDouble(WO_score.getText().toString()) + 0.5;
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        WO_score.setText(wo + "");
-                    }
-                });
-            }
-        });
-        WO_minus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                wo = Double.parseDouble(WO_score.getText().toString());
-                if (wo <= 0.0) {
-
-                } else {
-                    wo = wo - 0.5;
-                    if (wo < -0.0) {
-                        wo = 0.0;
-                    }
-                }
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        WO_score.setText(wo + "");
-                    }
-                });
-            }
-        });
-        WP_add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                wp = Double.parseDouble(WP_score.getText().toString()) + 0.5;
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        WP_score.setText(wp + "");
-                    }
-                });
-            }
-        });
-        WP_minus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                wp = Double.parseDouble(WP_score.getText().toString());
-                if (wp <= 0.0) {
-
-                } else {
-                    wp = wp - 0.5;
-                    if (wp < -0.0) {
-                        wp = 0.0;
-                    }
-                }
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        WP_score.setText(wp + "");
-                    }
-                });
-            }
-        });
-        WT_add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                wt = Double.parseDouble(WT_score.getText().toString()) + 0.5;
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        WT_score.setText(wt + "");
-                    }
-                });
-            }
-        });
-        WT_minus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                wt = Double.parseDouble(WT_score.getText().toString());
-                if (wt <= 0.0) {
-
-                } else {
-                    wt = wt - 0.5;
-                    if (wt < -0.0) {
-                        wt = 0.0;
-                    }
-                }
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        WT_score.setText(wt + "");
-                    }
-                });
-            }
-        });
-        WE_add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                we = Double.parseDouble(WE_score.getText().toString()) + 0.5;
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        WE_score.setText(we + "");
-                    }
-                });
-            }
-        });
-        WE_minus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                we = Double.parseDouble(WE_score.getText().toString());
-
-                we = we - 0.5;
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        WE_score.setText(we + "");
-                    }
-                });
-            }
-        });
-        WC_add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                wc = Double.parseDouble(WC_score.getText().toString()) + 0.5;
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        WC_score.setText(wc + "");
-                    }
-                });
-            }
-        });
-        WC_minus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                wc = Double.parseDouble(WC_score.getText().toString());
-                if (wc <= 0.0) {
-
-                } else {
-                    wc = wc - 0.5;
-                    if (wc < -0.0) {
-                        wc = 0.0;
-                    }
-                }
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        WC_score.setText(wc + "");
-                    }
-                });
-            }
-        });
-
-
-    }*/
 
     private void startGPSDialog() {
 
@@ -650,6 +507,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
                 if (evaluationSite == null && accuracy == null) {
                     ToastUtil.toast(ctx, "Evaluation site not defined");
                     GPS_layout4.setVisibility(View.VISIBLE);
+                    startLocationUpdates();
                     return;
                 }
                 if (selectedInsects == null) {
@@ -733,7 +591,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
                 WT_sp_category.setText("What environment are you at? Rocky or Sandy?");
                 EDT_comment.setText("");
                 AE_pin_point.setVisibility(View.GONE);
-                evaluationSite = new EvaluationSiteDTO();
+                evaluationSite =null;
 
                 TV_score_status.setText("not specified");
                 TV_score_status.setTextColor(getResources().getColor(R.color.gray));
@@ -746,6 +604,9 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
                 categoryID = null;
                 riverID = null;
                 conditionID = null;
+                GPS_layout4.setVisibility(View.GONE);
+
+
             }
         });
 
@@ -1072,7 +933,11 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
 
     @Override
     public void onStart() {
-        startScan();
+        super.onStart();
+        Log.e(LOG, "################ onStart .... connect API and location clients ");
+        if (!mResolvingError) {  // more about this later
+            mGoogleApiClient.connect();
+        }
 
         Log.i(LOG,
                 "### onStart, binding RequestSyncService and PhotoUploadService");
@@ -1104,7 +969,13 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
             unbindService(mConnection);
             mBound = false;
         }
-        stopScan();
+        Log.w(LOG, "############## onStop stopping google service clients");
+        try {
+            mGoogleApiClient.disconnect();
+        } catch (Exception e) {
+            Log.e(LOG, "Failed to Stop something", e);
+        }
+
         super.onStop();
     }
 
@@ -1189,28 +1060,28 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
                                 dialog.cancel();
                             }
                         });
-                                alertDialogBuilder
-                                        .setMessage("Contribute to Existing Site!!")
-                                        .setCancelable(false)
-                                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int id) {
-                                                // Intent intent = new Intent(ctx, PictureActivity.class);
-                                                // intent.putExtra("takenImages", )
-                                                // startActivityForResult(intent, CAPTURE_IMAGE);
-                                                cleanForm();
-                                                dialog.cancel();
-                                            }
-                                        })
-                                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                                    public void onClick(DialogInterface dialog, int id) {
-                                                        // if this button is clicked, just close
-                                                        // the dialog box and do nothing
-                                                        finish();
-                                                        dialog.cancel();
-                                                    }
-                                                }
+                alertDialogBuilder
+                        .setMessage("Contribute to Existing Site!!")
+                        .setCancelable(false)
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                // Intent intent = new Intent(ctx, PictureActivity.class);
+                                // intent.putExtra("takenImages", )
+                                // startActivityForResult(intent, CAPTURE_IMAGE);
+                                cleanForm();
+                                dialog.cancel();
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        // if this button is clicked, just close
+                                        // the dialog box and do nothing
+                                        finish();
+                                        dialog.cancel();
+                                    }
+                                }
 
-                                        );
+                        );
 
                 // create alert dialog
                 AlertDialog alertDialog = alertDialogBuilder.create();
@@ -1276,7 +1147,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
         w.setRequestType(RequestDTO.LIST_DATA_WITH_RADIUS_RIVERS);
         w.setLatitude(location.getLatitude());
         w.setLongitude(location.getLongitude());
-        w.setRadius(10);
+        w.setRadius(20);
         isBusy = true;
 
         BaseVolley.getRemoteData(Statics.SERVLET_ENDPOINT, w, ctx, new BaseVolley.BohaVolleyListener() {
@@ -1323,70 +1194,38 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
 
     }
 
-    Location location;
-    LocationManager locationManager;
-    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 2;
-    private static final long MIN_TIME_BW_UPDATES = 1;
-    public boolean isGPSEnabled = false;
-    public boolean isNetworkEnabled = false;
-    public boolean canGetLocation = false;
 
-    private Location getLocation() {
-        onLocationChanged(location);
-        return location;
+    protected void stopLocationUpdates() {
+        Log.e(LOG, "###### stopLocationUpdates - " + new Date().toString());
+        if (mGoogleApiClient.isConnected()) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(
+                    mGoogleApiClient, this);
+        }
     }
 
-    public void startScan() {
-        getLocation();
-    }
+    boolean mRequestingLocationUpdates;
 
+    protected void startLocationUpdates() {
+        Log.w(LOG, "###### startLocationUpdates: " + new Date().toString());
+        if (mGoogleApiClient.isConnected()) {
+            mRequestingLocationUpdates = true;
+            LocationServices.FusedLocationApi.requestLocationUpdates(
+                    mGoogleApiClient, locationRequest, this);
+        }
+    }
+    boolean isInsectsPickerBack = false;
     @Override
     public void onLocationChanged(Location location) {
-        locationManager = (LocationManager) ctx.getSystemService(Context.LOCATION_SERVICE);
-        isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-
-        Log.v(LOG + " gps", "=" + isGPSEnabled);
-
-        isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-
-        Log.v(LOG + " network", "=" + isNetworkEnabled);
-
-        if (isGPSEnabled == false && isNetworkEnabled == false) {
-            Log.d(LOG, "is not connected");
-            showSettingDialog();
-        } else {
-            canGetLocation = true;
-            if (isNetworkEnabled) {
-                location = null;
-                locationManager.requestLocationUpdates(
-                        LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES,
-                        MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-                Log.d(LOG, "Network");
-                if (locationManager != null) {
-                    location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                    if (location != null) {
-                        setGPSLocation(location);
-                    }
-                }
+        this.location = location;
+        setGPSLocation(location);
+        if (location.getAccuracy() <= ACCURACY_LIMIT) {
+            setGPSLocation(location);
+           // stopLocationUpdates();
+            if(!isInsectsPickerBack) {
+                getCachedRiverData();
             }
-
-            if (isGPSEnabled) {
-                location = null;
-                if (location == null) {
-                    locationManager.requestLocationUpdates(
-                            LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES,
-                            MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-                    Log.d(LOG, "GPs");
-                    if (locationManager != null) {
-                        location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                        if (location != null) {
-                            setGPSLocation(location);
-                        }
-                    }
-                }
-            }
-
         }
+        Log.e(LOG, "####### onLocationChanged");
     }
 
     Float accuracy = null;
@@ -1401,6 +1240,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
         evaluationSite.setLongitude(location.getLongitude());
         evaluationSite.setAccuracy(location.getAccuracy());
         setLocationTextviews(loc);
+        accuracy = location.getAccuracy();
         Log.w(LOG, "### Passing " + loc.getAccuracy());
         if (loc.getAccuracy() <= ACCURACY_THRESHOLD) {
 
@@ -1411,7 +1251,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
             evaluationSite.setLongitude(location.getLongitude());
             evaluationSite.setAccuracy(location.getAccuracy());
             accuracy = location.getAccuracy();
-            stopScan();
+            stopLocationUpdates();
             setEvaluationSite(evaluationSite);
 
             //finish();
@@ -1419,50 +1259,6 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
         }
     }
 
-    public void stopScan() {
-
-        if (locationManager != null) {
-            locationManager.removeUpdates(EvaluationActivity.this);
-        }
-
-    }
-
-
-    public void showSettingDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(EvaluationActivity.this);
-
-        builder.setTitle("GPS settings");
-        builder.setMessage("GPS is not enabled. Do you want to go to settings menu, to search for location?");
-        builder.setPositiveButton("Settings", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                startActivity(intent);
-            }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-        builder.show();
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
-    }
 
     //getting evaluations by distance
     boolean isBusy2;
@@ -1479,7 +1275,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
         w.setRiverID(riverID);
         isBusy2 = true;
 
-        BaseVolley.getRemoteData(Statics.SERVLET_TEST, w, ctx, new BaseVolley.BohaVolleyListener() {
+        BaseVolley.getRemoteData(Statics.SERVLET_ENDPOINT, w, ctx, new BaseVolley.BohaVolleyListener() {
             @Override
             public void onResponseReceived(ResponseDTO r) {
                 isBusy2 = false;
@@ -1508,7 +1304,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
             @Override
             public void onEvaluationClicked(EvaluationSiteDTO evaluation) {
                 showEvaluationDialog();
-                Log.i(LOG,new Gson().toJson(evaluation));
+                Log.i(LOG, new Gson().toJson(evaluation));
                 setFieldsFromVisitedSites(evaluation);
             }
         });
@@ -1528,5 +1324,108 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
             }
             Collections.sort(resp.getEvaluationSiteList());
         }
+    }
+
+    static final int ACCURACY_LIMIT = 50;
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        Log.i(LOG, "+++  onConnected() -  requestLocationUpdates ...");
+        location = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+        if (location != null) {
+            Log.w(LOG, "## requesting location ....lastLocation: "
+                    + location.getLatitude() + " "
+                    + location.getLongitude() + " acc: "
+                    + location.getAccuracy());
+        }
+        locationRequest = LocationRequest.create();
+        locationRequest.setInterval(3000);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setFastestInterval(2000);
+
+        if (location.getAccuracy() > ACCURACY_LIMIT) {
+            startLocationUpdates();
+        } else {
+            getRiversAroundMe();
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult result) {
+        if (mResolvingError) {
+            // Already attempting to resolve an error.
+            return;
+        } else if (result.hasResolution()) {
+            try {
+                mResolvingError = true;
+                result.startResolutionForResult(this, REQUEST_RESOLVE_ERROR);
+            } catch (IntentSender.SendIntentException e) {
+                // There was an error with the resolution intent. Try again.
+                mGoogleApiClient.connect();
+            }
+        } else {
+            // Show dialog using GooglePlayServicesUtil.getErrorDialog()
+            showErrorDialog(result.getErrorCode());
+            mResolvingError = true;
+        }
+    }
+
+    /* Creates a dialog for an error message */
+    private void showErrorDialog(int errorCode) {
+        // Create a fragment for the error dialog
+        ErrorDialogFragment dialogFragment = new ErrorDialogFragment();
+        // Pass the error that should be displayed
+        Bundle args = new Bundle();
+        args.putInt(DIALOG_ERROR, errorCode);
+        dialogFragment.setArguments(args);
+        dialogFragment.show(getFragmentManager(), "errordialog");
+    }
+
+    private void getCachedRiverData() {
+        final WebCheckResult w = WebCheck.checkNetworkAvailability(ctx);
+        CacheUtil.getCachedData(ctx, CacheUtil.CACHE_DATA, new CacheUtil.CacheUtilListener() {
+            @Override
+            public void onFileDataDeserialized(final ResponseDTO respond) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        response = respond;
+                        buildUI();
+
+                        if (w.isWifiConnected() || w.isMobileConnected()) {
+                            getRiversAroundMe();
+                        }
+                    }
+                });
+
+
+            }
+
+            @Override
+            public void onDataCached(ResponseDTO r) {
+
+            }
+
+            @Override
+            public void onError() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (w.isWifiConnected() || w.isMobileConnected()) {
+                            getRiversAroundMe();
+                        }
+                    }
+                });
+
+            }
+        });
+
+
     }
 }

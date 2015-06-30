@@ -1,17 +1,14 @@
 package com.sifiso.codetribe.riverteamapp;
 
-import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.ServiceConnection;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -27,11 +24,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.VolleyError;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.ErrorDialogFragment;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.sifiso.codetribe.minisasslibrary.R;
 import com.sifiso.codetribe.minisasslibrary.activities.EvaluationActivity;
 import com.sifiso.codetribe.minisasslibrary.activities.MapsActivity;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationSiteDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverDTO;
+import com.sifiso.codetribe.minisasslibrary.dto.RiverPartDTO;
+import com.sifiso.codetribe.minisasslibrary.dto.RiverPointDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverTownDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.RequestDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ResponseDTO;
@@ -52,10 +57,12 @@ import com.sifiso.codetribe.minisasslibrary.util.TimerUtil;
 import com.sifiso.codetribe.minisasslibrary.util.Util;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 
-public class MainPagerActivity extends ActionBarActivity implements LocationListener, CreateEvaluationListener {
+public class MainPagerActivity extends ActionBarActivity implements LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, CreateEvaluationListener {
     static final int NUM_ITEMS = 2;
     static final String LOG = MainPagerActivity.class.getSimpleName();
     Context ctx;
@@ -69,6 +76,16 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
     PagerAdapter adapter;
     private ResponseDTO response;
     private TextView RL_add;
+
+    GoogleApiClient mGoogleApiClient;
+    LocationRequest locationRequest;
+    Location location;
+    boolean mResolvingError;
+    static final long ONE_MINUTE = 1000 * 60;
+    static final long FIVE_MINUTES = 1000 * 60 * 5;
+    private static final int REQUEST_RESOLVE_ERROR = 1001;
+    // Unique tag for the error dialog fragment
+    private static final String DIALOG_ERROR = "dialog_error";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +114,11 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
 
             }
         });
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         // mPager.setOffscreenPageLimit(NUM_ITEMS - 1);
 
@@ -148,15 +170,22 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
 
     @Override
     protected void onStop() {
-        super.onStop();
         Log.d(LOG,
                 "#################### onStop");
-        if (mBound) {
 
+
+        if (mBound) {
             unbindService(mConnection);
             mBound = false;
         }
-        stopScan();
+        Log.w(LOG, "############## onStop stopping google service clients");
+        try {
+            mGoogleApiClient.disconnect();
+        } catch (Exception e) {
+            Log.e(LOG, "Failed to Stop something", e);
+        }
+
+        super.onStop();
     }
 
 
@@ -170,7 +199,7 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
     }
 
     private void buildPages() {
-
+        calculateDistances();
         pageFragmentList = new ArrayList<PageFragment>();
         riverListFragment = new RiverListFragment();
         Bundle data = new Bundle();
@@ -191,8 +220,10 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
 
     @Override
     protected void onStart() {
-        startScan();
-        getCachedRiverData();
+        Log.e(LOG, "################ onStart .... connect API and location clients ");
+        if (!mResolvingError) {  // more about this later
+            mGoogleApiClient.connect();
+        }
         TimerUtil.killFlashTimer();
 
         Intent intent = new Intent(MainPagerActivity.this, RequestSyncService.class);
@@ -312,7 +343,7 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
     @Override
     protected void onPause() {
         overridePendingTransition(com.sifiso.codetribe.minisasslibrary.R.anim.slide_in_left, com.sifiso.codetribe.minisasslibrary.R.anim.slide_out_right);
-        stopScan();
+
         super.onPause();
     }
 
@@ -400,123 +431,108 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
         startActivity(intent);
     }
 
-    Location location;
-    LocationManager locationManager;
-    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 2;
-    private static final long MIN_TIME_BW_UPDATES = 1;
-    public boolean isGPSEnabled = false;
-    public boolean isNetworkEnabled = false;
-    public boolean canGetLocation = false;
 
-    private Location getLocation() {
-        onLocationChanged(location);
-        return location;
+    boolean mRequestingLocationUpdates;
+
+    protected void startLocationUpdates() {
+        Log.w(LOG, "###### startLocationUpdates: " + new Date().toString());
+        if (mGoogleApiClient.isConnected()) {
+            mRequestingLocationUpdates = true;
+            LocationServices.FusedLocationApi.requestLocationUpdates(
+                    mGoogleApiClient, locationRequest, this);
+        }
     }
 
-    public void startScan() {
-        getLocation();
-    }
-
+    static final int ACCURACY_LIMIT = 50;
 
     @Override
     public void onLocationChanged(Location location) {
-        locationManager = (LocationManager) ctx.getSystemService(Context.LOCATION_SERVICE);
-        isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-
-        Log.v(LOG + " gps", "=" + isGPSEnabled);
-
-        isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-
-        Log.v(LOG + " network", "=" + isNetworkEnabled);
-
-        if (isGPSEnabled == false && isNetworkEnabled == false) {
-            Log.d(LOG, "is not connected");
-
-        } else {
-            canGetLocation = true;
-            if (isNetworkEnabled) {
-                location = null;
-                locationManager.requestLocationUpdates(
-                        LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES,
-                        MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-                Log.d(LOG, "Network");
-                if (locationManager != null) {
-                    location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                    if (location != null) {
-                        setLoc(location);
-                    }
-                }
-            }
-
-            if (isGPSEnabled) {
-                location = null;
-                if (location == null) {
-                    locationManager.requestLocationUpdates(
-                            LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES,
-                            MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-
-                    if (locationManager != null) {
-                        Log.d(LOG, "GPs");
-                        location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                        if (location != null) {
-                            setLoc(location);
-                        }
-                    }
-                }
-            }
-
+        this.location = location;
+        setLoc(location);
+        if (location.getAccuracy() <= ACCURACY_LIMIT) {
+            setLoc(location);
+            stopLocationUpdates();
+            getCachedRiverData();
+            // getRiversAroundMe();
         }
-
+        Log.e(LOG, "####### onLocationChanged");
     }
+
 
     void setLoc(Location loc) {
         this.location = loc;
-       // Log.v(LOG + " network",location.getLongitude()+ " = " + isNetworkEnabled);
-       // getCachedRiverData();
+        // Log.v(LOG + " network",location.getLongitude()+ " = " + isNetworkEnabled);
+        // getCachedRiverData();
     }
 
-    public void showSettingDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(MainPagerActivity.this);
-
-        builder.setTitle("GPS settings");
-        builder.setMessage("GPS is not enabled. Do you want to go to settings menu, to search for location?");
-        builder.setPositiveButton("Settings", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                startActivity(intent);
-            }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-        builder.show();
-    }
-
-    public void stopScan() {
-
-        if (locationManager != null) {
-            locationManager.removeUpdates(MainPagerActivity.this);
+    protected void stopLocationUpdates() {
+        Log.e(LOG, "###### stopLocationUpdates - " + new Date().toString());
+        if (mGoogleApiClient.isConnected()) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(
+                    mGoogleApiClient, this);
         }
+    }
 
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        Log.i(LOG, "+++  onConnected() -  requestLocationUpdates ...");
+        location = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+        if (location != null) {
+            Log.w(LOG, "## requesting location ....lastLocation: "
+                    + location.getLatitude() + " "
+                    + location.getLongitude() + " acc: "
+                    + location.getAccuracy());
+        }
+        locationRequest = LocationRequest.create();
+        locationRequest.setInterval(3000);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setFastestInterval(2000);
+
+        if (location.getAccuracy() > ACCURACY_LIMIT) {
+            startLocationUpdates();
+        } else {
+            getCachedRiverData();
+            // getRiversAroundMe();
+        }
     }
 
     @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
+    public void onConnectionSuspended(int i) {
 
     }
 
-    @Override
-    public void onProviderEnabled(String provider) {
 
+    @Override
+    public void onConnectionFailed(ConnectionResult result) {
+        if (mResolvingError) {
+            // Already attempting to resolve an error.
+            return;
+        } else if (result.hasResolution()) {
+            try {
+                mResolvingError = true;
+                result.startResolutionForResult(this, REQUEST_RESOLVE_ERROR);
+            } catch (IntentSender.SendIntentException e) {
+                // There was an error with the resolution intent. Try again.
+                mGoogleApiClient.connect();
+            }
+        } else {
+            // Show dialog using GooglePlayServicesUtil.getErrorDialog()
+            showErrorDialog(result.getErrorCode());
+            mResolvingError = true;
+        }
     }
 
-    @Override
-    public void onProviderDisabled(String provider) {
-
+    /* Creates a dialog for an error message */
+    private void showErrorDialog(int errorCode) {
+        // Create a fragment for the error dialog
+        ErrorDialogFragment dialogFragment = new ErrorDialogFragment();
+        // Pass the error that should be displayed
+        Bundle args = new Bundle();
+        args.putInt(DIALOG_ERROR, errorCode);
+        dialogFragment.setArguments(args);
+        dialogFragment.show(getFragmentManager(), "errordialog");
     }
 
     private class PagerAdapter extends FragmentStatePagerAdapter implements PageFragment {
@@ -568,7 +584,7 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
                     public void run() {
                         response = respond;
                         if (response != null) {
-
+                            //calculateDistancesForSite();
                             buildPages();
                         }
                         if (w.isWifiConnected() || w.isMobileConnected()) {
@@ -602,6 +618,20 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
     }
 
     boolean isBusy;
+
+    private void calculateDistancesForSite() {
+        if (location != null) {
+            List<EvaluationSiteDTO> riverPoints = new ArrayList<>();
+            Location spot = new Location(LocationManager.GPS_PROVIDER);
+
+            for (EvaluationSiteDTO w : response.getEvaluationSiteList()) {
+                spot.setLatitude(w.getLatitude());
+                spot.setLongitude(w.getLongitude());
+                w.setDistanceFromMe(location.distanceTo(spot));
+            }
+            Collections.sort(response.getEvaluationSiteList());
+        }
+    }
 
     private void getCachedRiverData() {
         final WebCheckResult w = WebCheck.checkNetworkAvailability(ctx);
@@ -663,10 +693,10 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
         w.setRequestType(RequestDTO.LIST_DATA_WITH_RADIUS_RIVERS);
         w.setLatitude(location.getLatitude());
         w.setLongitude(location.getLongitude());
-        w.setRadius(40);
+        w.setRadius(200);
         isBusy = true;
 
-        BaseVolley.getRemoteData(Statics.SERVLET_TEST, w, ctx, new BaseVolley.BohaVolleyListener() {
+        BaseVolley.getRemoteData(Statics.SERVLET_ENDPOINT, w, ctx, new BaseVolley.BohaVolleyListener() {
             @Override
             public void onResponseReceived(ResponseDTO r) {
                 isBusy = false;
@@ -711,7 +741,7 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
         RequestDTO w = new RequestDTO();
         w.setRequestType(RequestDTO.GET_DATA);
 
-        BaseVolley.getRemoteData(Statics.SERVLET_TEST, w, ctx, new BaseVolley.BohaVolleyListener() {
+        BaseVolley.getRemoteData(Statics.SERVLET_ENDPOINT, w, ctx, new BaseVolley.BohaVolleyListener() {
             @Override
             public void onResponseReceived(final ResponseDTO r) {
                 runOnUiThread(new Runnable() {
@@ -721,7 +751,7 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
                         if (!ErrorUtil.checkServerError(ctx, r)) {
                             return;
                         }
-                        response = r;
+
                         CacheUtil.cacheData(ctx, r, CacheUtil.CACHE_DATA, new CacheUtil.CacheUtilListener() {
                             @Override
                             public void onFileDataDeserialized(final ResponseDTO resp) {
@@ -733,6 +763,7 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
                                     /*Intent intent = new Intent(getApplicationContext(), RequestSyncService.class);
                                     startService(intent);*/
                                 // getData();
+                                response = r;
                                 buildPages();
                             }
 
@@ -828,5 +859,32 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
             super.onBackPressed();
         }
         isBack = true;
+    }
+    private void calculateDistances() {
+        if (location != null) {
+            List<RiverPointDTO> riverPoints = new ArrayList<>();
+            Location spot = new Location(LocationManager.GPS_PROVIDER);
+
+            for (RiverDTO w : response.getRiverList()) {
+                for (RiverPartDTO x : w.getRiverpartList()) {
+                    for (RiverPointDTO y : x.getRiverpointList()) {
+                        spot.setLatitude(y.getLatitude());
+                        spot.setLongitude(y.getLongitude());
+                        y.setDistanceFromMe(location.distanceTo(spot));
+                    }
+                    Collections.sort(x.getRiverpointList());
+                    x.setNearestLatitude(x.getRiverpointList().get(0).getLatitude());
+                    x.setNearestLongitude(x.getRiverpointList().get(0).getLongitude());
+                    x.setDistanceFromMe(x.getRiverpointList().get(0).getDistanceFromMe());
+                }
+                Collections.sort(w.getRiverpartList());
+                w.setNearestLatitude(w.getRiverpartList().get(0).getNearestLatitude());
+                w.setNearestLongitude(w.getRiverpartList().get(0).getNearestLongitude());
+                w.setDistanceFromMe(w.getRiverpartList().get(0).getDistanceFromMe());
+
+
+            }
+            Collections.sort(response.getRiverList());
+        }
     }
 }
