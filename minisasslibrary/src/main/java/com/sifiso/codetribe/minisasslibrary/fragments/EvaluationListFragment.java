@@ -119,8 +119,8 @@ public class EvaluationListFragment extends Fragment implements PageFragment {
         return evaluationSiteList.get(0).getRiverName();
     }
 
-    public void setEvaluation(List<EvaluationDTO> evaluationList) {
-        this.evaluationList = evaluationList;
+    public void setEvaluation() {
+
         if (!evaluationList.isEmpty()) {
             setList();
         }

@@ -267,7 +267,7 @@ public class BaseVolley {
 
                 } else {
                     Log.e(LOG, ctx.getResources().getString(
-                            R.string.error_server_comms) + error.toString());
+                            R.string.error_server_comms) + error.getMessage());
                 }
                 bohaVolleyListener.onVolleyError(error);
             }

@@ -380,12 +380,14 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
     }
 
     public void setFieldsFromVisitedSites(EvaluationSiteDTO r) {
+        evaluationSite = r;
         riverID = r.getRiverID();
         WT_sp_river.setText(r.getRiver().getRiverName());
         WT_sp_river.setEnabled(false);
         categoryID = r.getCategoryID();
         WT_sp_category.setText(r.getCategory().getCategoryName());
         WT_sp_category.setEnabled(false);
+        catType = r.getCategory().getCategoryName();
     }
 
     static final DecimalFormat df = new DecimalFormat("###,###,###,###,##0.0");
@@ -444,7 +446,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
                         WT_sp_category.setText(response.getCategoryList().get(indexCat).getCategoryName());
                         categoryID = response.getCategoryList().get(indexCat).getCategoryId();
                         catType = (response.getCategoryList().get(indexCat).getCategoryName());
-                       // evaluationSite.setCategoryID(categoryID);
+                        // evaluationSite.setCategoryID(categoryID);
                         Log.e(LOG, categoryID + "");
                     }
                 });
@@ -591,7 +593,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
                 WT_sp_category.setText("What environment are you at? Rocky or Sandy?");
                 EDT_comment.setText("");
                 AE_pin_point.setVisibility(View.GONE);
-                evaluationSite =null;
+                evaluationSite = null;
 
                 TV_score_status.setText("not specified");
                 TV_score_status.setTextColor(getResources().getColor(R.color.gray));
@@ -786,7 +788,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
 
 
     private void sendRequest(final RequestDTO request) {
-        BaseVolley.getRemoteData(Statics.SERVLET_TEST, request, ctx, new BaseVolley.BohaVolleyListener() {
+        BaseVolley.getRemoteData(Statics.SERVLET_ENDPOINT, request, ctx, new BaseVolley.BohaVolleyListener() {
             @Override
             public void onResponseReceived(ResponseDTO response) {
                 if (response.getStatusCode() > 0) {
@@ -804,7 +806,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
 
             @Override
             public void onVolleyError(VolleyError error) {
-                //addRequestToCache(request);
+                addRequestToCache(request);
             }
         });
        /* WebSocketUtil.sendRequest(ctx, Statics.MINI_SASS_ENDPOINT, request, new WebSocketUtil.WebSocketListener() {
@@ -987,45 +989,48 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
 
 
     private void showImageDialog() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-                        EvaluationActivity.this);
+        try {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                            EvaluationActivity.this);
 
-                // set title
-                alertDialogBuilder.setTitle("Evaluation Created");
+                    // set title
+                    alertDialogBuilder.setTitle("Evaluation Created");
 
-                // set dialog message
-                alertDialogBuilder
-                        .setMessage("Create another one?")
-                        .setCancelable(false)
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                // Intent intent = new Intent(ctx, PictureActivity.class);
-                                // intent.putExtra("takenImages", )
-                                // startActivityForResult(intent, CAPTURE_IMAGE);
-                                cleanForm();
-                                dialog.cancel();
-                            }
-                        })
-                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                // if this button is clicked, just close
-                                // the dialog box and do nothing
-                                finish();
-                                dialog.cancel();
-                            }
-                        });
+                    // set dialog message
+                    alertDialogBuilder
+                            .setMessage("Create another one?")
+                            .setCancelable(false)
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    // Intent intent = new Intent(ctx, PictureActivity.class);
+                                    // intent.putExtra("takenImages", )
+                                    // startActivityForResult(intent, CAPTURE_IMAGE);
+                                    cleanForm();
+                                    dialog.cancel();
+                                }
+                            })
+                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    // if this button is clicked, just close
+                                    // the dialog box and do nothing
+                                    finish();
+                                    dialog.cancel();
+                                }
+                            });
 
-                // create alert dialog
-                AlertDialog alertDialog = alertDialogBuilder.create();
+                    // create alert dialog
+                    AlertDialog alertDialog = alertDialogBuilder.create();
 
-                // show it
-                alertDialog.show();
-            }
-        });
-
+                    // show it
+                    alertDialog.show();
+                }
+            });
+        } catch (Exception e) {
+            Log.d(LOG, "{0}", e);
+        }
 
     }
 
@@ -1145,9 +1150,12 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
 
         RequestDTO w = new RequestDTO();
         w.setRequestType(RequestDTO.LIST_DATA_WITH_RADIUS_RIVERS);
+        /*w.setLatitude(-26.30566667);
+        w.setLongitude(28.01558333);
+        w.setRadius(5);*/
         w.setLatitude(location.getLatitude());
         w.setLongitude(location.getLongitude());
-        w.setRadius(20);
+        w.setRadius(5);
         isBusy = true;
 
         BaseVolley.getRemoteData(Statics.SERVLET_ENDPOINT, w, ctx, new BaseVolley.BohaVolleyListener() {
@@ -1213,15 +1221,17 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
                     mGoogleApiClient, locationRequest, this);
         }
     }
+
     boolean isInsectsPickerBack = false;
+
     @Override
     public void onLocationChanged(Location location) {
         this.location = location;
         setGPSLocation(location);
         if (location.getAccuracy() <= ACCURACY_LIMIT) {
             setGPSLocation(location);
-           // stopLocationUpdates();
-            if(!isInsectsPickerBack) {
+            // stopLocationUpdates();
+            if (!isInsectsPickerBack) {
                 getCachedRiverData();
             }
         }
@@ -1303,7 +1313,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
         Util.showPopupEvaluationSite(ctx, activity, resp.getEvaluationSiteList(), AE_find_near_sites, "Near Evaluated Site", new Util.PopupSiteListener() {
             @Override
             public void onEvaluationClicked(EvaluationSiteDTO evaluation) {
-                showEvaluationDialog();
+                // showEvaluationDialog();
                 Log.i(LOG, new Gson().toJson(evaluation));
                 setFieldsFromVisitedSites(evaluation);
             }

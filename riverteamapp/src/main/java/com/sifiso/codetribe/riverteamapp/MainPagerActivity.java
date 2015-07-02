@@ -641,6 +641,7 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        //Log.d(LOG, new Gson().toJson(respond.getRiverList().get(0)));
                         response = respond;
                         if (response != null) {
 
@@ -688,12 +689,15 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
             return;
         }
 
-
+//TODO remember to change back to location getLatitude and longitude
         RequestDTO w = new RequestDTO();
         w.setRequestType(RequestDTO.LIST_DATA_WITH_RADIUS_RIVERS);
+        /*w.setLatitude(-26.30566667);
+        w.setLongitude(28.01558333);
+        w.setRadius(5);*/
         w.setLatitude(location.getLatitude());
         w.setLongitude(location.getLongitude());
-        w.setRadius(200);
+        w.setRadius(5);
         isBusy = true;
 
         BaseVolley.getRemoteData(Statics.SERVLET_ENDPOINT, w, ctx, new BaseVolley.BohaVolleyListener() {
@@ -705,7 +709,7 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
                 if (!ErrorUtil.checkServerError(ctx, r)) {
                     return;
                 }
-                response = r;
+
                 CacheUtil.cacheData(ctx, r, CacheUtil.CACHE_DATA, new CacheUtil.CacheUtilListener() {
                     @Override
                     public void onFileDataDeserialized(final ResponseDTO resp) {
@@ -717,6 +721,7 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
                                     /*Intent intent = new Intent(getApplicationContext(), RequestSyncService.class);
                                     startService(intent);*/
                         // getData();
+                        response = r;
                         buildPages();
                     }
 
@@ -860,6 +865,7 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
         }
         isBack = true;
     }
+
     private void calculateDistances() {
         if (location != null) {
             List<RiverPointDTO> riverPoints = new ArrayList<>();
