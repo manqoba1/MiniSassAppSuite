@@ -199,7 +199,7 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
     }
 
     private void buildPages() {
-        calculateDistances();
+//        calculateDistances();
         pageFragmentList = new ArrayList<PageFragment>();
         riverListFragment = new RiverListFragment();
         Bundle data = new Bundle();

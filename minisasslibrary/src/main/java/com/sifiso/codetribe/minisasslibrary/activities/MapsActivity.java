@@ -118,7 +118,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
         if (displayType == EVALUATION_VIEW) {
             setEvaluationMarkers();
         }
-
+        setEvaluationMarkers();
         setGoogleMap();
     }
 
@@ -186,7 +186,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
 
                     }
                     index++;
-                    Log.d(LOG, "" + index);
+                    Log.d(LOG, "" + index+" "+eva.getEvaluationSite());
                     final Marker m = googleMap.addMarker(new MarkerOptions().position(new LatLng(eva.getEvaluationSite().getLatitude(), eva.getEvaluationSite().getLongitude())).icon(desc)
                             .snippet(eva.getRemarks()));
                     m.showInfoWindow();
@@ -213,6 +213,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
                     setTitle(river.getRiverName());
                 }
             });
+
         }
     }
 
@@ -261,7 +262,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
         list.add("Directions");
         list.add("Status Report");
 
-        Util.showPopupBasicWithHeroImage(ctx, this, list, topLayout, ctx.getString(R.string.select_action), new Util.UtilPopupListener() {
+        Util.showPopupBasicWithHeroImage(MapsActivity.this, MapsActivity.this, list, topLayout, ctx.getString(R.string.select_action), new Util.UtilPopupListener() {
             @Override
             public void onItemSelected(int index) {
                 switch (index) {

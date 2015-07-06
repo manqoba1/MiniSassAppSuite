@@ -20,6 +20,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewStub;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -80,8 +84,9 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
     private EditText WC_score, WP_score, WT_score, WO_score, WE_score;
     private TextView TV_total_score, TV_average_score, TV_avg_score, TV_score_status;
     private ImageView IMG_score_icon, AE_pin_point;
-    private TextView WT_sp_river, WT_sp_category, EDT_comment, AE_down_up;
+    private TextView  WT_sp_category, EDT_comment, AE_down_up;
     private Button WT_gps_picker, SL_show_insect, AE_create, AE_find_near_sites;
+    private AutoCompleteTextView WT_sp_river;
 
     //layouts
     RelativeLayout result2, result3;
@@ -163,7 +168,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
         TV_avg_score = (TextView) findViewById(R.id.TV_avg_score);
         TV_score_status = (TextView) findViewById(R.id.TV_score_status);
         IMG_score_icon = (ImageView) findViewById(R.id.IMG_score_icon);
-        WT_sp_river = (TextView) findViewById(R.id.WT_sp_river);
+        WT_sp_river = (AutoCompleteTextView) findViewById(R.id.WT_sp_river);
         WT_sp_category = (TextView) findViewById(R.id.WT_sp_category);
         EDT_comment = (EditText) findViewById(R.id.EDT_comment);
         AE_pin_point = (ImageView) findViewById(R.id.AE_pin_point);
@@ -433,12 +438,12 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
 
     private void setSpinner() {
 
-        calculateDistances();
+        //calculateDistances();
         Log.d(LOG, "category size " + response.getCategoryList().size());
         WT_sp_category.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                hideKeyboard();
                 Util.showPopupCategoryBasicWithHeroImage(ctx, EvaluationActivity.this, response.getCategoryList(), WT_sp_category, "", new Util.UtilPopupListener() {
                     @Override
                     public void onItemSelected(int index) {
@@ -446,14 +451,14 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
                         WT_sp_category.setText(response.getCategoryList().get(indexCat).getCategoryName());
                         categoryID = response.getCategoryList().get(indexCat).getCategoryId();
                         catType = (response.getCategoryList().get(indexCat).getCategoryName());
-                        // evaluationSite.setCategoryID(categoryID);
+                        evaluationSite.setCategoryID(categoryID);
                         Log.e(LOG, categoryID + "");
                     }
                 });
             }
         });
         Log.d(LOG, "river size " + response.getRiverList().size());
-        WT_sp_river.setOnClickListener(new View.OnClickListener() {
+        /*WT_sp_river.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -465,17 +470,48 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
                         indexRiv = ind;
                         WT_sp_river.setText(response.getRiverList().get(indexRiv).getRiverName());
                         riverID = response.getRiverList().get(indexRiv).getRiverID();
-                        //evaluationSite.setRiverID(riverID);
+                        evaluationSite.setRiverID(riverID);
                         Log.e(LOG, "" + riverID);
                     }
                 });
             }
-        });
+        });*/
+        setAutoTextData();
 
 
     }
 
-    private int indexCat, indexRiv;
+    List<String> riverTiles = new ArrayList<>();
+
+    private void setAutoTextData() {
+        for (RiverDTO r : response.getRiverList()) {
+            riverTiles.add(r.getRiverName().trim());
+        }
+        ArrayAdapter<String> riverSpinner = new ArrayAdapter<String>(ctx, R.layout.xsimple_spinner_dropdown_item, riverTiles);
+        WT_sp_river.setAdapter(riverSpinner);
+        WT_sp_river.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                hideKeyboard();
+                indexRiv = position;
+                WT_sp_river.setText(response.getRiverList().get(indexRiv).getRiverName().trim());
+                riverID = response.getRiverList().get(indexRiv).getRiverID();
+                evaluationSite.setRiverID(riverID);
+                Log.e(LOG, "" + riverID);
+            }
+        });
+        if (indexRiv != null) {
+            riverToBeCreated = WT_sp_river.getText().toString();
+        }
+
+    }
+    private void hideKeyboard(){
+        InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+    }
+
+    private String riverToBeCreated;
+    private Integer indexCat, indexRiv;
 
     private void startGPSDialog() {
 

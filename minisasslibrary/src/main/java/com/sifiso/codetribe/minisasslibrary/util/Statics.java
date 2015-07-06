@@ -11,15 +11,15 @@ import com.sifiso.codetribe.minisasslibrary.R;
 public class Statics {
 
 
-    public static final String WEBSOCKET_URL = "ws://69.89.15.29:8080/ms2/";
-    public static final String URL = "http://69.89.15.29:8080/ms2/";
-    public static final String IMAGE_URL = "http://69.89.15.29::8080/";
+  /*public static final String WEBSOCKET_URL = "ws://69.89.15.29:8080/ms2/";
+   public static final String URL = "http://69.89.15.29:8080/ms2/";
+  public static final String IMAGE_URL = "http://69.89.15.29::8080/";*/
 
-    // public static final String WEBSOCKET_URL = "ws://10.50.75.33:8080/ms2/";
-    //public static final String URL = "http://10.50.75.33:8080/ms2/";
-    //public static final String IMAGE_URL = "http://10.50.75.33:8080/";
+    public static final String WEBSOCKET_URL = "ws://192.168.1.125:8080/ms2/";
+    public static final String URL = "http://192.168.1.125:8080/ms2/";
+    public static final String IMAGE_URL = "http://192.168.1.125:8080/";
 
-    /*public static final String WEBSOCKET_URL = "ws://http://146.64.85.51/:8080/ms2/";
+   /* public static final String WEBSOCKET_URL = "ws://http://146.64.85.51/:8080/ms2/";
     public static final String URL = "http://http://146.64.85.51/:8080/ms2/";
     public static final String IMAGE_URL = "http://http://146.64.85.51/:8080/";*/
 
