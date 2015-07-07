@@ -14,7 +14,7 @@ import java.util.List;
 public class TeamMemberDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    private Integer teamMemberID;
+    private Integer teamMemberID, evaluationCount;
     private String firstName;
     private String lastName;
     private String email;
@@ -29,6 +29,14 @@ public class TeamMemberDTO implements Serializable {
     private TeamDTO team;
 
     public TeamMemberDTO() {
+    }
+
+    public Integer getEvaluationCount() {
+        return evaluationCount;
+    }
+
+    public void setEvaluationCount(Integer evaluationCount) {
+        this.evaluationCount = evaluationCount;
     }
 
     public TeamDTO getTeam() {

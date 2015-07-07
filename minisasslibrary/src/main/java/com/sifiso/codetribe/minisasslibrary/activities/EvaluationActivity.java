@@ -1143,6 +1143,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        response = new ResponseDTO();
                         response = respond;
                         buildUI();
 
@@ -1216,6 +1217,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
 
                     @Override
                     public void onDataCached(ResponseDTO r) {
+                        response = new ResponseDTO();
                         response = r;
                         Log.d(LOG, new Gson().toJson(r));
                         buildUI();
@@ -1372,7 +1374,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
         }
     }
 
-    static final int ACCURACY_LIMIT = 50;
+    static final int ACCURACY_LIMIT = 20;
 
     @Override
     public void onConnected(Bundle bundle) {
@@ -1441,6 +1443,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        response = new ResponseDTO();
                         response = respond;
                         buildUI();
 

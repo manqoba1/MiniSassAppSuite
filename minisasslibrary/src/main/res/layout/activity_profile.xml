@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/TOP_PL">
+
+    <TextView
+        android:id="@+id/P_TNAME"
+        style="@style/Title2TextStyleBlack"
+        android:text="Team Name"
+        android:textColor="@color/Black"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@color/Beige"
+        android:gravity="center"/>
+
+    <RelativeLayout
+        android:layout_below="@+id/P_TNAME"
+        android:background="@color/white"
+        android:id="@+id/P_LAY"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:layout_width="200dp"
+            android:layout_height="150dp"
+            android:id="@+id/AP_PP"
+            android:src="@drawable/boy"
+            android:background="@color/grey"
+            android:layout_alignEnd="@+id/P_CE" />
+
+
+        <ImageView
+            android:id="@+id/P_ICON"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/dot_green"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_alignEnd="@+id/P_add_member" />
+
+        <TextView
+            android:paddingLeft="5dp"
+            android:text="Name and Surname"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/P_name"
+            android:layout_below="@+id/P_ICON"
+            android:layout_toEndOf="@+id/P_CE" />
+
+        <TextView
+            android:paddingLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:id="@+id/P_phone"
+            android:text="Phone number"
+            android:layout_below="@+id/P_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/P_CE"/>
+
+        <TextView
+            android:paddingLeft="5dp"
+            android:id="@+id/P_email"
+            android:layout_marginTop="5dp"
+            android:layout_below="@+id/P_phone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Email"
+            android:layout_toEndOf="@+id/P_CE"/>
+
+        <TextView
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="10dp"
+            android:layout_below="@+id/AP_PP"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:text="Completed Evaluations: "
+            android:id="@+id/P_CE" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/BlueCircle"
+            android:id="@+id/P_EVN_count"
+            android:visibility="visible"
+            android:text="00"
+            android:layout_above="@+id/P_add_member"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/AP_PP"
+            android:layout_alignStart="@+id/P_ICON" />
+
+        <Button
+            android:layout_margin="5dp"
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:text="Add team member"
+            android:layout_below="@+id/P_CE"
+            android:id="@+id/P_add_member" />
+
+        <ImageView
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:id="@+id/P_edit"
+            android:src="@android:drawable/ic_menu_edit"
+            android:layout_above="@+id/P_name"
+            android:layout_toEndOf="@+id/AP_PP" />
+
+    </RelativeLayout>
+
+
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/P_membersList"
+        android:layout_below="@+id/P_LAY"
+        android:layout_alignParentEnd="true" />
+
+
+</RelativeLayout>

@@ -102,6 +102,10 @@
             android:name=".activities.ViewMoreImages"
             android:label="@string/title_activity_view_more_images" >
         </activity>
+        <activity
+            android:name=".activities.ProfileActivity"
+            android:label="@string/title_activity_view_more_images" >
+        </activity>
     </application>
 
 </manifest>

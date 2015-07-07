@@ -80,4 +80,5 @@
     <dimen name="circle_size_small">42dp</dimen>
     <dimen name="red_circle_size">64dp</dimen>
     <dimen name="map_image_hight">50dp</dimen>
+    <dimen name="icon_size">34dp</dimen>
 </resources>

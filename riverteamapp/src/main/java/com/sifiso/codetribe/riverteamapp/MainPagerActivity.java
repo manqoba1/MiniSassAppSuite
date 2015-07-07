@@ -33,6 +33,7 @@ import com.google.android.gms.location.LocationServices;
 import com.sifiso.codetribe.minisasslibrary.R;
 import com.sifiso.codetribe.minisasslibrary.activities.EvaluationActivity;
 import com.sifiso.codetribe.minisasslibrary.activities.MapsActivity;
+import com.sifiso.codetribe.minisasslibrary.activities.ProfileActivity;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationSiteDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverPartDTO;
@@ -316,9 +317,9 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
 
         //noinspection SimplifiableIfStatement
         switch (id) {
-            case R.id.add_member:
-            /*Intent intent = new Intent(MainPagerActivity.this, TeamMemberActivity.class);
-            startActivity(intent);*/
+            case R.id.profile:
+                Intent pro = new Intent(MainPagerActivity.this, ProfileActivity.class);
+                startActivity(pro);
                 return true;
             case R.id.log_out:
                 SharedUtil.clearTeam(ctx);
