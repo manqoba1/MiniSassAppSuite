@@ -481,9 +481,10 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
 
     }
 
-    List<String> riverTiles = new ArrayList<>();
+    List<String> riverTiles;
 
     private void setAutoTextData() {
+        riverTiles = new ArrayList<>();
         for (RiverDTO r : response.getRiverList()) {
             riverTiles.add(r.getRiverName().trim());
         }
@@ -505,9 +506,11 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
         }
 
     }
-    private void hideKeyboard(){
-        InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
-        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+    void hideKeyboard() {
+        InputMethodManager imm = (InputMethodManager) ctx
+                .getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(WT_sp_river.getWindowToken(), 0);
+        //imm.hideSoftInputFromWindow(WT_sp_river.getWindowToken(), 0);
     }
 
     private String riverToBeCreated;
@@ -572,12 +575,9 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
 
     private void startSelectionDialog() {
 
-
+        insectImageList = new ArrayList<InsectImageDTO>();
         for (InsectDTO i : response.getInsectList()) {
 
-            if (insectImageList == null) {
-                insectImageList = new ArrayList<InsectImageDTO>();
-            }
             for (InsectImageDTO ii : i.getInsectimageDTOList()) {
                 insectImageList.add(ii);
             }
@@ -592,7 +592,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
                     Log.d(LOG, "Insect Select " + insectImageList.size());
                     Intent intent = new Intent(EvaluationActivity.this, InsectPicker.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    intent.putExtra("insetImageList", (java.io.Serializable) insectImageList);
+                    intent.putExtra("insetImageList", (java.io.Serializable) response.getInsectimageDTOList());
                     startActivityForResult(intent, INSECT_DATA);
                 }
             }

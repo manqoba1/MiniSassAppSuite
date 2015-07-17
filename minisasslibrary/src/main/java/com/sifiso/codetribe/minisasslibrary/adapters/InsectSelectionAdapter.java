@@ -70,7 +70,7 @@ public class InsectSelectionAdapter extends RecyclerView.Adapter<InsectSelection
         final InsectImageDTO insect = mList.get(position);
 
         int rID = mContext.getResources().getIdentifier(insect.getUri(), "drawable", mContext.getPackageName());
-
+        Log.d("TAG",new Gson().toJson(insect));
         h.INSC_image.setImageResource(rID);
         h.INSC_image.setOnLongClickListener(new View.OnLongClickListener() {
             @Override

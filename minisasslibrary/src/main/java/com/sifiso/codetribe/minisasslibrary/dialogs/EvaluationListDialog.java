@@ -98,12 +98,17 @@ public class EvaluationListDialog extends DialogFragment {
         if (evaluationList == null) evaluationList = new ArrayList<>();
         adapter = new EvaluationAdapter(ctx, evaluationList, new EvaluationAdapter.EvaluationAdapterListener() {
             @Override
-            public void onMapSiteRequest(List<EvaluationSiteDTO> siteList) {
+            public void onEvaluationContribute(EvaluationDTO evaluation) {
 
             }
 
             @Override
-            public void onEvaluationRequest(List<EvaluationSiteDTO> siteList) {
+            public void onDirectionToSite(EvaluationSiteDTO evaluationSite) {
+
+            }
+
+            @Override
+            public void onEvaluationEdit(EvaluationDTO evaluation) {
 
             }
 

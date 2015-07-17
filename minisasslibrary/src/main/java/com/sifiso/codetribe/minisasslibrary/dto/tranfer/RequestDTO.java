@@ -17,8 +17,10 @@ import com.sifiso.codetribe.minisasslibrary.dto.InsectImageDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.ProvinceDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverTownDTO;
+import com.sifiso.codetribe.minisasslibrary.dto.StreamDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.TeamDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.TeamMemberDTO;
+import com.sifiso.codetribe.minisasslibrary.dto.TmemberDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.TownDTO;
 
 import java.io.Serializable;
@@ -31,21 +33,20 @@ import java.util.List;
 public class RequestDTO implements Serializable {
 
     public static final int REGISTER_TEAM = 1,
-            GENERATE_TEAM = 100,
-            GENERATE_RIVER = 101,
-            REGISTER_TEAM_MEMBER = 2,
             SIGN_IN_MEMBER = 3,
-            IMPORT_MEMBERS = 4;
+            REGISTER_TEAM_MEMBER = 2,
+            DECLINE_MEMBER = 12;
+
 
     public static final int ADD_RIVER = 10,
-            ADD_RIVER_TOWN = 11,
-            ADD_EVALUATION_SITE = 12,
             ADD_INSECT = 13,
             ADD_INSECT_IMAGE = 14,
             ADD_EVALUATION = 15,
             ADD_COMMENT = 16,
             ADD_EVALUATION_INSECT = 17,
-            ADD_ORGANISATION_TYPE = 18;
+            ADD_TEAM = 18,
+            ADD_STREAM= 19;
+
 
     public static final int ADD_COUNTRY = 21,
             ADD_PROVINCE = 22,
@@ -54,13 +55,13 @@ public class RequestDTO implements Serializable {
     public static final int UPDATE_RIVER = 30,
             UPDATE_RIVER_TOWN = 31,
             UPDATE_EVALUATION_SITE = 32,
-            UPDATE_INSECT = 33,
+            UPDATE_PROFILE = 33,
             UPDATE_INSECT_IMAGE = 34,
             UPDATE_TOWN = 35,
             UPDATE_TEAM = 36,
             UPDATE_TEAM_MEMBER = 37,
             UPDATE_COMMENT = 38,
-            UPDATE_CATEGORY = 39,
+            UPDATE_EVALUATION = 39,
             UPDATE_CONDITIONS = 55,
             UPDATE_EVALUATION_IMAGE = 56;
 
@@ -85,8 +86,8 @@ public class RequestDTO implements Serializable {
             LIST_EVALUATIONS = 70,
             LIST_RIVERS = 71,
             GET_DATA = 72,
-            LIST_ALL_RIVER_TOWNS=73,
-            LIST_DATA_WITH_RADIUS_RIVERS=75,
+            LIST_ALL_RIVER_TOWNS = 73,
+            LIST_DATA_WITH_RADIUS_RIVERS = 75,
             LIST_EVALUATION_SITE_WITH_RADIUS = 76,
             LIST_OF_INSECTS_IMAGES = 77,
             LIST_EVALUATION_BY_RIVER_ID = 78,
@@ -101,32 +102,55 @@ public class RequestDTO implements Serializable {
     public static final String TEAM_MEMBER_DIR = "teamMember";
     private int requestType, radius;
     private String email, password;
-    private String countryCode;
+    private String countryCode, teamMemberImage;
     private Integer countryID, categoryID, commentID, conditionsID, evaluationID, evaluationInsectID,
             evaluationCommentID, evaluationSiteID, insectID, provinceID, riverID, teamID, townID, teamMemberID,
             evaluationImageID;
     private Double latitude, longitude;
     private Float accuracy;
-    private EvaluationDTO evaluation;
     private ImagesDTO images;
-    private CategoryDTO category;
-    private ConditionsDTO conditions;
     private ErrorStoreAndroidDTO errorStoreAndroid;
     private ErrorStoreDTO errorStore;
+    private GcmDeviceDTO gcmDevice;
+    private EvaluationDTO evaluation;
+    private CategoryDTO category;
+    private ConditionsDTO conditions;
     private EvaluationImageDTO evaluationImage;
     private EvaluationInsectDTO evaluationInsect;
-    private GcmDeviceDTO gcmDevice;
     private TeamDTO team;
     private TeamMemberDTO teamMember;
     private RiverDTO river;
-    private RiverTownDTO riverTown;
     private EvaluationSiteDTO evaluationSite;
     private CommentDTO comment;
+    private CountryDTO country;
     private InsectDTO insect;
     private InsectImageDTO insectImage;
-    private CountryDTO country;
-    private TownDTO town;
-    private ProvinceDTO province;
+    private StreamDTO stream;
+    private TmemberDTO tmember;
+
+    public StreamDTO getStream() {
+        return stream;
+    }
+
+    public void setStream(StreamDTO stream) {
+        this.stream = stream;
+    }
+
+    public TmemberDTO getTmember() {
+        return tmember;
+    }
+
+    public void setTmember(TmemberDTO tmember) {
+        this.tmember = tmember;
+    }
+
+    public String getTeamMemberImage() {
+        return teamMemberImage;
+    }
+
+    public void setTeamMemberImage(String teamMemberImage) {
+        this.teamMemberImage = teamMemberImage;
+    }
 
     public int getRadius() {
         return radius;
@@ -276,28 +300,12 @@ public class RequestDTO implements Serializable {
         this.teamID = teamID;
     }
 
-    public TownDTO getTown() {
-        return town;
-    }
-
-    public void setTown(TownDTO town) {
-        this.town = town;
-    }
-
     public Integer getCountryID() {
         return countryID;
     }
 
     public void setCountryID(Integer countryID) {
         this.countryID = countryID;
-    }
-
-    public ProvinceDTO getProvince() {
-        return province;
-    }
-
-    public void setProvince(ProvinceDTO province) {
-        this.province = province;
     }
 
     public int getRequestType() {
@@ -378,14 +386,6 @@ public class RequestDTO implements Serializable {
 
     public void setRiver(RiverDTO river) {
         this.river = river;
-    }
-
-    public RiverTownDTO getRiverTown() {
-        return riverTown;
-    }
-
-    public void setRiverTown(RiverTownDTO riverTown) {
-        this.riverTown = riverTown;
     }
 
     public EvaluationSiteDTO getEvaluationSite() {

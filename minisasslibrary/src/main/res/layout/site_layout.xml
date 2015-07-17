@@ -11,6 +11,7 @@
         android:layout_height="wrap_content"
         android:hint="What is the current river are you at?"
         android:padding="10dp"
+        android:maxLines="1"
         android:textColor="@color/teal"
         android:textColorHint="@color/teal" />
 

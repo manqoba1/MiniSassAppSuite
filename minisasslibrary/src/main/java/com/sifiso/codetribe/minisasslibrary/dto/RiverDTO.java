@@ -24,8 +24,17 @@ public class RiverDTO implements Serializable, Comparable<RiverDTO> {
     private float distanceFromMe;
     private List<EvaluationSiteDTO> evaluationsiteList = new ArrayList<>();
     private List<RiverPartDTO> riverpartList =new ArrayList<>();
+    private List<StreamDTO> streamList = new ArrayList<>();
 
     public RiverDTO() {
+    }
+
+    public List<StreamDTO> getStreamList() {
+        return streamList;
+    }
+
+    public void setStreamList(List<StreamDTO> streamList) {
+        this.streamList = streamList;
     }
 
     public Integer getRiverID() {

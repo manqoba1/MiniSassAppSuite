@@ -3,8 +3,12 @@ package com.sifiso.codetribe.minisasslibrary.fragments;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
+import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,15 +19,23 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
+import com.android.volley.VolleyError;
 import com.sifiso.codetribe.minisasslibrary.R;
 import com.sifiso.codetribe.minisasslibrary.activities.InsectBrowser;
 import com.sifiso.codetribe.minisasslibrary.adapters.EvaluationAdapter;
+import com.sifiso.codetribe.minisasslibrary.dialogs.EditEvaluationDialog;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationInsectDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationSiteDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.InsectDTO;
+import com.sifiso.codetribe.minisasslibrary.dto.tranfer.RequestDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ResponseDTO;
 import com.sifiso.codetribe.minisasslibrary.services.CreateEvaluationListener;
+import com.sifiso.codetribe.minisasslibrary.toolbox.BaseVolley;
+import com.sifiso.codetribe.minisasslibrary.util.ErrorUtil;
+import com.sifiso.codetribe.minisasslibrary.util.GPSTracker;
+import com.sifiso.codetribe.minisasslibrary.util.Statics;
+import com.sifiso.codetribe.minisasslibrary.util.ToastUtil;
 import com.sifiso.codetribe.minisasslibrary.util.Util;
 
 import java.util.ArrayList;
@@ -44,7 +56,7 @@ public class EvaluationListFragment extends Fragment implements PageFragment {
     private ListView FEL_list;
     private ImageView SLT_imgSearch2, SLT_hero;
     private EditText SLT_editSearch;
-
+    private EditEvaluationDialog editEvaluationDialog;
 
     public EvaluationListFragment() {
         // Required empty public constructor
@@ -76,6 +88,7 @@ public class EvaluationListFragment extends Fragment implements PageFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // getActivity().setTheme(R.style.EvalListTheme);
+
     }
 
     View v;
@@ -96,6 +109,7 @@ public class EvaluationListFragment extends Fragment implements PageFragment {
         //  getActivity().setTheme(R.style.EvalListTheme);
         ctx = getActivity().getApplicationContext();
         activity = getActivity();
+        GPSTracker tracker = new GPSTracker(ctx);
         if (b != null) {
             evaluationSiteList = (List<EvaluationSiteDTO>) b.getSerializable("evaluationSite");
             response = (ResponseDTO) b.getSerializable("response");
@@ -109,6 +123,7 @@ public class EvaluationListFragment extends Fragment implements PageFragment {
                 }
             }
             getActivity().setTitle(evaluationSiteList.get(0).getRiverName() + " Evaluation");
+
 
         }
         build();
@@ -136,13 +151,31 @@ public class EvaluationListFragment extends Fragment implements PageFragment {
         // FEL_list.addFooterView(v);
         adapter = new EvaluationAdapter(ctx, evaluationList, new EvaluationAdapter.EvaluationAdapterListener() {
             @Override
-            public void onMapSiteRequest(List<EvaluationSiteDTO> siteList) {
-
+            public void onEvaluationContribute(EvaluationDTO evaluation) {
+                ToastUtil.toast(ctx, "Contributing still under construction");
             }
 
             @Override
-            public void onEvaluationRequest(List<EvaluationSiteDTO> siteList) {
+            public void onDirectionToSite(EvaluationSiteDTO evaluationSite) {
+                mListener.onDirection(evaluationSite.getLatitude(), evaluationSite.getLongitude());
+                // startDirectionsMap(evaluationSite.getLatitude(), evaluationSite.getLongitude());
+            }
 
+            @Override
+            public void onEvaluationEdit(EvaluationDTO evaluation) {
+                editEvaluationDialog = new EditEvaluationDialog();
+                editEvaluationDialog.show(getFragmentManager(), "Edit Evaluation");
+                editEvaluationDialog.setEvaluation(evaluation);
+                editEvaluationDialog.setListener(new EditEvaluationDialog.EditEvaluationDialogListener() {
+                    @Override
+                    public void onSaveUpdate(EvaluationDTO evaluation) {
+                        if (evaluation.getEvaluationID() == null) {
+                            ToastUtil.errorToast(ctx, "Evaluation can not be edited");
+                            return;
+                        }
+                        editEvaluation(evaluation);
+                    }
+                });
             }
 
             @Override
@@ -164,6 +197,35 @@ public class EvaluationListFragment extends Fragment implements PageFragment {
         FEL_list.setAdapter(adapter);
     }
 
+    static String LOG = EvaluationListFragment.class.getSimpleName();
+
+
+    private void editEvaluation(EvaluationDTO dto) {
+        RequestDTO w = new RequestDTO();
+        w.setRequestType(RequestDTO.UPDATE_EVALUATION);
+        w.setEvaluation(dto);
+
+        BaseVolley.getRemoteData(Statics.SERVLET_TEST, w, ctx, new BaseVolley.BohaVolleyListener() {
+            @Override
+            public void onResponseReceived(ResponseDTO r) {
+                if (!ErrorUtil.checkServerError(ctx, r)) {
+                    return;
+                }
+                for (int i = 0; i < evaluationList.size(); i++) {
+                    if (evaluationList.get(i).getEvaluationID() == r.getEvaluation().getEvaluationID()) {
+                        evaluationList.set(i, r.getEvaluation());
+                    }
+                }
+
+                setList();
+            }
+
+            @Override
+            public void onVolleyError(VolleyError error) {
+
+            }
+        });
+    }
 
     @Override
     public void onAttach(Activity activity) {
@@ -193,7 +255,7 @@ public class EvaluationListFragment extends Fragment implements PageFragment {
      * fragment to allow an interaction in this fragment to be communicated
      * to the activity and potentially other fragments contained in that
      * activity.
-     * <p>
+     * <p/>
      * See the Android Training lesson <a href=
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.

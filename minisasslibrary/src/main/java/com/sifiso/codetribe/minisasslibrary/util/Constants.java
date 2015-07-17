@@ -32,5 +32,8 @@ public interface Constants {
     public static final int CHOCOLATE_CRAB = 4;
     public static final int RED_CRAB = 5;
 
+    static final String IMAGE_URI = "imageUri";
+    static final String THUMB_URI = "thumbUri";
+
 
 }

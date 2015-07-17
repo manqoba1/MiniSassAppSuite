@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/TOP_PL"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/P_TNAME"
+        style="@style/Title2TextStyleBlack"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/Beige"
+        android:gravity="center"
+
+        android:text="Team Name"
+        android:textColor="@color/Black" />
+
+    <RelativeLayout
+        android:id="@+id/P_LAY"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/P_TNAME"
+        android:background="@color/white">
+
+        <ImageView
+            android:id="@+id/AP_PP"
+            android:layout_width="@dimen/pp_image_width"
+            android:layout_height="@dimen/pp_image_height"
+            android:layout_alignEnd="@+id/P_CE"
+            android:layout_margin="4dp"
+            android:background="@color/grey"
+            android:scaleType="fitXY"
+            android:src="@drawable/boy" />
+
+
+        <ImageView
+            android:id="@+id/P_ICON"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@+id/add_layout"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:src="@drawable/dot_green" />
+
+        <TextView
+            android:id="@+id/P_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/P_ICON"
+            android:layout_marginTop="10dp"
+            android:layout_toEndOf="@+id/P_CE"
+            android:paddingLeft="5dp"
+            android:text="Name and Surname" />
+
+        <TextView
+            android:id="@+id/P_phone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/P_name"
+            android:layout_marginTop="5dp"
+            android:layout_toEndOf="@+id/P_CE"
+            android:paddingLeft="5dp"
+            android:text="Phone number" />
+
+        <TextView
+            android:id="@+id/P_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/P_phone"
+            android:layout_marginTop="5dp"
+            android:layout_toEndOf="@+id/P_CE"
+            android:paddingLeft="5dp"
+            android:text="Email" />
+
+        <TextView
+            android:id="@+id/P_CE"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_below="@+id/AP_PP"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="10dp"
+            android:text="Completed Evaluations: " />
+
+        <TextView
+            android:id="@+id/P_EVN_count"
+            style="@style/BlueCircle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/add_layout"
+            android:layout_alignParentEnd="true"
+            android:layout_alignStart="@+id/P_ICON"
+            android:layout_below="@+id/AP_PP"
+            android:text="00"
+            android:visibility="visible" />
+
+
+        <LinearLayout
+            android:id="@+id/add_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/P_CE"
+            android:orientation="horizontal"
+            android:padding="5dp"
+            android:weightSum="2">
+
+
+            <Button
+                android:id="@+id/P_add_member"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+
+                android:text="Add team member" />
+
+            <Button
+                android:id="@+id/P_import"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Invite member" />
+        </LinearLayout>
+
+        <Spinner
+            android:id="@+id/P_sp_team"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_below="@+id/add_layout" />
+
+        <ImageView
+            android:id="@+id/P_edit"
+            android:layout_width="@dimen/icon_edit"
+            android:layout_height="@dimen/icon_edit"
+            android:layout_above="@+id/P_name"
+
+            android:layout_marginLeft="10dp"
+            android:layout_toEndOf="@+id/AP_PP"
+            android:src="@android:drawable/ic_menu_edit" />
+
+        <TextView
+            android:id="@+id/textView7"
+            style="@style/TextStyleBlueSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/AP_PP"
+            android:layout_alignEnd="@+id/AP_PP"
+            android:layout_alignParentStart="true"
+            android:autoLink="all"
+            android:gravity="center"
+            android:text="edit profile picture"
+
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="100dp"
+            android:layout_height="48dp"
+            android:layout_alignStart="@+id/P_EVN_count"
+            android:layout_below="@+id/add_layout"
+            android:paddingRight="8dp"
+            android:src="@drawable/ic_action_add_person" />
+
+    </RelativeLayout>
+
+
+    <ListView
+        android:id="@+id/P_membersList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/P_LAY" />
+
+
+</RelativeLayout>

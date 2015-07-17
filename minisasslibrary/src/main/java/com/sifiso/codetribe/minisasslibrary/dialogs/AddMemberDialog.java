@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,6 +46,7 @@ public class AddMemberDialog extends DialogFragment {
         Log.w(LOG, "###### onCreateView");
 
         v = inflater.inflate(R.layout.add_member_layout, container, false);
+
         ctx = getActivity().getApplicationContext();
         //activity = this;
         setFields();
@@ -63,6 +65,17 @@ public class AddMemberDialog extends DialogFragment {
         cbMoreMember.setVisibility(View.GONE);
         rsRegister = (Button) v.findViewById(R.id.btnReg);
         rsRegister.setText("Join team " + teamMember.getTeam().getTeamName());
+        getDialog().setTitle("Add Member");
+        if(isFlag()){
+            rsMemberName.setText(teamMember.getFirstName());
+            rsMemberSurname.setText(teamMember.getLastName());
+            rsCellphone.setText(teamMember.getCellphone());
+            rsMemberEmail.setText(teamMember.getEmail());
+            rsMemberEmail.setEnabled(false);
+            rsPin.setText(teamMember.getPin());
+            rsRegister.setText("Submit");
+            getDialog().setTitle("Edit member profile");
+        }
         rsRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -90,11 +103,24 @@ public class AddMemberDialog extends DialogFragment {
                 member.setLastName(rsMemberSurname.getText().toString());
                 member.setPin(rsPin.getText().toString());
                 member.setTeamID(teamMember.getTeam().getTeamID());
-                member.setTeamMemberID(teamMember.getTeamMemberID());
+                member.setTeamMemberImage(teamMember.getTeamMemberImage());
+                if (isFlag()) {
+                    member.setTeamMemberID(teamMember.getTeamMemberID());
+                }
                 listener.membersToBeRegistered(member);
                 dismiss();
             }
         });
+    }
+
+    boolean flag;
+
+    public boolean isFlag() {
+        return flag;
+    }
+
+    public void setFlag(boolean flag) {
+        this.flag = flag;
     }
 
     public void setTeamMember(TeamMemberDTO teamMember) {

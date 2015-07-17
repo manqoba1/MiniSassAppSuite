@@ -7,6 +7,7 @@ import android.content.IntentSender;
 import android.content.ServiceConnection;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
@@ -318,7 +319,7 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
         //noinspection SimplifiableIfStatement
         switch (id) {
             case R.id.profile:
-                Intent pro = new Intent(MainPagerActivity.this, ProfileActivity.class);
+                Intent pro = new Intent(MainPagerActivity.this, Profile.class);
                 startActivity(pro);
                 return true;
             case R.id.log_out:
@@ -327,6 +328,8 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
                 startActivity(intent);
                 finish();
                 return true;
+
+
         }
        /* switch (id) {
             case R.id.add_member:
@@ -350,6 +353,8 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
 
     @Override
     protected void onResume() {
+        overridePendingTransition(com.sifiso.codetribe.minisasslibrary.R.anim.slide_out_left, com.sifiso.codetribe.minisasslibrary.R.anim.slide_in_right);
+
         super.onResume();
     }
 
@@ -381,26 +386,6 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
         //  evaluationListFragment.setEvaluation(siteList);
     }
 
-    @Override
-    public void onRefreshTown(List<RiverTownDTO> riverTownList, int index) {
-        if (riverTownList.size() == 0) {
-            return;
-        }
-        if (pageFragmentList.size() > 1) {
-            pageFragmentList.remove(pageFragmentList.size() - 1);
-            adapter.notifyDataSetChanged();
-        }
-        townListFragment = new TownListFragment();
-        Bundle b = new Bundle();
-        b.putSerializable("riverTown", (java.io.Serializable) riverTownList);
-        b.putSerializable("response", response);
-        currentView = 1;
-        townListFragment.setArguments(b);
-        pageFragmentList.add(townListFragment);
-        initializeAdapter();
-        adapter.notifyDataSetChanged();
-        mPager.setCurrentItem(currentView);
-    }
 
     @Override
     public void onRefreshMap(RiverDTO river, int result) {
@@ -412,7 +397,7 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
 
 
     @Override
-    public void onCreateEvaluationRL(RiverDTO river) {
+    public void onCreateEvaluation(RiverDTO river) {
         // ToastUtil.toast(ctx, river.getRiverName());
         Intent createEva = new Intent(MainPagerActivity.this, EvaluationActivity.class);
         createEva.putExtra("riverCreate", river);
@@ -421,16 +406,24 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
         startActivityForResult(createEva, CREATE_EVALUATION);
     }
 
+    @Override
+    public void onDirection(Double latitude, Double longitude) {
+        startDirectionsMap(latitude, longitude);
+    }
+
+    private void startDirectionsMap(double lat, double lng) {
+        Log.i(LOG, "startDirectionsMap ..........");
+        String url = "http://maps.google.com/maps?saddr="
+                + location.getLatitude() + "," + location.getLongitude()
+                + "&daddr=" + lat + "," + lng + "&mode=driving";
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
+        startActivity(intent);
+    }
+
     static final int CREATE_EVALUATION = 108;
     static final int RIVER_VIEW = 13;
     private int currentView;
-
-    @Override
-    public void onCreateEvaluation(ResponseDTO response) {
-        Intent intent = new Intent(MainPagerActivity.this, EvaluationActivity.class);
-        intent.putExtra("statusCode", CREATE_EVALUATION);
-        startActivity(intent);
-    }
 
 
     boolean mRequestingLocationUpdates;
@@ -575,48 +568,6 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
         }
     }
 
-    private void getLocalData() {
-        final WebCheckResult w = WebCheck.checkNetworkAvailability(ctx);
-        CacheUtil.getCachedData(ctx, CacheUtil.CACHE_DATA, new CacheUtil.CacheUtilListener() {
-            @Override
-            public void onFileDataDeserialized(final ResponseDTO respond) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        response = respond;
-                        if (response != null) {
-                            //calculateDistancesForSite();
-                            buildPages();
-                        }
-                        if (w.isWifiConnected() || w.isMobileConnected()) {
-                            getData();
-                        }
-                    }
-                });
-
-
-            }
-
-            @Override
-            public void onDataCached(ResponseDTO r) {
-
-            }
-
-            @Override
-            public void onError() {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (w.isWifiConnected() || w.isMobileConnected()) {
-                            //  getRiversAroundMe();
-                        }
-                    }
-                });
-
-            }
-        });
-
-    }
 
     boolean isBusy;
 
@@ -643,6 +594,7 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
                     @Override
                     public void run() {
                         //Log.d(LOG, new Gson().toJson(respond.getRiverList().get(0)));
+
                         response = respond;
                         if (response != null) {
 
@@ -794,66 +746,6 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
 
     }
 
-   /* public void getData() {
-
-        RequestDTO w = new RequestDTO();
-        w.setRequestType(RequestDTO.GET_DATA);
-
-        try {
-
-            WebSocketUtil.sendRequest(ctx, Statics.MINI_SASS_ENDPOINT, w, new WebSocketUtil.WebSocketListener() {
-                @Override
-                public void onMessage(final ResponseDTO r) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Log.e(LOG, "## getStarterData responded...statusCode: " + r.getStatusCode());
-                            if (!ErrorUtil.checkServerError(ctx, r)) {
-                                return;
-                            }
-                            response = r;
-                            CacheUtil.cacheData(ctx, r, CacheUtil.CACHE_DATA, new CacheUtil.CacheUtilListener() {
-                                @Override
-                                public void onFileDataDeserialized(final ResponseDTO resp) {
-
-                                }
-
-                                @Override
-                                public void onDataCached(ResponseDTO r) {
-                                    Intent intent = new Intent(getApplicationContext(), RequestSyncService.class);
-                                    startService(intent);
-                                    // getData();
-                                    buildPages();
-                                }
-
-                                @Override
-                                public void onError() {
-
-                                }
-                            });
-                            Intent intent = new Intent(getApplicationContext(), RequestSyncService.class);
-                            startService(intent);
-                        }
-                    });
-
-
-                }
-
-                @Override
-                public void onClose() {
-
-                }
-
-                @Override
-                public void onError(final String message) {
-
-                }
-            });
-
-        } catch (Exception e) {
-
-        }
-    }*/
 
     boolean isBack = false;
 

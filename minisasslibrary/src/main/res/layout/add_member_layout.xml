@@ -7,8 +7,9 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/fieldsLayout"
         android:background="@color/white"
+        android:padding="5dp"
         android:orientation="vertical"
-        android:padding="8dp">
+    >
 
 
         <LinearLayout
@@ -39,13 +40,17 @@
         <EditText
             android:id="@+id/edtMemberName"
             android:layout_width="match_parent"
+            android:maxLines="1"
             android:layout_height="wrap_content"
-            android:hint="First Name" />
+            android:hint="First Name" >
+
+        </EditText>
 
         <EditText
             android:id="@+id/edtMemberLastNAme"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:maxLines="1"
             android:layout_below="@+id/edtMemberName"
             android:hint="Last Name" />
 
@@ -55,12 +60,14 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/edtMemberLastNAme"
             android:hint="Email Address"
+            android:maxLines="1"
             android:inputType="textEmailAddress" />
 
         <EditText
             android:id="@+id/edtMemberPhone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:maxLines="1"
             android:layout_below="@+id/edtMemberEmail"
             android:hint="Cellphone Number"
             android:inputType="number" />
@@ -68,6 +75,7 @@
         <EditText
             android:id="@+id/edtPassword"
             android:layout_width="match_parent"
+            android:maxLines="1"
             android:layout_height="wrap_content"
             android:layout_below="@+id/edtMemberEmail"
             android:hint="Pin Code"

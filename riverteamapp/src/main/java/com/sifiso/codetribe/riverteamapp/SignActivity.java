@@ -22,19 +22,24 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.gson.Gson;
 import com.sifiso.codetribe.minisasslibrary.R;
 import com.sifiso.codetribe.minisasslibrary.activities.RiverMapActivity;
+import com.sifiso.codetribe.minisasslibrary.dialogs.AddTeamDialog;
 import com.sifiso.codetribe.minisasslibrary.dto.GcmDeviceDTO;
+import com.sifiso.codetribe.minisasslibrary.dto.TeamDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.TeamMemberDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.RequestDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ResponseDTO;
 import com.sifiso.codetribe.minisasslibrary.toolbox.WebCheck;
 import com.sifiso.codetribe.minisasslibrary.toolbox.WebCheckResult;
 import com.sifiso.codetribe.minisasslibrary.util.CacheUtil;
+import com.sifiso.codetribe.minisasslibrary.util.DataUtil;
 import com.sifiso.codetribe.minisasslibrary.util.ErrorUtil;
 import com.sifiso.codetribe.minisasslibrary.util.GCMUtil;
 import com.sifiso.codetribe.minisasslibrary.util.SharedUtil;
 import com.sifiso.codetribe.minisasslibrary.util.Statics;
+import com.sifiso.codetribe.minisasslibrary.util.ToastUtil;
 import com.sifiso.codetribe.minisasslibrary.util.WebSocketUtil;
 
 import java.util.ArrayList;
@@ -84,6 +89,8 @@ public class SignActivity extends ActionBarActivity {
             return true;
         }
         if (id == android.R.id.home) {
+            Intent intent = new Intent(SignActivity.this, Welcome.class);
+            startActivity(intent);
             finish();
         }
         return super.onOptionsItemSelected(item);
@@ -101,7 +108,7 @@ public class SignActivity extends ActionBarActivity {
         bsSignin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                 sendSignIn();
+                sendSignIn();
               /*  Intent intentEva = new Intent(SignActivity.this, EvaluationView.class);
                 startActivity(intentEva);
                 finish();*/
@@ -181,6 +188,7 @@ public class SignActivity extends ActionBarActivity {
         return true;
     }
 
+    AddTeamDialog addTeamDialog;
 
     public void sendSignIn() {
 
@@ -198,25 +206,54 @@ public class SignActivity extends ActionBarActivity {
         w.setEmail(esEmail.getText().toString());
         w.setPassword(esPin.getText().toString());
         //w.setGcmDevice(gcmDevice);
+        Log.d(LOG, new Gson().toJson(w));
         WebSocketUtil.sendRequest(ctx, Statics.MINI_SASS_ENDPOINT, w, new WebSocketUtil.WebSocketListener() {
             @Override
             public void onMessage(final ResponseDTO resp) {
 
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                       // Log.d(LOG,resp.getTeamMember().getEmail());
-                        if (!ErrorUtil.checkServerError(ctx, resp)) {
-                            return;
+
+                // Log.d(LOG,resp.getTeamMember().getEmail());
+                if (!ErrorUtil.checkServerError(ctx, resp)) {
+                    return;
+                }
+                // Log.d(LOG,resp.getTeamMember().getEmail());
+                if (resp.getTeamMember().getTeam() == null) {
+                    addTeamDialog = new AddTeamDialog();
+                    addTeamDialog.setTeamData(resp);
+                    addTeamDialog.setListener(new AddTeamDialog.AddTeamDialogListener() {
+                        @Override
+                        public void onAddTeamToMember(TeamDTO team) {
+                            DataUtil.addTeam(team, new DataUtil.DataUtilInterface() {
+                                @Override
+                                public void onResponse(ResponseDTO r) {
+                                    if (!ErrorUtil.checkServerError(ctx, r)) {
+                                        return;
+                                    }
+                                    ToastUtil.toast(ctx, r.getMessage());
+                                    resp.getTeamMember().setTeam(r.getTeam());
+                                    SharedUtil.saveTeamMember(ctx, resp.getTeamMember());
+                                    SharedUtil.storeEmail(ctx, esEmail.getText().toString());
+                                    Intent intent = new Intent(SignActivity.this, MainPagerActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                }
+
+                                @Override
+                                public void onError(String error) {
+
+                                }
+                            });
                         }
-                       // Log.d(LOG,resp.getTeamMember().getEmail());
-                        SharedUtil.saveTeamMember(ctx, resp.getTeamMember());
-                        SharedUtil.storeEmail(ctx, esEmail.getText().toString());
-                        Intent intent = new Intent(SignActivity.this, MainPagerActivity.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                });
+                    });
+                    addTeamDialog.show(getFragmentManager(), " ");
+                    return;
+                }
+                SharedUtil.saveTeamMember(ctx, resp.getTeamMember());
+                SharedUtil.storeEmail(ctx, esEmail.getText().toString());
+                Intent intent = new Intent(SignActivity.this, MainPagerActivity.class);
+                startActivity(intent);
+                finish();
+
             }
 
             @Override

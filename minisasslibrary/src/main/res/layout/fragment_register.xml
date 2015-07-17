@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:layout_weight="1"
     android:background="@color/grey"
-    android:padding="8dp">
+    android:padding="4dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -13,7 +13,8 @@
         <LinearLayout
             android:id="@+id/fieldsLayout1"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:visibility="visible">
 
             <ImageView
                 android:id="@+id/imgTopLgo"
@@ -28,10 +29,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@+id/fieldsLayout1"
-            android:layout_marginTop="5dp"
             android:background="@color/white"
-            android:orientation="vertical"
-            android:padding="8dp">
+            android:orientation="vertical">
 
 
             <TextView
@@ -39,7 +38,7 @@
                 style="@style/TextStyleOrangeSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-
+                android:padding="5dp"
                 android:text="Organisation Info"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
@@ -47,8 +46,13 @@
                 android:id="@+id/edtRegTeamName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:marqueeRepeatLimit="1"
                 android:layout_below="@+id/imgTopLgo"
-                android:hint="Organisation Name" />
+                android:hint="Organisation Name">
+
+                <requestFocus />
+            </EditText>
 
             <Spinner
                 android:id="@+id/sp_org_type"

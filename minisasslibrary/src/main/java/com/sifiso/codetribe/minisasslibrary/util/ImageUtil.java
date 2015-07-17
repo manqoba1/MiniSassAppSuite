@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.location.Location;
 import android.net.Uri;
@@ -32,7 +33,7 @@ public class ImageUtil {
         try {
             File rootDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
             if (rootDir == null) {
-                rootDir = Environment.getRootDirectory();
+                rootDir = Environment.getDataDirectory();
             }
             File imgDir = new File(rootDir, "minisass_app");
             if (!imgDir.exists()) {
@@ -114,6 +115,39 @@ public class ImageUtil {
         return bm;
 
     }
+    public static Bitmap getResizedBitmap(Bitmap bitmap, int maxWidth,
+                                          int maxHeight) {
+        System.gc();
+        Log.d(LOGTAG, "### Original Bitmap width: " + bitmap.getWidth()
+                + " height: " + bitmap.getHeight());
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
 
+        float xRatio = (float) maxWidth / width;
+        float yRatio = (float) maxHeight / height;
+        float scaleRatio = xRatio < yRatio ? xRatio : yRatio;
+        Bitmap resizedBitmap = null;
+        try {
+            Matrix matrix = new Matrix();
+            matrix.postScale(scaleRatio, scaleRatio);
+            resizedBitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height,
+                    matrix, true);
+            Log.d(LOGTAG,
+                    "### Resized Bitmap width: " + resizedBitmap.getWidth()
+                            + " height: " + resizedBitmap.getHeight()
+                            + " rowBytes: " + resizedBitmap.getRowBytes());
+
+        } catch (OutOfMemoryError e) {
+            Log.e(LOGTAG, "$$$$$$$$$$ OUT OF MEMORY");
+            return null;
+        } catch (Exception e) {
+            Log.e(LOGTAG, "$$$$$$$$$$ GENERIC EXCEPTION");
+            return null;
+        } catch (Throwable t) {
+            Log.e(LOGTAG, "$$$$ Throwable Exception getting image: ");
+            return null;
+        }
+        return resizedBitmap;
+    }
     static final String LOGTAG = ImageUtil.class.getSimpleName();
 }

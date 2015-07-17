@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_weight="1"
-    android:padding="8dp"
+    android:padding="4dp"
     android:background="@color/grey"
     tools:context="com.sifiso.codetribe.riverteamapp.Signin"
     android:fillViewport="false"
@@ -26,6 +26,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="150dp"
                 android:alpha="1"
+
                 android:scaleType="fitXY"
                 android:src="@drawable/mini_trans" />
 
@@ -47,7 +48,7 @@
             android:layout_width="match_parent"
             android:layout_height="fill_parent"
             android:layout_alignParentBottom="true"
-            android:layout_marginTop="@dimen/padding_top_10">
+            android:layout_marginTop="5dp">
 
             <include layout="@layout/sign_in_top" />
         </RelativeLayout>

@@ -276,5 +276,39 @@ public class DataUtil {
 
     }
 
+    public static void addTeam(TeamDTO team, final DataUtilInterface listener) {
+        dataUtilInterface = listener;
 
+        RequestDTO req = new RequestDTO();
+        req.setTeam(team);
+        req.setRequestType(RequestDTO.ADD_TEAM);
+        WebSocketUtil.sendRequest(ctx, Statics.MINI_SASS_ENDPOINT, req, new WebSocketUtil.WebSocketListener() {
+            @Override
+            public void onMessage(final ResponseDTO r) {
+              listener.onResponse(r);
+
+            }
+
+            @Override
+            public void onClose() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressBar.setVisibility(View.GONE);
+                    }
+                });
+            }
+
+            @Override
+            public void onError(final String message) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressBar.setVisibility(View.GONE);
+                        Util.showErrorToast(ctx, message);
+                    }
+                });
+            }
+        });
+    }
 }

@@ -6,6 +6,8 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
+
+import android.view.ViewGroup.LayoutParams;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -35,6 +37,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListPopupWindow;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,6 +52,7 @@ import com.sifiso.codetribe.minisasslibrary.dto.EvaluationInsectDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationSiteDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.InsectDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverDTO;
+import com.sifiso.codetribe.minisasslibrary.dto.TeamMemberDTO;
 
 import org.joda.time.DateTime;
 
@@ -96,8 +100,8 @@ public class Util {
     static int maxFlashes, count;
     private static int MAX_IMAGE_DIMENSION = 720;
 
-    public static void setCustomActionBar( Context ctx,
-                                           ActionBar actionBar, String text, Drawable image) {
+    public static void setCustomActionBar(Context ctx,
+                                          ActionBar actionBar, String text, Drawable image) {
         actionBar.setDisplayShowCustomEnabled(true);
 
         LayoutInflater inflator = (LayoutInflater)
@@ -111,6 +115,7 @@ public class Util {
         actionBar.setCustomView(v);
         actionBar.setTitle("");
     }
+
     public static int getPopupWidth(Activity activity) {
         DisplayMetrics displaymetrics = new DisplayMetrics();
         activity.getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
@@ -150,8 +155,6 @@ public class Util {
         sb.append("<h2>").append(ctx.getResources().getString(R.string.enjoy)).append("</h2>");
         return sb.toString();
     }
-
-
 
 
     public static void pretendFlash(final View v, final int duration, final int max, final UtilAnimationListener listener) {
@@ -228,7 +231,6 @@ public class Util {
         customtoast.setDuration(Toast.LENGTH_SHORT);
         customtoast.show();
     }
-
     public static void showPopupWithHeroImage(Context ctx, Activity act,
                                               List<String> list,
                                               View anchorView, String caption, final UtilPopupListener listener) {
@@ -262,6 +264,53 @@ public class Util {
             }
         });
         pop.show();
+    }
+    public static void showPopupWith(Context ctx, Activity act,
+                                              List<TeamMemberDTO> list,
+                                              View anchorView, String caption, final UtilPopupListener listener) {
+        final ListPopupWindow pop = new ListPopupWindow(act);
+        LayoutInflater inf = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View v = inf.inflate(R.layout.hero_image_popup, null);
+        TextView txt = (TextView) v.findViewById(R.id.HERO_caption);
+        if (caption != null) {
+            txt.setText(caption);
+        } else {
+            txt.setVisibility(View.GONE);
+        }
+        ImageView img = (ImageView) v.findViewById(R.id.HERO_image);
+        img.setImageDrawable(getRandomHeroImage(ctx));
+
+        pop.setPromptView(v);
+        pop.setPromptPosition(ListPopupWindow.POSITION_PROMPT_ABOVE);
+
+        pop.setAdapter(new ArrayAdapter(ctx, R.layout.xxsimple_spinner_item, R.id.text1, list));
+        pop.setAnchorView(anchorView);
+        pop.setHorizontalOffset(getPopupHorizontalOffset(act));
+        pop.setModal(true);
+        pop.setWidth(getPopupWidth(act));
+        pop.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                pop.dismiss();
+                if (listener != null) {
+                    listener.onItemSelected(position);
+                }
+            }
+        });
+        pop.show();
+    }
+
+    public static void addMemberPopUp(Context ctx,
+                                      TeamMemberDTO dto,
+                                      View anchorView, String caption, final AddMemberListener listener) {
+
+        LayoutInflater inf = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        View v = inf.inflate(R.layout.add_member_layout, null);
+        final PopupWindow pop = new PopupWindow(v, LayoutParams.WRAP_CONTENT,
+                LayoutParams.WRAP_CONTENT);
+
+        pop.showAsDropDown(anchorView);
     }
 
     public static View getHeroView(Context ctx, String caption) {
@@ -540,8 +589,8 @@ public class Util {
     }
 
     public static void showPopupCategoryBasicWithHeroImage(Context ctx, Activity act,
-                                                   List<CategoryDTO> list,
-                                                   View anchorView, String caption, final UtilPopupListener listener) {
+                                                           List<CategoryDTO> list,
+                                                           View anchorView, String caption, final UtilPopupListener listener) {
         Log.d(LOG, "category size " + list.size());
         final ListPopupWindow pop = new ListPopupWindow(act);
         LayoutInflater inf = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -611,9 +660,10 @@ public class Util {
         });
         pop.show();
     }
+
     public static void showPopupInsectsSelected(Context ctx, Activity act,
-                                                   final List<EvaluationInsectDTO> list,
-                                                   View anchorView, String caption, final UtilPopupInsectListener listener) {
+                                                final List<EvaluationInsectDTO> list,
+                                                View anchorView, String caption, final UtilPopupInsectListener listener) {
         final ListPopupWindow pop = new ListPopupWindow(act);
         LayoutInflater inf = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View v = inf.inflate(R.layout.insect_popup, null);
@@ -624,7 +674,7 @@ public class Util {
             txt.setVisibility(View.GONE);
         }
         ImageView img = (ImageView) v.findViewById(R.id.HERO_image);
-         img.setImageDrawable(getRandomHeroImage(ctx));
+        img.setImageDrawable(getRandomHeroImage(ctx));
 
         pop.setPromptView(v);
 
@@ -647,9 +697,10 @@ public class Util {
         });
         pop.show();
     }
+
     public static void showPopupEvaluationSite(Context ctx, Activity act,
-                                                final List<EvaluationSiteDTO> list,
-                                                View anchorView, String caption, final PopupSiteListener listener) {
+                                               final List<EvaluationSiteDTO> list,
+                                               View anchorView, String caption, final PopupSiteListener listener) {
         final ListPopupWindow pop = new ListPopupWindow(ctx);
         LayoutInflater inf = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View v = inf.inflate(R.layout.insect_popup, null);
@@ -1531,10 +1582,16 @@ public class Util {
         public void onItemSelected(int index);
 
     }
-    public interface UtilPopupInsectListener{
+
+    public interface UtilPopupInsectListener {
         public void onInsectSelected(InsectDTO insect);
     }
-    public interface PopupSiteListener{
+
+    public interface PopupSiteListener {
         public void onEvaluationClicked(EvaluationSiteDTO evaluation);
+    }
+
+    public interface AddMemberListener {
+        public void membersToBeRegistered(TeamMemberDTO tm);
     }
 }

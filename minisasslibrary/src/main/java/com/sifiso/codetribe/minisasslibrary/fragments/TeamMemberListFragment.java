@@ -38,9 +38,10 @@ import com.sifiso.codetribe.minisasslibrary.util.WebSocketUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TeamMemberListFragment extends Fragment implements PageInterface {
+public class TeamMemberListFragment extends Fragment implements PageInterface,PageFragment{
 
 	Context ctx;
+	List<TeamMemberDTO> teamMemberList;
 	TeamDTO team;
 	BusyListener busyListener;
 	TeamMemberAddedListener teamMemberAddedListener;
@@ -76,8 +77,8 @@ public class TeamMemberListFragment extends Fragment implements PageInterface {
 		setFields();
 		Bundle b = getArguments();
 		if (b != null) {
-			team = (TeamDTO) b.getSerializable("team");
-			//setList();
+			teamMemberList = (List<TeamMemberDTO>) b.getSerializable("teamMemberList");
+			setList();
 		}
 		return view;
 	}
@@ -88,9 +89,9 @@ public class TeamMemberListFragment extends Fragment implements PageInterface {
     }
 	private void setList() {
 		adapter = new TeamMemberAdapter(ctx, R.layout.team_member_item,
-				team.getTeammemberList());
-		btnSave.setText(team.getTeamName());
-		txtCount.setText("" + team.getTeammemberList().size());
+				teamMemberList);
+		//btnSave.setText(team.getTeamName());
+		txtCount.setText("" + teamMemberList.size());
 		listView.setAdapter(adapter);
 		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -106,7 +107,7 @@ public class TeamMemberListFragment extends Fragment implements PageInterface {
 	private void setFields() {
 		imageLoader = BohaVolley.getImageLoader(ctx);
 		listView = (ListView) view.findViewById(R.id.TMM_list);
-		txtCount = (TextView) view.findViewById(R.id.TMM_txtCount);
+		txtCount = (TextView) view.findViewById(R.id.TEAM_count);
 
 		txtLabel = (TextView) view.findViewById(R.id.TMM_joinLabel);
 		btnSave = (Button) view.findViewById(R.id.TMM_btnSave);
@@ -135,7 +136,7 @@ public class TeamMemberListFragment extends Fragment implements PageInterface {
 		RequestDTO r = new RequestDTO();
 		r.setRequestType(RequestDTO.REGISTER_TEAM_MEMBER);
 		 TeamMemberDTO tm = new TeamMemberDTO();
-		tm.setTeamID(team.getTeamID());
+		//tm.setTeamID(team.getTeamID());
 		r.setTeamMember(tm);
 
 		if (!BaseVolley.checkNetworkOnDevice(ctx))
@@ -152,7 +153,7 @@ public class TeamMemberListFragment extends Fragment implements PageInterface {
 							ToastUtil.errorToast(ctx, r.getMessage());
 							return;
 						}
-						team.setTeammemberList(r.getTeamMemberList());
+						//team.setTeammemberList(r.getTeamMemberList());
 						adapter.notifyDataSetChanged();
 						Log.i(LOG,
 								"tell teamMemberAddedListener, member just added");
@@ -403,4 +404,9 @@ public class TeamMemberListFragment extends Fragment implements PageInterface {
 				}
 			});
 		}
+
+	@Override
+	public void animateCounts() {
+
 	}
+}

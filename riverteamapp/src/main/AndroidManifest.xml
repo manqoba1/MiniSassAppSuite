@@ -38,9 +38,6 @@
 
         </activity>
         <activity
-            android:name=".EvaluationView"
-            android:label="@string/title_activity_evaluation_view"></activity>
-        <activity
             android:name="com.sifiso.codetribe.minisasslibrary.activities.MapsActivity"
             android:label="@string/title_activity_minisass_maps"></activity>
         <activity
@@ -71,6 +68,9 @@
         </activity>
         <activity
             android:name=".MapsActivity"
+            android:label="@string/title_activity_maps"></activity>
+        <activity
+            android:name=".Profile"
             android:label="@string/title_activity_maps"></activity>
     </application>
 

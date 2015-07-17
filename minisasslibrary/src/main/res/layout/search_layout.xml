@@ -15,6 +15,7 @@
     <RelativeLayout
         android:id="@+id/SLT_bottomLayout"
         android:layout_width="match_parent"
+        android:visibility="gone"
         android:layout_height="wrap_content"
         android:layout_below="@+id/SLT_hero"
         android:padding="@dimen/mon_padding">

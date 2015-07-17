@@ -24,8 +24,10 @@ import com.sifiso.codetribe.minisasslibrary.dto.OrganisationtypeDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.ProvinceDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverTownDTO;
+import com.sifiso.codetribe.minisasslibrary.dto.StreamDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.TeamDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.TeamMemberDTO;
+import com.sifiso.codetribe.minisasslibrary.dto.TmemberDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.TownDTO;
 
 import java.io.Serializable;
@@ -69,6 +71,24 @@ public class ResponseDTO implements Serializable {
     private List<InsectImageListDTO> insectImageListDTOs = new ArrayList<>();
     private List<String> evaluationImageFileName;
     private List<OrganisationtypeDTO> organisationtypeList = new ArrayList<>();
+    private List<TmemberDTO> tmemberList = new ArrayList<>();
+    private List<StreamDTO> streamList = new ArrayList<>();
+
+    public List<TmemberDTO> getTmemberList() {
+        return tmemberList;
+    }
+
+    public void setTmemberList(List<TmemberDTO> tmemberList) {
+        this.tmemberList = tmemberList;
+    }
+
+    public List<StreamDTO> getStreamList() {
+        return streamList;
+    }
+
+    public void setStreamList(List<StreamDTO> streamList) {
+        this.streamList = streamList;
+    }
 
     public List<OrganisationtypeDTO> getOrganisationtypeList() {
         return organisationtypeList;

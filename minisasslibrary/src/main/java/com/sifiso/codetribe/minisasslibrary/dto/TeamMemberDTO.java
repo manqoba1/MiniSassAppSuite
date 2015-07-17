@@ -6,6 +6,7 @@
 package com.sifiso.codetribe.minisasslibrary.dto;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,8 +28,17 @@ public class TeamMemberDTO implements Serializable {
     private String teamMemberImage;
     private List<GcmDeviceDTO> gcmdeviceList;
     private TeamDTO team;
+    private List<TmemberDTO> tmemberList = new ArrayList<>();
 
     public TeamMemberDTO() {
+    }
+
+    public List<TmemberDTO> getTmemberList() {
+        return tmemberList;
+    }
+
+    public void setTmemberList(List<TmemberDTO> tmemberList) {
+        this.tmemberList = tmemberList;
     }
 
     public Integer getEvaluationCount() {

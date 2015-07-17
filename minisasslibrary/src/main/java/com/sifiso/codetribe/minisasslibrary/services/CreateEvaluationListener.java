@@ -11,13 +11,11 @@ import java.util.List;
  * Created by sifiso on 4/16/2015.
  */
 public interface CreateEvaluationListener {
-    public void onCreateEvaluation(ResponseDTO response);
-
     public void onRefreshEvaluation(List<EvaluationSiteDTO> siteList, int index);
-
-    public void onRefreshTown(List<RiverTownDTO> riverTownList, int index);
 
     public void onRefreshMap(RiverDTO river, int result);
 
-    public void onCreateEvaluationRL(RiverDTO river);
+    public void onCreateEvaluation(RiverDTO river);
+
+    public void onDirection(Double latitude, Double longitude);
 }

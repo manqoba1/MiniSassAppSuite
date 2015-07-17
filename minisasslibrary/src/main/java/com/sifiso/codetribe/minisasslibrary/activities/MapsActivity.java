@@ -3,15 +3,20 @@ package com.sifiso.codetribe.minisasslibrary.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.graphics.PorterDuff;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.android.volley.VolleyError;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationClient;
@@ -30,16 +35,25 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.sifiso.codetribe.minisasslibrary.R;
+import com.sifiso.codetribe.minisasslibrary.dialogs.EditEvaluationDialog;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationImageDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.EvaluationSiteDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverDTO;
+import com.sifiso.codetribe.minisasslibrary.dto.tranfer.RequestDTO;
+import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ResponseDTO;
+import com.sifiso.codetribe.minisasslibrary.interfaces.MarkerInfoWindowAdapterListener;
+import com.sifiso.codetribe.minisasslibrary.toolbox.BaseVolley;
 import com.sifiso.codetribe.minisasslibrary.util.Constants;
+import com.sifiso.codetribe.minisasslibrary.util.ErrorUtil;
+import com.sifiso.codetribe.minisasslibrary.util.Statics;
+import com.sifiso.codetribe.minisasslibrary.util.ToastUtil;
 import com.sifiso.codetribe.minisasslibrary.util.Util;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -52,7 +66,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
 
 
     Location location;
-    Context ctx;
+    Context mCtx;
     List<Marker> markers = new ArrayList<Marker>();
     static final String LOG = MapsActivity.class.getSimpleName();
     boolean mResolvingError;
@@ -78,8 +92,8 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        ctx = MapsActivity.this;
-
+        mCtx = MapsActivity.this;
+        mMarkersHashMap = new HashMap<Marker, EvaluationDTO>();
         evaluationImage = (EvaluationImageDTO) getIntent().getSerializableExtra("evaluationImage");
         evaluation = (EvaluationDTO) getIntent().getSerializableExtra("evaluation");
         river = (RiverDTO) getIntent().getSerializableExtra("river");
@@ -109,7 +123,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
 
         googleMap = mapFragment.getMap();
         if (googleMap == null) {
-            Util.showToast(ctx, getString(R.string.map_unavailable));
+            Util.showToast(mCtx, getString(R.string.map_unavailable));
             // finish();
             return;
         }
@@ -120,6 +134,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
         }
         setEvaluationMarkers();
         setGoogleMap();
+
     }
 
     static final int EVALUATION_VIEW = 12;
@@ -135,7 +150,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
         if (!river.getEvaluationsiteList().isEmpty()) {
             int index = 0;
             for (EvaluationSiteDTO es : river.getEvaluationsiteList()) {
-                BitmapDescriptor desc = BitmapDescriptorFactory.fromResource(R.drawable.dot_black);
+                BitmapDescriptor desc = BitmapDescriptorFactory.fromResource(R.drawable.gray_crap);
                 Integer conditionColor = null;
                 for (EvaluationDTO eva : es.getEvaluationList()) {
                     if (eva.getConditionsID() != null) {
@@ -143,7 +158,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
                         switch (eva.getConditionsID()) {
                             case Constants.UNMODIFIED_NATURAL_SAND:
 
-                                desc = BitmapDescriptorFactory.fromResource(R.drawable.purple_crap);
+                                desc = BitmapDescriptorFactory.fromResource(R.drawable.blue_crap);
                                 break;
                             case Constants.LARGELY_NATURAL_SAND:
 
@@ -151,19 +166,19 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
                                 break;
                             case Constants.MODERATELY_MODIFIED_SAND:
 
-                                desc = BitmapDescriptorFactory.fromResource(R.drawable.blue_crap);
+                                desc = BitmapDescriptorFactory.fromResource(R.drawable.orange_crap);
                                 break;
                             case Constants.LARGELY_MODIFIED_SAND:
 
-                                desc = BitmapDescriptorFactory.fromResource(R.drawable.orange_crap);
+                                desc = BitmapDescriptorFactory.fromResource(R.drawable.red_crap);
                                 break;
                             case Constants.CRITICALLY_MODIFIED_SAND:
 
-                                desc = BitmapDescriptorFactory.fromResource(R.drawable.red_crap);
+                                desc = BitmapDescriptorFactory.fromResource(R.drawable.purple_crap);
                                 break;
                             case Constants.UNMODIFIED_NATURAL_ROCK:
 
-                                desc = BitmapDescriptorFactory.fromResource(R.drawable.purple_crap);
+                                desc = BitmapDescriptorFactory.fromResource(R.drawable.blue_crap);
                                 break;
                             case Constants.LARGELY_NATURAL_ROCK:
 
@@ -171,27 +186,51 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
                                 break;
                             case Constants.MODERATELY_MODIFIED_ROCK:
 
-                                desc = BitmapDescriptorFactory.fromResource(R.drawable.blue_crap);
+                                desc = BitmapDescriptorFactory.fromResource(R.drawable.orange_crap);
                                 break;
                             case Constants.LARGELY_MODIFIED_ROCK:
 
-                                desc = BitmapDescriptorFactory.fromResource(R.drawable.orange_crap);
+                                desc = BitmapDescriptorFactory.fromResource(R.drawable.red_crap);
                                 break;
                             case Constants.CRITICALLY_MODIFIED_ROCK:
 
-                                desc = BitmapDescriptorFactory.fromResource(R.drawable.red_crap);
+                                desc = BitmapDescriptorFactory.fromResource(R.drawable.purple_crap);
                                 break;
-
                         }
 
                     }
                     index++;
-                    Log.d(LOG, "" + index+" "+eva.getEvaluationSite());
-                    final Marker m = googleMap.addMarker(new MarkerOptions().position(new LatLng(eva.getEvaluationSite().getLatitude(), eva.getEvaluationSite().getLongitude())).icon(desc)
-                            .snippet(eva.getRemarks()));
-                    m.showInfoWindow();
-
+                    Log.d(LOG, "" + index + " " + eva.getEvaluationSite());
+                    MarkerOptions markerOptions = new MarkerOptions().position(new LatLng(eva.getEvaluationSite().getLatitude(), eva.getEvaluationSite().getLongitude())).icon(desc)
+                            .snippet(eva.getRemarks());
+                    //markerOptions.
+                    final Marker m = googleMap.addMarker(markerOptions);
+                    mMarkersHashMap.put(m, eva);
                     markers.add(m);
+                    googleMap.setInfoWindowAdapter(new MarkerInfoWindowAdapter(new MarkerInfoWindowAdapterListener() {
+                        @Override
+                        public void onEditEvaluation(EvaluationDTO evaluation) {
+                            editEvaluationDialog = new EditEvaluationDialog();
+                            editEvaluationDialog.show(getSupportFragmentManager(), "Edit Evaluation");
+                            editEvaluationDialog.setEvaluation(evaluation);
+                            editEvaluationDialog.setListener(new EditEvaluationDialog.EditEvaluationDialogListener() {
+                                @Override
+                                public void onSaveUpdate(EvaluationDTO evaluation) {
+                                    if (evaluation.getEvaluationID() == null) {
+                                        ToastUtil.errorToast(mCtx, "Evaluation can not be edited");
+                                        return;
+                                    }
+                                    editEvaluation(evaluation);
+                                }
+                            });
+
+                        }
+
+                        @Override
+                        public void onDirection(EvaluationDTO evaluation) {
+                            startDirectionsMap(evaluation.getEvaluationSite().getLatitude(), evaluation.getEvaluationSite().getLongitude());
+                        }
+                    }));
                 }
 
             }
@@ -206,6 +245,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
 
                     LatLngBounds bounds = builder.build();
                     int padding = 10; // offset from edges of the map in pixels
+
                     CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
                     //   txtCount.setText("" + markers.size());
                     //googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point, 1.0f));
@@ -217,38 +257,53 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
         }
     }
 
+    private void editEvaluation(EvaluationDTO dto) {
+        RequestDTO w = new RequestDTO();
+        w.setRequestType(RequestDTO.UPDATE_EVALUATION);
+        w.setEvaluation(dto);
+
+        BaseVolley.getRemoteData(Statics.SERVLET_TEST, w, mCtx, new BaseVolley.BohaVolleyListener() {
+            @Override
+            public void onResponseReceived(ResponseDTO r) {
+                if (!ErrorUtil.checkServerError(mCtx, r)) {
+                    return;
+                }
+
+
+                //   setList();
+            }
+
+            @Override
+            public void onVolleyError(VolleyError error) {
+
+            }
+        });
+    }
+
     private void setGoogleMap() {
         try {
             googleMap.setMyLocationEnabled(true);
             googleMap.setBuildingsEnabled(true);
 
-                googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-                    @Override
-                    public void onMapClick(LatLng latLng) {
-                        location.setLatitude(latLng.latitude);
-                        location.setLongitude(latLng.longitude);
-                        Log.w(LOG, "********* onMapClick");
-                    }
-                });
-                googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-                    @Override
-                    public boolean onMarkerClick(Marker marker) {
-                        marker.showInfoWindow();
-                        LatLng latLng = marker.getPosition();
-                        Location loc = new Location(location);
-                        loc.setLatitude(latLng.latitude);
-                        loc.setLongitude(latLng.longitude);
+            googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+                @Override
+                public void onMapClick(LatLng latLng) {
+                    location.setLatitude(latLng.latitude);
+                    location.setLongitude(latLng.longitude);
+                    Log.w(LOG, "********* onMapClick");
+                }
+            });
+            googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick(Marker marker) {
+                    //CameraUpdate cu = CameraUpdateFactory.newLatLng(marker.getPosition());
+                    CameraUpdate cu = CameraUpdateFactory.newLatLngZoom(marker.getPosition(), 10f);
+                    googleMap.animateCamera(cu);
+                    marker.showInfoWindow();
 
-                        float f = location.distanceTo(loc);
-                        Log.w(LOG, "distance" + f);
-                        try {
-                            showPopup(latLng.latitude, latLng.longitude, marker.getTitle() + "\n" + marker.getSnippet());
-                        } catch (Exception e) {
-                            Log.w(LOG, "{0}", e);
-                        }
-                        return true;
-                    }
-                });
+                    return true;
+                }
+            });
 
         } catch (Exception e) {
             Log.e(LOG, "", e);
@@ -262,7 +317,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
         list.add("Directions");
         list.add("Status Report");
 
-        Util.showPopupBasicWithHeroImage(MapsActivity.this, MapsActivity.this, list, topLayout, ctx.getString(R.string.select_action), new Util.UtilPopupListener() {
+        Util.showPopupBasicWithHeroImage(MapsActivity.this, MapsActivity.this, list, topLayout, mCtx.getString(R.string.select_action), new Util.UtilPopupListener() {
             @Override
             public void onItemSelected(int index) {
                 switch (index) {
@@ -355,7 +410,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
         if (!mResolvingError) {  // more about this later
             mGoogleApiClient.connect();
 
-                    Log.e(LOG, "################ onStart .... connect API and location clients {0} "+mGoogleApiClient.isConnecting());
+            Log.e(LOG, "################ onStart .... connect API and location clients {0} " + mGoogleApiClient.isConnecting());
         }
 
     }
@@ -436,6 +491,184 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
             // Show dialog using GooglePlayServicesUtil.getErrorDialog()
 
             mResolvingError = true;
+        }
+    }
+
+    private HashMap<Marker, EvaluationDTO> mMarkersHashMap;
+    EditEvaluationDialog editEvaluationDialog;
+
+    public class MarkerInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
+        MarkerInfoWindowAdapterListener mListener;
+
+        public MarkerInfoWindowAdapter(MarkerInfoWindowAdapterListener mListener) {
+            this.mListener = mListener;
+        }
+
+        @Override
+        public View getInfoWindow(Marker marker) {
+            return null;
+        }
+
+        @Override
+        public View getInfoContents(Marker marker) {
+            View v = getLayoutInflater().inflate(R.layout.evaluation_list_item, null);
+
+            final EvaluationDTO myMarker = mMarkersHashMap.get(marker);
+
+            TextView ELI_condition = (TextView) v.findViewById(R.id.ELI_condition);
+            TextView ELI_date = (TextView) v.findViewById(R.id.ELI_date);
+            TextView ELI_oxygen = (TextView) v.findViewById(R.id.ELI_oxygen);
+            TextView ELI_pH = (TextView) v.findViewById(R.id.ELI_pH);
+            TextView ELI_score = (TextView) v.findViewById(R.id.ELI_score);
+            TextView ELI_team = (TextView) v.findViewById(R.id.ELI_team);
+            TextView ELI_wc = (TextView) v.findViewById(R.id.ELI_wc);
+            TextView ELI_wt = (TextView) v.findViewById(R.id.ELI_wt);
+            TextView ELI_remarks = (TextView) v.findViewById(R.id.ELI_remarks);
+
+            RelativeLayout AR_traineeLayout = (RelativeLayout) v.findViewById(R.id.AR_traineeLayout);
+            RelativeLayout AR_traineeLayout2 = (RelativeLayout) v.findViewById(R.id.AR_traineeLayout2);
+            RelativeLayout AR_insLayout =(RelativeLayout)  v.findViewById(R.id.AR_insLayout);
+            RelativeLayout AR_insLayout2 = (RelativeLayout) v.findViewById(R.id.AR_insLayout2);
+
+            ImageView ELI_condition_image = (ImageView) v.findViewById(R.id.ELI_condition_image);
+            //h.ELI_contribute = (ImageView) v.findViewById(R.id.ELI_contribute);
+            final ImageView ELI_edit = (ImageView) v.findViewById(R.id.ELI_edit);
+            final ImageView ELI_directions = (ImageView) v.findViewById(R.id.ELI_directions);
+            TextView ELI_txtCount = (TextView) v.findViewById(R.id.ELI_txtCount);
+            ELI_txtCount.setVisibility(View.GONE);
+            Linkify.addLinks(ELI_remarks, Linkify.ALL);
+            ELI_edit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Util.flashOnce(ELI_edit, 200, new Util.UtilAnimationListener() {
+                        @Override
+                        public void onAnimationEnded() {
+                            mListener.onEditEvaluation(myMarker);
+                        }
+                    });
+
+                }
+            });
+            ELI_directions.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Util.flashOnce(ELI_directions, 200, new Util.UtilAnimationListener() {
+                        @Override
+                        public void onAnimationEnded() {
+                            mListener.onDirection(myMarker);
+                        }
+                    });
+
+                }
+            });
+            ELI_team.setText("Team " + myMarker.getTeamName());
+
+            ELI_date.setText(Util.getLongDate(new Date(myMarker.getEvaluationDate())));
+            ELI_score.setText((Math.round(myMarker.getScore() * 100.00) / 100.00) + "");
+            if (myMarker.getOxygen() == 0) {
+                AR_insLayout.setVisibility(View.GONE);
+            } else {
+                AR_insLayout.setVisibility(View.VISIBLE);
+            }
+            if (myMarker.getWaterClarity() == 0) {
+                AR_traineeLayout.setVisibility(View.GONE);
+            } else {
+                AR_traineeLayout.setVisibility(View.VISIBLE);
+            }
+            if (myMarker.getWaterTemperature() == 0) {
+                AR_traineeLayout2.setVisibility(View.GONE);
+            } else {
+                AR_traineeLayout2.setVisibility(View.VISIBLE);
+            }
+            if (myMarker.getpH() == 0) {
+                AR_insLayout2.setVisibility(View.GONE);
+            } else {
+                AR_insLayout2.setVisibility(View.VISIBLE);
+            }
+            ELI_oxygen.setText(myMarker.getOxygen() + "");
+            ELI_wc.setText(myMarker.getWaterClarity() + "");
+            ELI_wt.setText(myMarker.getWaterTemperature() + "");
+            ELI_pH.setText(myMarker.getpH() + "");
+            if (myMarker.getRemarks() == null) {
+                ELI_remarks.setVisibility(View.GONE);
+            } else {
+                ELI_remarks.setVisibility(View.VISIBLE);
+            }
+
+            ELI_remarks.setText(myMarker.getRemarks());
+            switch (myMarker.getConditionsID()) {
+                case Constants.UNMODIFIED_NATURAL_SAND:
+                    ELI_condition.setTextColor(mCtx.getResources().getColor(R.color.dark_blue));
+                    ELI_score.setTextColor(mCtx.getResources().getColor(R.color.dark_blue));
+                    ELI_condition_image.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.blue_crap));
+                    ELI_condition_image.setColorFilter(mCtx.getResources().getColor(R.color.dark_blue), PorterDuff.Mode.MULTIPLY);
+                    break;
+                case Constants.LARGELY_NATURAL_SAND:
+                    ELI_condition.setTextColor(mCtx.getResources().getColor(R.color.green));
+                    ELI_score.setTextColor(mCtx.getResources().getColor(R.color.green));
+                    ELI_condition_image.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.green_crap));
+                    ELI_condition_image.setColorFilter(mCtx.getResources().getColor(R.color.green), PorterDuff.Mode.MULTIPLY);
+                    break;
+                case Constants.MODERATELY_MODIFIED_SAND:
+                    ELI_condition.setTextColor(mCtx.getResources().getColor(R.color.orange));
+                    ELI_score.setTextColor(mCtx.getResources().getColor(R.color.orange));
+                    ELI_condition_image.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.orange_crap));
+                    ELI_condition_image.setColorFilter(mCtx.getResources().getColor(R.color.orange), PorterDuff.Mode.MULTIPLY);
+                    break;
+                case Constants.LARGELY_MODIFIED_SAND:
+                    ELI_condition.setTextColor(mCtx.getResources().getColor(R.color.red));
+                    ELI_score.setTextColor(mCtx.getResources().getColor(R.color.red));
+                    ELI_condition_image.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.red_crap));
+                    ELI_condition_image.setColorFilter(mCtx.getResources().getColor(R.color.red), PorterDuff.Mode.MULTIPLY);
+
+                    break;
+                case Constants.CRITICALLY_MODIFIED_SAND:
+                    ELI_condition.setTextColor(mCtx.getResources().getColor(R.color.purple));
+                    ELI_score.setTextColor(mCtx.getResources().getColor(R.color.purple));
+                    ELI_condition_image.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.purple_crap));
+                    ELI_condition_image.setColorFilter(mCtx.getResources().getColor(R.color.purple), PorterDuff.Mode.MULTIPLY);
+                    break;
+                case Constants.UNMODIFIED_NATURAL_ROCK:
+                    ELI_condition.setTextColor(mCtx.getResources().getColor(R.color.dark_blue));
+                    ELI_score.setTextColor(mCtx.getResources().getColor(R.color.dark_blue));
+                    ELI_condition_image.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.blue_crap));
+                    ELI_condition_image.setColorFilter(mCtx.getResources().getColor(R.color.dark_blue), PorterDuff.Mode.MULTIPLY);
+                    break;
+                case Constants.LARGELY_NATURAL_ROCK:
+                    ELI_condition.setTextColor(mCtx.getResources().getColor(R.color.green));
+                    ELI_score.setTextColor(mCtx.getResources().getColor(R.color.green));
+                    ELI_condition_image.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.green_crap));
+                    ELI_condition_image.setColorFilter(mCtx.getResources().getColor(R.color.green), PorterDuff.Mode.MULTIPLY);
+                    break;
+                case Constants.MODERATELY_MODIFIED_ROCK:
+                    ELI_condition.setTextColor(mCtx.getResources().getColor(R.color.orange));
+                    ELI_score.setTextColor(mCtx.getResources().getColor(R.color.orange));
+                    ELI_condition_image.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.orange_crap));
+                    ELI_condition_image.setColorFilter(mCtx.getResources().getColor(R.color.orange), PorterDuff.Mode.MULTIPLY);
+                    break;
+                case Constants.LARGELY_MODIFIED_ROCK:
+                    ELI_condition.setTextColor(mCtx.getResources().getColor(R.color.red));
+                    ELI_score.setTextColor(mCtx.getResources().getColor(R.color.red));
+                    ELI_condition_image.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.red_crap));
+                    ELI_condition_image.setColorFilter(mCtx.getResources().getColor(R.color.red), PorterDuff.Mode.MULTIPLY);
+                    break;
+                case Constants.CRITICALLY_MODIFIED_ROCK:
+                    ELI_condition.setTextColor(mCtx.getResources().getColor(R.color.purple));
+                    ELI_score.setTextColor(mCtx.getResources().getColor(R.color.purple));
+                    ELI_condition_image.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.purple_crap));
+                    ELI_condition_image.setColorFilter(mCtx.getResources().getColor(R.color.purple), PorterDuff.Mode.MULTIPLY);
+                    break;
+                case Constants.NOT_SPECIFIED:
+                    ELI_condition.setTextColor(mCtx.getResources().getColor(R.color.gray));
+                    ELI_score.setTextColor(mCtx.getResources().getColor(R.color.gray));
+                    ELI_condition_image.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.gray_crap));
+                    ELI_condition_image.setColorFilter(mCtx.getResources().getColor(R.color.gray), PorterDuff.Mode.MULTIPLY);
+                    break;
+            }
+
+            ELI_condition.setText(myMarker.getConditionName());
+
+            return v;
         }
     }
 }

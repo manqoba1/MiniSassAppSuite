@@ -26,6 +26,7 @@ import com.sifiso.codetribe.minisasslibrary.dto.RiverDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverTownDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ResponseDTO;
 import com.sifiso.codetribe.minisasslibrary.services.CreateEvaluationListener;
+import com.sifiso.codetribe.minisasslibrary.util.GPSTracker;
 import com.sifiso.codetribe.minisasslibrary.util.Util;
 
 import java.util.ArrayList;
@@ -69,6 +70,7 @@ public class RiverListFragment extends Fragment implements PageFragment {
         ctx = getActivity().getApplicationContext();
         activity = getActivity();
         getActivity().setTitle("MiniSASS Rivers");
+        GPSTracker tracker = new GPSTracker(ctx);
         setField();
         return v;
     }
@@ -159,23 +161,24 @@ public class RiverListFragment extends Fragment implements PageFragment {
         Log.d(LOG, "Mentor " + new Gson().toJson(response.getRiverList()));
         riverAdapter = new RiverAdapter(response.getRiverList(), ctx, new RiverAdapter.RiverAdapterListener() {
             @Override
+            public void onDirection(Double latitude, Double longitude) {
+                mListener.onDirection(latitude,longitude);
+            }
+
+            @Override
             public void onMapSiteRequest(List<EvaluationSiteDTO> siteList) {
 
             }
 
             @Override
             public void onEvaluationRequest(List<EvaluationSiteDTO> siteList) {
-               /* evaluationListDialog = new EvaluationListDialog();
-                Bundle b = new Bundle();
-                b.putSerializable("evaluationSite", (java.io.Serializable) siteList);
-                evaluationListDialog.setArguments(b);
-                evaluationListDialog.show(getFragmentManager(),"");*/
+
                 mListener.onRefreshEvaluation(siteList, 1);
             }
 
             @Override
-            public void onTownshipRequest(List<RiverTownDTO> riverTownList) {
-                mListener.onRefreshTown(riverTownList, 111);
+            public void onCreateEvaluation(RiverDTO river) {
+                mListener.onCreateEvaluation(river);
             }
 
             @Override
@@ -191,7 +194,7 @@ public class RiverListFragment extends Fragment implements PageFragment {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
-                mListener.onCreateEvaluationRL((RiverDTO) parent.getItemAtPosition(position));
+                mListener.onCreateEvaluation((RiverDTO) parent.getItemAtPosition(position));
                 return false;
             }
         });

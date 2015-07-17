@@ -23,8 +23,17 @@ public class TeamDTO implements Serializable {
     private CountryDTO country;
     private OrganisationtypeDTO organisationType;
     private List<TeamMemberDTO> teammemberList = new ArrayList<>();
+    private List<TmemberDTO> tmemberList = new ArrayList<>();
 
     public TeamDTO() {
+    }
+
+    public List<TmemberDTO> getTmemberList() {
+        return tmemberList;
+    }
+
+    public void setTmemberList(List<TmemberDTO> tmemberList) {
+        this.tmemberList = tmemberList;
     }
 
     public Integer getTeamID() {

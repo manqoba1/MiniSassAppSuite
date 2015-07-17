@@ -50,6 +50,11 @@ public class EvaluationAdapter extends BaseAdapter {
         return mList.get(position).getEvaluationID();
     }
 
+    class Holder {
+        TextView ELI_txtCount, ELI_team, ELI_date, ELI_wc, ELI_pH, ELI_wt, ELI_oxygen, ELI_score, ELI_condition, ELI_remarks;
+        ImageView ELI_condition_image, ELI_contribute, ELI_edit, ELI_directions;
+    }
+
     @Override
     public View getView(int position, View v, ViewGroup parent) {
         final Holder h;
@@ -67,21 +72,25 @@ public class EvaluationAdapter extends BaseAdapter {
             h.ELI_wt = (TextView) v.findViewById(R.id.ELI_wt);
             h.ELI_remarks = (TextView) v.findViewById(R.id.ELI_remarks);
             h.ELI_condition_image = (ImageView) v.findViewById(R.id.ELI_condition_image);
+            //h.ELI_contribute = (ImageView) v.findViewById(R.id.ELI_contribute);
+            h.ELI_edit = (ImageView) v.findViewById(R.id.ELI_edit);
+            h.ELI_directions = (ImageView) v.findViewById(R.id.ELI_directions);
+            h.ELI_txtCount = (TextView) v.findViewById(R.id.ELI_txtCount);
             v.setTag(h);
         } else {
             h = (Holder) v.getTag();
         }
-        final EvaluationDTO site = mList.get(position);
+        final EvaluationDTO evaluation = mList.get(position);
 
-        h.ELI_team.setText(site.getTeamName());
-
-        h.ELI_date.setText(Util.getLongDate(new Date(site.getEvaluationDate())));
-        h.ELI_score.setText((Math.round(site.getScore() * 100.00) / 100.00) + "");
-        h.ELI_oxygen.setText(site.getOxygen() + "");
-        h.ELI_wc.setText(site.getWaterClarity() + "");
-        h.ELI_wt.setText(site.getWaterTemperature() + "");
-        h.ELI_pH.setText(site.getpH() + "");
-        if (site.getRemarks() == null) {
+        h.ELI_team.setText("Team "+evaluation.getTeamName());
+        h.ELI_txtCount.setText((position+1)+"");
+        h.ELI_date.setText(Util.getLongDate(new Date(evaluation.getEvaluationDate())));
+        h.ELI_score.setText((Math.round(evaluation.getScore() * 100.00) / 100.00) + "");
+        h.ELI_oxygen.setText(evaluation.getOxygen() + "");
+        h.ELI_wc.setText(evaluation.getWaterClarity() + "");
+        h.ELI_wt.setText(evaluation.getWaterTemperature() + "");
+        h.ELI_pH.setText(evaluation.getpH() + "");
+        if (evaluation.getRemarks() == null) {
             h.ELI_remarks.setVisibility(View.GONE);
         } else {
             h.ELI_remarks.setVisibility(View.VISIBLE);
@@ -92,14 +101,51 @@ public class EvaluationAdapter extends BaseAdapter {
                 Util.flashOnce(h.ELI_score, 200, new Util.UtilAnimationListener() {
                     @Override
                     public void onAnimationEnded() {
-                        mListener.onViewInsect(site.getEvaluationinsectList());
+                        mListener.onViewInsect(evaluation.getEvaluationinsectList());
                     }
                 });
 
             }
         });
-        h.ELI_remarks.setText(site.getRemarks());
-        switch (site.getConditionsID()) {
+        h.ELI_condition_image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Util.flashOnce(h.ELI_condition_image, 200, new Util.UtilAnimationListener() {
+                    @Override
+                    public void onAnimationEnded() {
+                        mListener.onViewInsect(evaluation.getEvaluationinsectList());
+                    }
+                });
+
+            }
+        });
+
+        h.ELI_edit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Util.flashOnce(h.ELI_edit, 200, new Util.UtilAnimationListener() {
+                    @Override
+                    public void onAnimationEnded() {
+                        mListener.onEvaluationEdit(evaluation);
+                    }
+                });
+
+            }
+        });
+        h.ELI_directions.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Util.flashOnce(h.ELI_directions, 200, new Util.UtilAnimationListener() {
+                    @Override
+                    public void onAnimationEnded() {
+                        mListener.onDirectionToSite(evaluation.getEvaluationSite());
+                    }
+                });
+
+            }
+        });
+        h.ELI_remarks.setText(evaluation.getRemarks());
+        switch (evaluation.getConditionsID()) {
             case Constants.UNMODIFIED_NATURAL_SAND:
                 h.ELI_condition.setTextColor(mCtx.getResources().getColor(R.color.dark_blue));
                 h.ELI_score.setTextColor(mCtx.getResources().getColor(R.color.dark_blue));
@@ -161,7 +207,7 @@ public class EvaluationAdapter extends BaseAdapter {
                 h.ELI_condition_image.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.purple_crap));
                 h.ELI_condition_image.setColorFilter(mCtx.getResources().getColor(R.color.purple), PorterDuff.Mode.MULTIPLY);
                 break;
-                case Constants.NOT_SPECIFIED:
+            case Constants.NOT_SPECIFIED:
                 h.ELI_condition.setTextColor(mCtx.getResources().getColor(R.color.gray));
                 h.ELI_score.setTextColor(mCtx.getResources().getColor(R.color.gray));
                 h.ELI_condition_image.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.gray_crap));
@@ -169,7 +215,7 @@ public class EvaluationAdapter extends BaseAdapter {
                 break;
         }
 
-        h.ELI_condition.setText(site.getConditionName());
+        h.ELI_condition.setText(evaluation.getConditionName());
         animateView(v);
         return v;
     }
@@ -182,15 +228,13 @@ public class EvaluationAdapter extends BaseAdapter {
         view.startAnimation(a);
     }
 
-    class Holder {
-        TextView ELI_team, ELI_date, ELI_wc, ELI_pH, ELI_wt, ELI_oxygen, ELI_score, ELI_condition, ELI_remarks;
-        ImageView ELI_condition_image;
-    }
 
     public interface EvaluationAdapterListener {
-        public void onMapSiteRequest(List<EvaluationSiteDTO> siteList);
+        public void onEvaluationContribute(EvaluationDTO evaluation);
 
-        public void onEvaluationRequest(List<EvaluationSiteDTO> siteList);
+        public void onDirectionToSite(EvaluationSiteDTO evaluationSite);
+
+        public void onEvaluationEdit(EvaluationDTO evaluation);
 
         public void onViewInsect(List<EvaluationInsectDTO> insectImage);
     }

@@ -271,7 +271,7 @@ public class CacheUtil implements Serializable {
                         break;
 
                    /* case CACHE_RIVER_DATA:
-                        stream = ctx.openFileInput(JSON_COUNTRIES);
+                        stream = ctx.openFileInput(JSON_RIVER);
                         response = getData(stream);
                         Log.i(LOG, "++ country cache retrieved");
                         break;*/

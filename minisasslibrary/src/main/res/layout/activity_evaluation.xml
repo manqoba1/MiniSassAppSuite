@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="8dp"
+
     tools:context="com.sifiso.codetribe.minisasslibrary.activities.EvaluationActivity">
 
     <ScrollView
@@ -14,22 +15,22 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
             <Button
-                android:layout_below="@+id/result1"
                 android:id="@+id/AE_find_near_sites"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/result1"
                 android:background="@color/blue"
                 android:text="Do you want find sites visited before?"
-                android:textStyle="bold"
-                android:textColor="@color/white" />
+                android:textColor="@color/white"
+                android:textStyle="bold" />
 
             <RelativeLayout
                 android:id="@+id/result1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-
-               >
+                android:elevation="10dp">
 
                 <include
 
@@ -45,13 +46,13 @@
                     android:id="@+id/AE_pin_point"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentTop="true"
                     android:layout_marginRight="10dp"
                     android:backgroundTint="@color/blue"
                     android:src="@drawable/ic_point"
                     android:tint="@color/blue"
-                    android:visibility="gone"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentEnd="true" />
+                    android:visibility="gone" />
             </RelativeLayout>
 
             <TextView
@@ -64,9 +65,8 @@
                 android:drawableRight="@android:drawable/arrow_up_float"
                 android:padding="10dp"
                 android:text="Do you have testing equipments? If yes tab here."
-                android:textStyle="bold"
                 android:textColor="@color/White"
-                />
+                android:textStyle="bold" />
 
             <RelativeLayout
                 android:id="@+id/result2"
@@ -82,12 +82,13 @@
                     android:layout_height="match_parent"
                     android:layout_marginTop="10dp" />
             </RelativeLayout>
+
             <LinearLayout
                 android:id="@+id/LL1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
                 android:layout_below="@+id/result2"
+                android:layout_marginTop="10dp"
                 android:orientation="horizontal">
 
                 <Button
@@ -96,8 +97,8 @@
                     android:layout_height="wrap_content"
                     android:background="@color/blue"
                     android:text="Which insects group did you find?"
-                    android:textStyle="bold"
-                    android:textColor="@color/white" />
+                    android:textColor="@color/white"
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <RelativeLayout
@@ -141,8 +142,8 @@
                 android:background="@drawable/xsquare_green"
                 android:drawablePadding="10dp"
                 android:text="Submit Results"
-                android:textStyle="bold"
-                android:textColor="@color/white" />
+                android:textColor="@color/white"
+                android:textStyle="bold" />
 
 
         </RelativeLayout>

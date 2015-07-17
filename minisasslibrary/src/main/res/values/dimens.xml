@@ -81,4 +81,10 @@
     <dimen name="red_circle_size">64dp</dimen>
     <dimen name="map_image_hight">50dp</dimen>
     <dimen name="icon_size">34dp</dimen>
+    <dimen name="icon_edit">64dp</dimen>
+    <dimen name="textSize_30">30sp</dimen>
+    <dimen name="img_folder">32sp</dimen>
+    <dimen name="pp_image_width">190dp</dimen>
+    <dimen name="pp_image_height">150dp</dimen>
+
 </resources>

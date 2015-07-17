@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -213,5 +214,36 @@ public class SharedUtil {
 
     }
 
+    public static void saveImageUri(Context ctx, Uri uri) {
+        SharedPreferences sp = PreferenceManager
+                .getDefaultSharedPreferences(ctx);
+        SharedPreferences.Editor ed = sp.edit();
+        ed.putString(Constants.IMAGE_URI, uri.toString());
+        ed.commit();
+    }
 
+    public static void saveThumbUri(Context ctx, Uri uri) {
+        SharedPreferences sp = PreferenceManager
+                .getDefaultSharedPreferences(ctx);
+        SharedPreferences.Editor ed = sp.edit();
+        ed.putString(Constants.THUMB_URI, uri.toString());
+        ed.commit();
+    }
+    public static String getImageUri(Context ctx) {
+
+        SharedPreferences sp = PreferenceManager
+                .getDefaultSharedPreferences(ctx);
+        String s = sp.getString(Constants.IMAGE_URI, null);
+
+        return s;
+    }
+
+    public static String getThumbUri(Context ctx) {
+
+        SharedPreferences sp = PreferenceManager
+                .getDefaultSharedPreferences(ctx);
+        String s = sp.getString(Constants.THUMB_URI, null);
+
+        return s;
+    }
 }

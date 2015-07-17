@@ -1,14 +1,22 @@
 package com.sifiso.codetribe.minisasslibrary.util;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
+import android.widget.ImageView;
 
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ImagesDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ResponseDTO;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by Chris on 2015-02-26.
@@ -48,6 +56,39 @@ public class PictureUtil {
                     });
         }
 
+
+    }
+    public static Uri getImageFileUri() {
+        File rootDir = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES);
+        if (rootDir == null) {
+            rootDir = Environment.getRootDirectory();
+        }
+        File imgDir = new File(rootDir, "minisass_app");
+        if (!imgDir.exists()) {
+            imgDir.mkdir();
+        }
+
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US)
+                .format(new Date());
+
+        return Uri.fromFile(new File(imgDir,"CM_" + timeStamp + ".jpg"));
+
+    }
+    public static Intent getCameraIntent(ImageView image, Uri fileUri) {
+
+        int w = image.getWidth();
+        int h = image.getWidth();
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        cameraIntent.putExtra("crop", "true");
+        cameraIntent.putExtra("outputX", w);
+        cameraIntent.putExtra("outputY", h);
+        cameraIntent.putExtra("aspectX", 1);
+        cameraIntent.putExtra("aspectY", 1);
+        cameraIntent.putExtra("scale", true);
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+
+        return cameraIntent;
 
     }
 

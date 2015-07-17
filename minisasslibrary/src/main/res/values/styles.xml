@@ -55,7 +55,13 @@
     <style name="Title3TextStyleBlack" parent="@android:style/TextAppearance.Medium">
         <item name="android:textColor">@color/black</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:textSize">@dimen/header_name</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="Title3TextStyleSasa2" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textColor">@color/DeepPink</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">18sp</item>
     </style>
 
     <style name="BlueCircleSmall" parent="@android:style/TextAppearance.Small">
@@ -411,6 +417,13 @@
             <item name="android:padding">5dp</item>
             <item name="android:textSize">30sp</item>
         </style>
+
+    <style name="Title1TextStyleSasa" >
+        <item name="android:textColor">@color/DeepPink</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:padding">5dp</item>
+        <item name="android:textSize">30sp</item>
+    </style>
 
         <style name="Title3TextStyleGrey" >
             <item name="android:textColor">@color/grey2</item>

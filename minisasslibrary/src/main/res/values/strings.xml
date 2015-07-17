@@ -32,6 +32,7 @@
     <string name="send_app_link">Send App Link</string>
     <string name="select_action">enter first name</string>
     <string name="action_team">Teams</string>
+    <string name="image_source">Choose Photo Source</string>
 
     <string name="evaluation_image_map">Evaluation Image Map</string>
     <string name="sans_serif" translatable="false">sans-serif</string>
@@ -95,6 +96,9 @@
     <string name="title_activity_picture">PictureActivity</string>
     <string name="take_pic">Take Picture</string>
     <string name="gallery">Gallery</string>
+    <string name="camera">Open Camera</string>
+    <string name="error_image_get">Unable to get picture from disk. Please take another picture</string>
+    <string name="image_pick_cancelled">No photo selected</string>
     <string name="finding_gps">Finding GPS</string>
     <string name="start_camera">Start camera</string>
     <string name="title_activity_mini_sassma">MiniSass</string>
