@@ -25,6 +25,7 @@ public class EvaluationSiteDTO implements Serializable, Comparable<EvaluationSit
     private List<EvaluationDTO> evaluationList;
     private RiverDTO river;
     private CategoryDTO category;
+    private StreamDTO stream;
 
     @Override
     public int compareTo(EvaluationSiteDTO another) {
@@ -35,6 +36,14 @@ public class EvaluationSiteDTO implements Serializable, Comparable<EvaluationSit
             return 1;
         }
         return 0;
+    }
+
+    public StreamDTO getStream() {
+        return stream;
+    }
+
+    public void setStream(StreamDTO stream) {
+        this.stream = stream;
     }
 
     public EvaluationSiteDTO() {

@@ -42,7 +42,7 @@ public class InsectPicker extends ActionBarActivity {
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         Log.i(LOG, "onCreate select insect");
-        mRawImages = new ArrayList<>();
+        //mRawImages = new ArrayList<>();
         mRawImages = (List<InsectImageDTO>) getIntent().getSerializableExtra("insetImageList");
         Log.i(LOG, "onCreate select insect " + mRawImages.size());
         setFields();
@@ -63,8 +63,8 @@ public class InsectPicker extends ActionBarActivity {
             public void onViewMoreImages(InsectImageDTO insect, int index) {
                 intent = new Intent(InsectPicker.this, ViewMoreImages.class);
                 intent.putExtra("insetImageList", (java.io.Serializable) mRawImages);
-                intent.putExtra("insect",  insect);
-                startActivityForResult(intent,RETURN_PICKER);
+                intent.putExtra("insect", insect);
+                startActivityForResult(intent, RETURN_PICKER);
             }
         });
         SD_list.setAdapter(adapter);

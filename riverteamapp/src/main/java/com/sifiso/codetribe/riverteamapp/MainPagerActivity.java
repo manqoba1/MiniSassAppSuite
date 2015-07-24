@@ -40,6 +40,7 @@ import com.sifiso.codetribe.minisasslibrary.dto.RiverDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverPartDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverPointDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverTownDTO;
+import com.sifiso.codetribe.minisasslibrary.dto.TeamMemberDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.RequestDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ResponseDTO;
 import com.sifiso.codetribe.minisasslibrary.fragments.EvaluationListFragment;
@@ -78,7 +79,7 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
     PagerAdapter adapter;
     private ResponseDTO response;
     private TextView RL_add;
-
+    TeamMemberDTO teamMember;
     GoogleApiClient mGoogleApiClient;
     LocationRequest locationRequest;
     Location location;
@@ -94,6 +95,16 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ctx = getApplicationContext();
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        getSupportActionBar().setDisplayShowCustomEnabled(true);
+        teamMember = SharedUtil.getTeamMember(ctx);
+        Util.setCustomActionBar(ctx, getSupportActionBar(), teamMember.getFirstName() + " " + teamMember.getLastName(), teamMember.getTeam().getTeamName(), teamMember.getTeamMemberImage(), new Util.ActinBarListener() {
+            @Override
+            public void onEvokeProfile() {
+                Intent pro = new Intent(MainPagerActivity.this, ProfileActivity.class);
+                startActivity(pro);
+            }
+        });
         setField();
 
 
@@ -109,7 +120,6 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
                     @Override
                     public void onAnimationEnded() {
                         Intent intent = new Intent(MainPagerActivity.this, EvaluationActivity.class);
-                        intent.putExtra("statusCode", CREATE_EVALUATION);
                         startActivity(intent);
                     }
                 });
@@ -252,10 +262,23 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
                             pageFragmentList.remove(riverListFragment);
                             adapter.notifyDataSetChanged();
                         }
-                        getSupportActionBar().setTitle(evaluationListFragment.getRiverName());
+
+                        Util.setCustomActionBar(ctx, getSupportActionBar(), evaluationListFragment.getRiverName(), "", teamMember.getTeamMemberImage(), new Util.ActinBarListener() {
+                            @Override
+                            public void onEvokeProfile() {
+                                Intent pro = new Intent(MainPagerActivity.this, ProfileActivity.class);
+                                startActivity(pro);
+                            }
+                        });
                         isBack = false;
                     } else if (pf instanceof RiverListFragment) {
-                        getSupportActionBar().setTitle("MiniSASS ");
+                        Util.setCustomActionBar(ctx, getSupportActionBar(), teamMember.getFirstName() + " " + teamMember.getLastName(), teamMember.getTeam().getTeamName(), teamMember.getTeamMemberImage(), new Util.ActinBarListener() {
+                            @Override
+                            public void onEvokeProfile() {
+                                Intent pro = new Intent(MainPagerActivity.this, ProfileActivity.class);
+                                startActivity(pro);
+                            }
+                        });
                         if (pf.equals(evaluationListFragment)) {
                             pageFragmentList.remove(evaluationListFragment);
                             adapter.notifyDataSetChanged();
@@ -274,6 +297,7 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
                             pageFragmentList.remove(evaluationListFragment);
                             adapter.notifyDataSetChanged();
                         }
+
                         getSupportActionBar().setTitle(townListFragment.getTownName() + " Towns");
                         isBack = false;
                     }
@@ -318,18 +342,12 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
 
         //noinspection SimplifiableIfStatement
         switch (id) {
-            case R.id.profile:
-                Intent pro = new Intent(MainPagerActivity.this, Profile.class);
-                startActivity(pro);
-                return true;
             case R.id.log_out:
                 SharedUtil.clearTeam(ctx);
                 Intent intent = new Intent(MainPagerActivity.this, SignActivity.class);
                 startActivity(intent);
                 finish();
                 return true;
-
-
         }
        /* switch (id) {
             case R.id.add_member:
@@ -403,13 +421,19 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
         createEva.putExtra("riverCreate", river);
         createEva.putExtra("response", response);
         createEva.putExtra("statusCode", CREATE_EVALUATION);
-        startActivityForResult(createEva, CREATE_EVALUATION);
+        startActivity(createEva);
     }
 
     @Override
     public void onDirection(Double latitude, Double longitude) {
         startDirectionsMap(latitude, longitude);
     }
+
+    @Override
+    public void onPullRefresh() {
+        getCachedRiverData();
+    }
+
 
     private void startDirectionsMap(double lat, double lng) {
         Log.i(LOG, "startDirectionsMap ..........");
@@ -602,6 +626,7 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
                         }
                         if (w.isWifiConnected() || w.isMobileConnected()) {
                             getRiversAroundMe();
+                            // getData();
                         }
                     }
                 });
@@ -635,10 +660,12 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
         if (location == null) {
             Toast.makeText(ctx, "Busy...getting rivers ...t", Toast.LENGTH_SHORT).show();
             // getRiversAroundMe();
+            //riverListFragment.refreshListStop();
             return;
         }
         if (isBusy) {
             Toast.makeText(ctx, "Busy...getting rivers2 ...", Toast.LENGTH_SHORT).show();
+            // riverListFragment.refreshListStop();
             return;
         }
 
@@ -652,11 +679,12 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
         w.setLongitude(location.getLongitude());
         w.setRadius(5);
         isBusy = true;
-
+        //riverListFragment.refreshListStart();
         BaseVolley.getRemoteData(Statics.SERVLET_ENDPOINT, w, ctx, new BaseVolley.BohaVolleyListener() {
             @Override
             public void onResponseReceived(ResponseDTO r) {
                 isBusy = false;
+
 //              progressBar.setVisibility(View.GONE);
                 Log.e(LOG, "## getStarterData responded...statusCode: " + r.getStatusCode());
                 if (!ErrorUtil.checkServerError(ctx, r)) {
@@ -676,6 +704,8 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
                         // getData();
                         response = r;
                         buildPages();
+                        riverListFragment.refreshListStop();
+                        getData();
                     }
 
                     @Override
@@ -688,6 +718,7 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
             @Override
             public void onVolleyError(VolleyError error) {
                 isBusy = false;
+                //riverListFragment.refreshListStop();
                 Toast.makeText(ctx, "Problem: " + error.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
@@ -710,7 +741,7 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
                             return;
                         }
 
-                        CacheUtil.cacheData(ctx, r, CacheUtil.CACHE_DATA, new CacheUtil.CacheUtilListener() {
+                        CacheUtil.cacheData(ctx, r, CacheUtil.CACHE_RIVER_DATA, new CacheUtil.CacheUtilListener() {
                             @Override
                             public void onFileDataDeserialized(final ResponseDTO resp) {
 
@@ -718,11 +749,7 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
 
                             @Override
                             public void onDataCached(ResponseDTO r) {
-                                    /*Intent intent = new Intent(getApplicationContext(), RequestSyncService.class);
-                                    startService(intent);*/
-                                // getData();
-                                response = r;
-                                buildPages();
+
                             }
 
                             @Override

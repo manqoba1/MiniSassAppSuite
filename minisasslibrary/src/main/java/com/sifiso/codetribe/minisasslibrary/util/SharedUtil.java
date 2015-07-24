@@ -79,7 +79,7 @@ public class SharedUtil {
 
         ed.putString(TEAM_MEMBER_JSON, gson.toJson(evi));
         ed.commit();
-        Log.e(LOG, "SharedUtil, LOCATION IMAGE: " + evi.getFirstName() + " SAVED IN SharedPreferences");
+        Log.e(LOG, "SharedUtil, LOCATION IMAGE: " + new Gson().toJson(evi) + " SAVED IN SharedPreferences");
 
     }
 

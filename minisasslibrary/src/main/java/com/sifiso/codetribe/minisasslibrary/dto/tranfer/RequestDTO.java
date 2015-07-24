@@ -45,7 +45,7 @@ public class RequestDTO implements Serializable {
             ADD_COMMENT = 16,
             ADD_EVALUATION_INSECT = 17,
             ADD_TEAM = 18,
-            ADD_STREAM= 19;
+            ADD_STREAM = 19;
 
 
     public static final int ADD_COUNTRY = 21,
@@ -63,13 +63,13 @@ public class RequestDTO implements Serializable {
             UPDATE_COMMENT = 38,
             UPDATE_EVALUATION = 39,
             UPDATE_CONDITIONS = 55,
-            UPDATE_EVALUATION_IMAGE = 56;
+            SEND_INVITE_TO_TEAM_MEMBER = 56;
 
     public static final int LIST_RIVERS_IN_COUNTRY = 40,
             LIST_RIVER_TOWNS = 41,
             LIST_EVALUATION_SITES = 42,
-            LIST_INSECTS = 43,
-            LIST_TEAMS = 44,
+            SEARCH_MEMBERS = 43,
+            GET_MEMBER = 44,
             LIST_EVALUATION_SITE_BY_RIVER = 45,
             LIST_PROVINCE_BY_COUNTRY = 46,
             LIST_REGISTER_DATA = 50,
@@ -102,7 +102,7 @@ public class RequestDTO implements Serializable {
     public static final String TEAM_MEMBER_DIR = "teamMember";
     private int requestType, radius;
     private String email, password;
-    private String countryCode, teamMemberImage;
+    private String countryCode, teamMemberImage, search;
     private Integer countryID, categoryID, commentID, conditionsID, evaluationID, evaluationInsectID,
             evaluationCommentID, evaluationSiteID, insectID, provinceID, riverID, teamID, townID, teamMemberID,
             evaluationImageID;
@@ -127,6 +127,14 @@ public class RequestDTO implements Serializable {
     private InsectImageDTO insectImage;
     private StreamDTO stream;
     private TmemberDTO tmember;
+
+    public String getSearch() {
+        return search;
+    }
+
+    public void setSearch(String search) {
+        this.search = search;
+    }
 
     public StreamDTO getStream() {
         return stream;

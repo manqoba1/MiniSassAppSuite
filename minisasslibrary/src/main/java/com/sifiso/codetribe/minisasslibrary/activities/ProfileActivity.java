@@ -9,6 +9,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.PagerTitleStrip;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.graphics.Palette;
 import android.util.Log;
@@ -23,6 +28,7 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.VolleyError;
 import com.google.gson.Gson;
@@ -32,15 +38,23 @@ import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import com.sifiso.codetribe.minisasslibrary.R;
 import com.sifiso.codetribe.minisasslibrary.adapters.TeamMemberAdapter;
 import com.sifiso.codetribe.minisasslibrary.dialogs.AddMemberDialog;
+import com.sifiso.codetribe.minisasslibrary.dto.TeamDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.TeamMemberDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.TmemberDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.RequestDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ResponseDTO;
+import com.sifiso.codetribe.minisasslibrary.fragments.PageFragment;
+import com.sifiso.codetribe.minisasslibrary.fragments.TeamListFragment;
+import com.sifiso.codetribe.minisasslibrary.fragments.TeamMemberListFragment;
+import com.sifiso.codetribe.minisasslibrary.interfaces.TeamListener;
+import com.sifiso.codetribe.minisasslibrary.interfaces.TeamMemberAddedListener;
 import com.sifiso.codetribe.minisasslibrary.listeners.BitmapListener;
+import com.sifiso.codetribe.minisasslibrary.listeners.BusyListener;
 import com.sifiso.codetribe.minisasslibrary.toolbox.BaseVolley;
 import com.sifiso.codetribe.minisasslibrary.toolbox.WebCheck;
 import com.sifiso.codetribe.minisasslibrary.toolbox.WebCheckResult;
 import com.sifiso.codetribe.minisasslibrary.util.Bitmaps;
+import com.sifiso.codetribe.minisasslibrary.util.CacheUtil;
 import com.sifiso.codetribe.minisasslibrary.util.CloudinaryUtil;
 import com.sifiso.codetribe.minisasslibrary.util.ErrorUtil;
 import com.sifiso.codetribe.minisasslibrary.util.ImageTask;
@@ -52,20 +66,25 @@ import com.sifiso.codetribe.minisasslibrary.util.ToastUtil;
 import com.sifiso.codetribe.minisasslibrary.util.Util;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class ProfileActivity extends ActionBarActivity {
+public class ProfileActivity extends ActionBarActivity implements BusyListener, TeamMemberAddedListener, TeamListener {
 
     TextView P_TNAME, P_name, P_phone, P_email, P_EVN_count, textView7;
     Spinner P_sp_team;
     ImageView AP_PP, P_ICON, P_edit;
     ListView P_membersList;
     Button P_add_member, P_inviteMember;
+
+    List<PageFragment> pageFragmentList;
+    ViewPager mPager;
+    Menu mMenu;
+    PagerAdapter adapter;
     Context ctx;
     private TeamMemberDTO teamMember;
-    private TeamMemberAdapter teamMemberAdapter;
     static String LOG = ProfileActivity.class.getSimpleName();
     private AddMemberDialog addMemberDialog;
 
@@ -73,11 +92,27 @@ public class ProfileActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         ctx = getApplicationContext();
+        getSupportActionBar().setTitle("Profile");
         teamMember = SharedUtil.getTeamMember(ctx);
         Log.d(LOG, new Gson().toJson(teamMember));
         setFields();
-        //updateProfilePicture(teamMember);
+        setRefreshActionButtonState(true);
+    }
+
+    public void setRefreshActionButtonState(final boolean refreshing) {
+        if (mMenu != null) {
+            final MenuItem refreshItem = mMenu.findItem(R.id.menu_refresh);
+            if (refreshItem != null) {
+                if (refreshing) {
+                    refreshItem.setActionView(R.layout.action_bar_progess);
+                } else {
+                    refreshItem.setActionView(null);
+                }
+            }
+        }
     }
 
     private void checkConnection() {
@@ -89,8 +124,10 @@ public class ProfileActivity extends ActionBarActivity {
     }
 
     private void setFields() {
+        mPager = (ViewPager) findViewById(R.id.SITE_pager);
+        PagerTitleStrip strip = (PagerTitleStrip) findViewById(R.id.pager_title_strip);
         P_name = (TextView) findViewById(R.id.P_name);
-        textView7 = (TextView) findViewById(R.id.textView7);
+        // textView7 = (TextView) findViewById(R.id.textView7);
         P_phone = (TextView) findViewById(R.id.P_phone);
         P_email = (TextView) findViewById(R.id.P_email);
         P_EVN_count = (TextView) findViewById(R.id.P_EVN_count);
@@ -99,147 +136,33 @@ public class ProfileActivity extends ActionBarActivity {
         P_TNAME = (TextView) findViewById(R.id.P_TNAME);
         P_edit = (ImageView) findViewById(R.id.P_edit);
         P_ICON = (ImageView) findViewById(R.id.P_ICON);
-        P_membersList = (ListView) findViewById(R.id.P_membersList);
         P_add_member = (Button) findViewById(R.id.P_add_member);
         P_inviteMember = (Button) findViewById(R.id.P_inviteMember);
-        P_sp_team = (Spinner) findViewById(R.id.P_sp_team);
+        //P_sp_team = (Spinner) findViewById(R.id.P_sp_team);
 
-        P_name.setText(teamMember.getFirstName() + " " + teamMember.getLastName());
-        P_phone.setText((teamMember.getCellphone().equals("") ? "cell not specified" : teamMember.getCellphone()));
-        P_email.setText(teamMember.getEmail());
-        P_EVN_count.setText(teamMember.getEvaluationCount() + "");
-        P_TNAME.setText("Team " + teamMember.getTeam().getTeamName());
         P_TNAME.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Util.flashOnce(P_TNAME, 200, new Util.UtilAnimationListener() {
                     @Override
                     public void onAnimationEnded() {
-                        setTeamMemberList(teamMember.getTeam().getTeammemberList());
-                        // ToastUtil.toast(ctx,"My team members");
-                        setSpinner();
+
+
                     }
                 });
 
             }
         });
-        setSpinner();
 
-        if (teamMember.getTeamMemberImage() == null) {
-            AP_PP.setImageDrawable(ctx.getResources().getDrawable(R.drawable.boy));
-        } else {
-            ImageLoader.getInstance().displayImage(teamMember.getTeamMemberImage(), AP_PP);
-            ImageLoader.getInstance().displayImage(teamMember.getTeamMemberImage(), AP_PP, new ImageLoadingListener() {
-                @Override
-                public void onLoadingStarted(String s, View view) {
-
-                }
-
-                @Override
-                public void onLoadingFailed(String s, View view, FailReason failReason) {
-
-                }
-
-                @Override
-                public void onLoadingComplete(String s, View view, Bitmap bitmap) {
-                    Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
-                        @Override
-                        public void onGenerated(Palette palette) {
-                            Palette.Swatch aSwitch = palette.getMutedSwatch();
-                            try {
-                                textView7.setTextColor(aSwitch.getRgb());
-                            } catch (Exception e) {
-
-                            }
-                        }
-                    });
-                }
-
-                @Override
-                public void onLoadingCancelled(String s, View view) {
-
-                }
-            });
-        }
-
-        P_add_member.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                addMemberDialog = new AddMemberDialog();
-                addMemberDialog.show(getFragmentManager(), LOG);
-                addMemberDialog.setTeamMember(teamMember);
-                addMemberDialog.setFlag(false);
-                addMemberDialog.setListener(new AddMemberDialog.AddMemberDialogListener() {
-                    @Override
-                    public void membersToBeRegistered(TeamMemberDTO tm) {
-                        registerMember(tm);
-                    }
-                });
-            }
-        });
-        P_edit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addMemberDialog = new AddMemberDialog();
-                addMemberDialog.show(getFragmentManager(), LOG);
-                addMemberDialog.setTeamMember(teamMember);
-                addMemberDialog.setFlag(true);
-                addMemberDialog.setListener(new AddMemberDialog.AddMemberDialogListener() {
-                    @Override
-                    public void membersToBeRegistered(TeamMemberDTO tm) {
-                        updateProfilePicture(tm);
-                    }
-                });
-            }
-        });
-        P_inviteMember.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ToastUtil.errorToast(ctx, "Site Under Construction");
-            }
-        });
-        AP_PP.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                selectImageSource();
-            }
-        });
-
-        setTeamMemberList(teamMember.getTeam().getTeammemberList());
+        buildPages();
     }
 
-    private void setSpinner() {
-        List<String> tNames = new ArrayList<>();
-        tNames.add("Tap to see teams you invited to");
-        for (TmemberDTO t : teamMember.getTmemberList()) {
-            tNames.add(t.getTeam().getTeamName());
-        }
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(ctx, R.layout.xxsimple_spinner_dropdown_item, tNames);
-        P_sp_team.setAdapter(adapter);
-        P_sp_team.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (position == 0) {
-                    return;
-                }
-            //    setTeamMemberList(teamMember.getTmemberList().get(position - 1).getTeam().getTeammemberList());
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-    }
-
-    private void updateProfilePicture(TeamMemberDTO teamMember) {
-        Log.e(LOG, new Gson().toJson(teamMember));
+    private void updateProfilePicture(final TeamMemberDTO tm) {
+        Log.e(LOG, new Gson().toJson(tm));
         RequestDTO w = new RequestDTO();
         w.setRequestType(RequestDTO.UPDATE_PROFILE);
-        w.setTeamMember(teamMember);
+        w.setTeamMember(tm);
         BaseVolley.getRemoteData(Statics.SERVLET_TEST, w, ctx, new BaseVolley.BohaVolleyListener() {
             @Override
             public void onResponseReceived(final ResponseDTO r) {
@@ -248,6 +171,8 @@ public class ProfileActivity extends ActionBarActivity {
                     public void run() {
                         Log.i(LOG + "Check", new Gson().toJson(r));
                         SharedUtil.saveTeamMember(ctx, r.getTeamMember());
+                        teamMember = r.getTeamMember();
+                        buildPages();
                     }
                 });
             }
@@ -259,10 +184,6 @@ public class ProfileActivity extends ActionBarActivity {
         });
     }
 
-    private void setTeamMemberList(List<TeamMemberDTO> teamMemberList) {
-        teamMemberAdapter = new TeamMemberAdapter(ctx, R.layout.team_member_item, teamMemberList);
-        P_membersList.setAdapter(teamMemberAdapter);
-    }
 
     private void registerMember(TeamMemberDTO dto) {
         RequestDTO w = new RequestDTO();
@@ -271,13 +192,19 @@ public class ProfileActivity extends ActionBarActivity {
 
         BaseVolley.getRemoteData(Statics.SERVLET_TEST, w, ctx, new BaseVolley.BohaVolleyListener() {
             @Override
-            public void onResponseReceived(ResponseDTO response) {
-                if (ErrorUtil.checkServerError(ctx, response)) {
+            public void onResponseReceived(final ResponseDTO r) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (!ErrorUtil.checkServerError(ctx, r)) {
 
-                }
-                SharedUtil.saveTeamMember(ctx, response.getTeamMember());
-                teamMember = response.getTeamMember();
-                setTeamMemberList(teamMember.getTeam().getTeammemberList());
+                        }
+                        SharedUtil.saveTeamMember(ctx, r.getTeamMember());
+                        teamMember = r.getTeamMember();
+                        buildPages();
+                    }
+                });
+
             }
 
             @Override
@@ -291,6 +218,7 @@ public class ProfileActivity extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_profile, menu);
+        setRefreshActionButtonState(true);
         return true;
     }
 
@@ -302,8 +230,11 @@ public class ProfileActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.menu_refresh) {
+            getProfileData();
             return true;
+        } else if (id == android.R.id.home) {
+            finish();
         }
 
         return super.onOptionsItemSelected(item);
@@ -346,7 +277,6 @@ public class ProfileActivity extends ActionBarActivity {
                 pictureChanged = false;
                 String url = (String) uploadResult.get("url");
                 teamMember.setTeamMemberImage(url);
-                SharedUtil.saveTeamMember(ctx, teamMember);
                 updateProfilePicture(teamMember);
             }
 
@@ -491,4 +421,247 @@ public class ProfileActivity extends ActionBarActivity {
     boolean pictureChanged;
     static final int CAPTURE_IMAGE = 3, PICK_IMAGE = 4;
     private static Uri fileUri;
+
+    @Override
+    public void onTeamPicked(TeamDTO team) {
+
+    }
+
+    @Override
+    public void onTeamMemberAdded(List<TeamMemberDTO> list) {
+
+    }
+
+    @Override
+    public void setBusy() {
+
+    }
+
+    @Override
+    public void setNotBusy() {
+
+    }
+
+    private class PagerAdapter extends FragmentStatePagerAdapter implements PageFragment {
+
+        public PagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int i) {
+
+            return (Fragment) pageFragmentList.get(i);
+        }
+
+        @Override
+        public int getCount() {
+            return pageFragmentList.size();
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            String title = "Title";
+
+            switch (position) {
+                case 0:
+                    title = "Team members";
+                    break;
+                case 1:
+                    title = "Teams";
+                    break;
+
+                default:
+                    break;
+            }
+            return title;
+        }
+
+        @Override
+        public void animateCounts() {
+
+        }
+    }
+
+    TeamListFragment teamListFragment;
+    TeamMemberListFragment teamMemberListFragment;
+
+    private void buildPages() {
+//        calculateDistances();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                P_name.setText(teamMember.getFirstName() + " " + teamMember.getLastName());
+                P_phone.setText((teamMember.getCellphone().equals("") ? "cell not specified" : teamMember.getCellphone()));
+                P_email.setText(teamMember.getEmail());
+                P_EVN_count.setText(teamMember.getEvaluationCount() + "");
+                P_TNAME.setText("Team " + teamMember.getTeam().getTeamName());
+                if (teamMember.getTeamMemberImage() == null) {
+                    AP_PP.setImageDrawable(ctx.getResources().getDrawable(R.drawable.boy));
+                } else {
+                    ImageLoader.getInstance().displayImage(teamMember.getTeamMemberImage(), AP_PP);
+                    ImageLoader.getInstance().displayImage(teamMember.getTeamMemberImage(), AP_PP, new ImageLoadingListener() {
+                        @Override
+                        public void onLoadingStarted(String s, View view) {
+
+                        }
+
+                        @Override
+                        public void onLoadingFailed(String s, View view, FailReason failReason) {
+
+                        }
+
+                        @Override
+                        public void onLoadingComplete(String s, View view, Bitmap bitmap) {
+                            Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+                                @Override
+                                public void onGenerated(Palette palette) {
+                                    Palette.Swatch aSwitch = palette.getMutedSwatch();
+                                    try {
+                                        textView7.setTextColor(aSwitch.getRgb());
+                                    } catch (Exception e) {
+
+                                    }
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onLoadingCancelled(String s, View view) {
+
+                        }
+                    });
+                }
+
+                P_add_member.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        addMemberDialog = new AddMemberDialog();
+                        addMemberDialog.show(getFragmentManager(), LOG);
+                        addMemberDialog.setTeamMember(teamMember);
+                        addMemberDialog.setFlag(false);
+                        addMemberDialog.setListener(new AddMemberDialog.AddMemberDialogListener() {
+                            @Override
+                            public void membersToBeRegistered(TeamMemberDTO tm) {
+                                registerMember(tm);
+                            }
+                        });
+                    }
+                });
+                P_edit.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        addMemberDialog = new AddMemberDialog();
+                        addMemberDialog.show(getFragmentManager(), LOG);
+                        addMemberDialog.setTeamMember(teamMember);
+                        addMemberDialog.setFlag(true);
+                        addMemberDialog.setListener(new AddMemberDialog.AddMemberDialogListener() {
+                            @Override
+                            public void membersToBeRegistered(TeamMemberDTO tm) {
+                                updateProfilePicture(tm);
+                            }
+                        });
+                    }
+                });
+                P_inviteMember.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(ProfileActivity.this, InviteMemberActivity.class);
+                        startActivity(intent);
+                    }
+                });
+                AP_PP.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        selectImageSource();
+                    }
+                });
+
+            }
+        });
+        pageFragmentList = new ArrayList<PageFragment>();
+        teamMemberListFragment = new TeamMemberListFragment();
+        teamListFragment = new TeamListFragment();
+        Bundle data = new Bundle();
+        Log.i(LOG, new Gson().toJson(teamMember.getTeam().getTeammemberList()));
+        data.putSerializable("teamMemberList", (Serializable) teamMember.getTeam().getTeammemberList());
+        data.putSerializable("tTeamList", (Serializable) teamMember.getTmemberList());
+
+        teamMemberListFragment.setArguments(data);
+        teamListFragment.setArguments(data);
+
+        pageFragmentList.add(teamMemberListFragment);
+        pageFragmentList.add(teamListFragment);
+
+        initializeAdapter();
+
+
+    }
+
+    private void initializeAdapter() {
+        try {
+            adapter = new PagerAdapter(getSupportFragmentManager());
+            mPager.setAdapter(adapter);
+            mPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                @Override
+                public void onPageSelected(int arg0) {
+                    PageFragment pf = pageFragmentList.get(arg0);
+
+
+                }
+
+                @Override
+                public void onPageScrolled(int arg0, float arg1, int arg2) {
+
+                }
+
+                @Override
+                public void onPageScrollStateChanged(int arg0) {
+                }
+            });
+            //ZoomOutPageTransformerImpl z = new ZoomOutPageTransformerImpl();
+            // mPager.setPageTransformer(true, z);
+        } catch (Exception e) {
+            Log.e(LOG, "-- Some shit happened, probably IllegalState of some kind ..." + e.toString());
+        }
+    }
+
+    private void getProfileData() {
+        RequestDTO w = new RequestDTO();
+        w.setRequestType(RequestDTO.GET_MEMBER);
+        w.setTeamMemberID(teamMember.getTeamMemberID());
+        runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+                setRefreshActionButtonState(true);
+            }
+        });
+        BaseVolley.getRemoteData(Statics.SERVLET_ENDPOINT, w, ctx, new BaseVolley.BohaVolleyListener() {
+            @Override
+            public void onResponseReceived(final ResponseDTO r) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        setRefreshActionButtonState(false);
+                        Log.e(LOG, "## getStarterData responded...statusCode: " + r.getStatusCode());
+                        if (!ErrorUtil.checkServerError(ctx, r)) {
+                            return;
+                        }
+                        SharedUtil.saveTeamMember(ctx, r.getTeamMember());
+                        teamMember = r.getTeamMember();
+                        buildPages();
+                    }
+                });
+
+            }
+
+            @Override
+            public void onVolleyError(VolleyError error) {
+                Toast.makeText(ctx, "Problem: " + error.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+
+    }
 }

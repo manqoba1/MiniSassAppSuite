@@ -5,7 +5,12 @@
     android:padding="8dp"
 
     tools:context="com.sifiso.codetribe.minisasslibrary.activities.EvaluationActivity">
-
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBar2"
+        android:visibility="gone"
+        android:layout_alignParentRight="true"/>
     <ScrollView
         android:id="@+id/scroll"
         android:layout_width="match_parent"

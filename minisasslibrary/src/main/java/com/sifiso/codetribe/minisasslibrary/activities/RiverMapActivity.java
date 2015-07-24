@@ -94,6 +94,7 @@ public class RiverMapActivity extends ActionBarActivity
     View topLayout;
     Activity activity;
     ProgressBar progressBar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(LOG, "############### onCreate ........................");
@@ -117,8 +118,6 @@ public class RiverMapActivity extends ActionBarActivity
         }
         setGoogleMap();
         getCachedData();
-        Util.setCustomActionBar(ctx, getSupportActionBar(),
-                "SA River Finder", ctx.getResources().getDrawable(R.drawable.ic_launcher));
     }
 
 
@@ -408,12 +407,14 @@ public class RiverMapActivity extends ActionBarActivity
     }
 
     ObjectAnimator an;
-    public  void rotateSearch() {
-        an =  ObjectAnimator.ofFloat(imgSearch, "rotation", 0.0f, 360f);
+
+    public void rotateSearch() {
+        an = ObjectAnimator.ofFloat(imgSearch, "rotation", 0.0f, 360f);
         an.setRepeatCount(ObjectAnimator.INFINITE);
         an.setInterpolator(new AccelerateDecelerateInterpolator());
         an.start();
     }
+
     private void setRiverMarkers() {
         googleMap.clear();
         int index = 0, count = 0;
@@ -424,10 +425,10 @@ public class RiverMapActivity extends ActionBarActivity
 
         progressBar.setVisibility(View.VISIBLE);
         BitmapDescriptor desc = BitmapDescriptorFactory.fromResource(R.drawable.dot_red_tiny);
-        for(EvaluationSiteDTO x : river.getEvaluationsiteList()){
+        for (EvaluationSiteDTO x : river.getEvaluationsiteList()) {
             LatLng pnt = new LatLng(x.getLatitude(), x.getLongitude());
 
-            for(EvaluationDTO e:x.getEvaluationList()){
+            for (EvaluationDTO e : x.getEvaluationList()) {
                 switch (e.getConditionsID()) {
                     case Constants.UNMODIFIED_NATURAL_SAND:
                         desc = BitmapDescriptorFactory.fromResource(R.drawable.blue_crap);
@@ -437,13 +438,13 @@ public class RiverMapActivity extends ActionBarActivity
                         break;
                     case Constants.MODERATELY_MODIFIED_SAND:
                         desc = BitmapDescriptorFactory.fromResource(R.drawable.orange_crap);
-                       break;
+                        break;
                     case Constants.LARGELY_MODIFIED_SAND:
                         desc = BitmapDescriptorFactory.fromResource(R.drawable.red_crap);
-                       break;
+                        break;
                     case Constants.CRITICALLY_MODIFIED_SAND:
                         desc = BitmapDescriptorFactory.fromResource(R.drawable.purple_crap);
-                         break;
+                        break;
                     case Constants.UNMODIFIED_NATURAL_ROCK:
                         desc = BitmapDescriptorFactory.fromResource(R.drawable.blue_crap);
                         break;
@@ -455,17 +456,17 @@ public class RiverMapActivity extends ActionBarActivity
                         break;
                     case Constants.LARGELY_MODIFIED_ROCK:
                         desc = BitmapDescriptorFactory.fromResource(R.drawable.red_crap);
-                         break;
+                        break;
                     case Constants.CRITICALLY_MODIFIED_ROCK:
                         desc = BitmapDescriptorFactory.fromResource(R.drawable.purple_crap);
-                       break;
+                        break;
                     case Constants.NOT_SPECIFIED:
                         desc = BitmapDescriptorFactory.fromResource(R.drawable.gray_crap);
                         break;
                 }
                 Marker m =
                         googleMap.addMarker(new MarkerOptions()
-                                .title(x.getRiverName()+" Site #"+x.getEvaluationSiteID())
+                                .title(x.getRiverName() + " Site #" + x.getEvaluationSiteID())
                                 .icon(desc)
                                 .snippet("Points: " + x.getEvaluationList().size())
                                 .position(pnt));
@@ -503,7 +504,6 @@ public class RiverMapActivity extends ActionBarActivity
 
 
     }
-
 
 
     private void startDirectionsMap(double lat, double lng) {

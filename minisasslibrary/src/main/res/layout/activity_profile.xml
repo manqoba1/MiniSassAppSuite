@@ -11,8 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/Beige"
+        android:elevation="8dp"
         android:gravity="center"
-
         android:text="Team Name"
         android:textColor="@color/Black" />
 
@@ -20,8 +20,11 @@
         android:id="@+id/P_LAY"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
         android:layout_below="@+id/P_TNAME"
-        android:background="@color/white">
+        android:background="@color/white"
+        android:elevation="8dp"
+        android:padding="8dp">
 
         <ImageView
             android:id="@+id/AP_PP"
@@ -30,6 +33,7 @@
             android:layout_alignEnd="@+id/P_CE"
             android:layout_margin="4dp"
             android:background="@color/grey"
+            android:elevation="8dp"
             android:scaleType="fitXY"
             android:src="@drawable/boy" />
 
@@ -38,34 +42,41 @@
             android:id="@+id/P_ICON"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignEnd="@+id/add_layout"
+            android:layout_alignParentTop="true"
+            android:layout_alignStart="@+id/P_EVN_count"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:src="@drawable/dot_green" />
 
         <TextView
             android:id="@+id/P_name"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Name and Surname"
             android:layout_below="@+id/P_ICON"
-            android:layout_alignStart="@+id/P_phone" />
+            android:layout_marginLeft="5dp"
+            android:layout_toEndOf="@+id/P_CE"
+            android:elevation="8dp"
+            android:text="Name and Surname" />
 
         <TextView
             android:id="@+id/P_phone"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Phone number"
+            android:layout_alignStart="@+id/P_email"
             android:layout_below="@+id/P_email"
-            android:layout_alignStart="@+id/P_email" />
+            android:layout_marginLeft="5dp"
+            android:elevation="8dp"
+            android:text="Phone number" />
 
         <TextView
             android:id="@+id/P_email"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Email"
             android:layout_below="@+id/P_name"
-            android:layout_alignStart="@+id/P_edit" />
+            android:layout_toEndOf="@+id/AP_PP"
+            android:elevation="8dp"
+            android:paddingLeft="5dp"
+            android:text="Email" />
 
         <TextView
             android:id="@+id/P_CE"
@@ -81,89 +92,78 @@
             style="@style/BlueCircle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="00"
-            android:visibility="visible"
+            android:layout_alignParentEnd="true"
             android:layout_below="@+id/AP_PP"
-            android:layout_alignEnd="@+id/P_ICON" />
+            android:layout_marginRight="6dp"
+            android:elevation="8dp"
+            android:text="00"
+            android:visibility="visible" />
 
-
-        <LinearLayout
-            android:id="@+id/add_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/P_CE"
-            android:orientation="horizontal"
-            android:padding="5dp"
-            android:weightSum="2">
-
-
-            <Button
-                android:id="@+id/P_add_member"
-                style="@style/ButtonNavyBlueSmall"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-               android:layout_marginRight="8dp"
-                android:text="Add team member" />
-
-            <Button
-                android:id="@+id/P_inviteMember"
-                style="@style/ButtonNavyBlueSmall"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Invite member" />
-        </LinearLayout>
-
-        <Spinner
-            android:id="@+id/P_sp_team"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/add_layout" />
 
         <ImageView
             android:id="@+id/P_edit"
             android:layout_width="@dimen/icon_edit"
             android:layout_height="@dimen/icon_edit"
-            android:layout_above="@+id/P_name"
 
+            android:layout_above="@+id/P_name"
             android:layout_marginLeft="10dp"
+            android:layout_marginStart="88dp"
             android:layout_toEndOf="@+id/AP_PP"
             android:src="@android:drawable/ic_menu_edit" />
 
-        <TextView
-            android:id="@+id/textView7"
-            style="@style/TextStyleBlueSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/AP_PP"
-            android:layout_alignEnd="@+id/AP_PP"
-            android:layout_alignParentStart="true"
-            android:autoLink="all"
-            android:gravity="center"
-            android:text="edit profile picture"
-
-            android:textAppearance="?android:attr/textAppearanceSmall" />
-
-        <ImageView
-            android:id="@+id/imageView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignStart="@+id/P_EVN_count"
-            android:layout_below="@+id/add_layout"
-            android:layout_marginRight="6dp"
-            android:src="@drawable/ic_action_add_person" />
 
     </RelativeLayout>
 
+    <LinearLayout
+        android:id="@+id/add_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/P_LAY"
+        android:elevation="8dp"
+        android:orientation="horizontal"
+        android:padding="5dp">
 
-    <ListView
-        android:id="@+id/P_membersList"
+
+        <Button
+            android:id="@+id/P_add_member"
+            style="@style/ButtonNavyBlueSmall"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:elevation="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_weight="1"
+            android:text="Add team member" />
+
+        <Button
+            android:id="@+id/P_inviteMember"
+            style="@style/ButtonNavyBlueSmall"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:elevation="8dp"
+            android:layout_weight="1"
+            android:text="Invite member" />
+    </LinearLayout>
+
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/SITE_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentEnd="true"
-        android:layout_below="@+id/P_LAY" />
+        android:elevation="8dp"
+        android:layout_below="@+id/add_layout"
+        android:layout_marginTop="5dp">
 
-
+        <android.support.v4.view.PagerTitleStrip
+            android:id="@+id/pager_title_strip"
+            style="@style/PagerSmall"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:background="@color/blue"
+            android:paddingBottom="8dp"
+            android:paddingTop="8dp"
+            android:textColor="#fff"
+            android:visibility="gone" />
+    </android.support.v4.view.ViewPager>
 </RelativeLayout>

@@ -4,26 +4,61 @@
     android:layout_height="match_parent"
     android:background="@drawable/xborder">
 
-    <AutoCompleteTextView
-        android:id="@+id/WT_sp_river"
-        android:background="@drawable/xborder"
+
+    <LinearLayout
+        android:id="@+id/no_connect_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="What is the current river are you at?"
-        android:padding="10dp"
-        android:maxLines="1"
-        android:textColor="@color/teal"
-        android:textColorHint="@color/teal" />
+        android:orientation="vertical">
+
+        <AutoCompleteTextView
+            android:id="@+id/WT_sp_river"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/xborder"
+            android:hint="What is the current river are you at?"
+            android:maxLines="1"
+            android:padding="10dp"
+            android:visibility="visible"
+            android:textColor="@color/teal"
+            android:textColorHint="@color/teal" />
+
+        <TextView
+            android:id="@+id/WT_sp_riverConnected"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/xborder"
+            android:hint="What is the current river are you at?"
+            android:maxLines="1"
+            android:textSize="18sp"
+            android:padding="10dp"
+            android:textColor="@color/teal"
+            android:textColorHint="@color/teal"
+            android:visibility="visible" />
+
+        <AutoCompleteTextView
+            android:id="@+id/WT_sp_stream"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/WT_sp_river"
+            android:background="@drawable/xborder"
+            android:padding="10dp"
+            android:visibility="gone"
+            android:hint="Stream not available? Add 0r Search"
+            android:textColor="@color/teal"
+            android:textColorHint="@color/teal" />
+    </LinearLayout>
 
     <RelativeLayout
         android:id="@+id/GPS_layout4"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/WT_sp_river"
+        android:layout_below="@id/no_connect_layout"
         android:layout_marginTop="@dimen/mon_divider"
         android:background="@drawable/xborder"
-        android:visibility="gone"
-        android:padding="@dimen/mon_padding">
+        android:padding="@dimen/mon_padding"
+        android:visibility="gone">
+
         <RelativeLayout
             android:id="@+id/GPS_layout2"
             android:layout_width="match_parent"
@@ -86,8 +121,7 @@
             android:id="@+id/GPS_accLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/GPS_layout3"
-            >
+            android:layout_below="@+id/GPS_layout3">
 
             <TextView
                 android:id="@+id/GPS_label4"
@@ -103,37 +137,25 @@
             style="@style/Title1TextStyleRed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/mon_margin"
-            android:text="00.0"
-            android:textSize="40sp"
             android:layout_below="@+id/GPS_layout3"
-            android:layout_toEndOf="@+id/GPS_accLayout" />
+            android:layout_marginLeft="@dimen/mon_margin"
+            android:layout_toEndOf="@+id/GPS_accLayout"
+            android:text="00.0"
+            android:textSize="40sp" />
 
     </RelativeLayout>
 
     <TextView
         android:id="@+id/WT_sp_category"
-        android:background="@drawable/xborder"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/GPS_layout4"
+        android:background="@drawable/xborder"
         android:focusable="false"
+        android:textSize="15sp"
         android:hint="What environment are you at? Rocky or Sandy?"
         android:padding="10dp"
-        android:layout_below="@+id/GPS_layout4"
         android:textColor="@color/teal"
         android:textColorHint="@color/teal" />
-
-    <Button
-        android:id="@+id/WT_gps_picker"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/WT_sp_category"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/xsquare_red"
-        android:text="Select site location"
-        android:visibility="gone"
-        android:textColor="@color/white" />
-
 
 </RelativeLayout>

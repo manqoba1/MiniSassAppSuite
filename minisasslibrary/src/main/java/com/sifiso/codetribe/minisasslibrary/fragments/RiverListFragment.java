@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,8 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class RiverListFragment extends Fragment implements PageFragment {
-
+public class RiverListFragment extends Fragment implements PageFragment, SwipeRefreshLayout.OnRefreshListener {
 
     ResponseDTO response;
     RiverAdapter riverAdapter;
@@ -46,6 +47,7 @@ public class RiverListFragment extends Fragment implements PageFragment {
     private AutoCompleteTextView SLT_editSearch;
     private ImageView SLT_imgSearch2, SLT_hero;
     private ListView RL_riverList;
+    private SwipeRefreshLayout refreshLayout;
 
 
     public RiverListFragment() {
@@ -80,8 +82,8 @@ public class RiverListFragment extends Fragment implements PageFragment {
         SLT_hero = (ImageView) v.findViewById(R.id.SLT_hero);
 
         SLT_imgSearch2 = (ImageView) v.findViewById(R.id.SLT_imgSearch2);
-        // SLT_imgSearch2.setVisibility(View.GONE);
-        // SLT_editSearch.setVisibility(View.GONE);
+        refreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.refreshLayout);
+        refreshLayout.setOnRefreshListener(this);
 
         SLT_imgSearch2.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -96,6 +98,7 @@ public class RiverListFragment extends Fragment implements PageFragment {
         setListView();
         riverToSearch();
     }
+
 
     List<String> stringRiver;
 
@@ -162,7 +165,7 @@ public class RiverListFragment extends Fragment implements PageFragment {
         riverAdapter = new RiverAdapter(response.getRiverList(), ctx, new RiverAdapter.RiverAdapterListener() {
             @Override
             public void onDirection(Double latitude, Double longitude) {
-                mListener.onDirection(latitude,longitude);
+                mListener.onDirection(latitude, longitude);
             }
 
             @Override
@@ -224,5 +227,28 @@ public class RiverListFragment extends Fragment implements PageFragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onRefresh() {
+        refreshLayout.setRefreshing(true);
+        mListener.onPullRefresh();
+
+    }
+
+    public void refreshListStop() {
+        //do processing to get new data and set your listview's adapter, maybe  reinitialise the loaders you may be using or so
+        //when your data has finished loading, cset the refresh state of the view to false
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                refreshLayout.setRefreshing(false);
+            }
+        }, 50000);
+
+    }
+    public void refreshListStart() {
+        refreshLayout.setRefreshing(true);
+        mListener.onPullRefresh();
     }
 }

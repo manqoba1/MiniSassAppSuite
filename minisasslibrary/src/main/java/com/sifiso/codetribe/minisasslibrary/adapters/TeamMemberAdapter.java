@@ -76,6 +76,7 @@ public class TeamMemberAdapter extends ArrayAdapter<TeamMemberDTO> {
             ImageLoader.getInstance().displayImage(tm.getTeamMemberImage(), viewHolderItem.image);
         }
 
+
         Statics.setRobotoFontBold(ctx, viewHolderItem.txtName);
         animateView(convertView);
 

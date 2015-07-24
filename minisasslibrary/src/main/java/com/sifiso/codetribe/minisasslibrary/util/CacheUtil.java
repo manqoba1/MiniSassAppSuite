@@ -45,7 +45,7 @@ public class CacheUtil implements Serializable {
 
     static CacheUtilListener utilListener;
     static CacheRequestListener cacheListener;
-    public static final int CACHE_DATA = 1, CACHE_REGISTER_DATA = 2, CACHE_COUNTRIES = 3, CACHE_EVALUATION = 4, CACHE_REQUEST = 5, CACHE_RIVER = 6, CACHE_RIVER_DATA = 7;
+    public static final int CACHE_DATA = 1, CACHE_REGISTER_DATA = 2, CACHE_SEARCH_DATA = 3, CACHE_EVALUATION = 4, CACHE_REQUEST = 5, CACHE_RIVER = 6, CACHE_RIVER_DATA = 7;
     static int dataType;
     static Integer projectID;
     static ResponseDTO response;
@@ -53,7 +53,7 @@ public class CacheUtil implements Serializable {
     static String countryCode;
     static Context ctx;
     static RequestCache requestCache;
-    static final String JSON_DATA = "data.json", JSON_COUNTRIES = "countries.json",
+    static final String JSON_DATA = "data.json", JSON_SEARCH = "search.json",
             JSON_EVALUATION_DATA = "evaluation_data", JSON_REGISTER_DATA = "register_data.json",
             JSON_REQUEST = "requestCache.json", JSON_RIVER = "river_data.json";
 
@@ -66,7 +66,7 @@ public class CacheUtil implements Serializable {
         new CacheTask().execute();
     }
 
-    public static void cacheRegisterData(Context context, ResponseDTO r,int type, CacheUtilListener cacheUtilListener) {
+    public static void cacheRegisterData(Context context, ResponseDTO r, int type, CacheUtilListener cacheUtilListener) {
         dataType = type;
         response = r;
         response.setLastCacheDate(new Date());
@@ -178,11 +178,21 @@ public class CacheUtil implements Serializable {
                                     " - length: " + file.length());
                         }
                         break;
-                    case CACHE_COUNTRIES:
+                    case CACHE_SEARCH_DATA:
                         json = gson.toJson(response);
-                        outputStream = ctx.openFileOutput(JSON_COUNTRIES, Context.MODE_PRIVATE);
+                        outputStream = ctx.openFileOutput(JSON_SEARCH, Context.MODE_PRIVATE);
                         write(outputStream, json);
-                        file = ctx.getFileStreamPath(JSON_COUNTRIES);
+                        file = ctx.getFileStreamPath(JSON_SEARCH);
+                        if (file != null) {
+                            Log.e(LOG, "Country cache written, path: " + file.getAbsolutePath() +
+                                    " - length: " + file.length());
+                        }
+                        break;
+                    case CACHE_RIVER_DATA:
+                        json = gson.toJson(response);
+                        outputStream = ctx.openFileOutput(JSON_RIVER, Context.MODE_PRIVATE);
+                        write(outputStream, json);
+                        file = ctx.getFileStreamPath(JSON_RIVER);
                         if (file != null) {
                             Log.e(LOG, "Country cache written, path: " + file.getAbsolutePath() +
                                     " - length: " + file.length());
@@ -264,17 +274,17 @@ public class CacheUtil implements Serializable {
                         response = getData(stream);
                         Log.i(LOG, "++ company data cache retrieved");
                         break;
-                    case CACHE_COUNTRIES:
-                        stream = ctx.openFileInput(JSON_COUNTRIES);
+                    case CACHE_SEARCH_DATA:
+                        stream = ctx.openFileInput(JSON_SEARCH);
                         response = getData(stream);
                         Log.i(LOG, "++ country cache retrieved");
                         break;
 
-                   /* case CACHE_RIVER_DATA:
+                    case CACHE_RIVER_DATA:
                         stream = ctx.openFileInput(JSON_RIVER);
                         response = getData(stream);
                         Log.i(LOG, "++ country cache retrieved");
-                        break;*/
+                        break;
 
                 }
                 response.setStatusCode(0);

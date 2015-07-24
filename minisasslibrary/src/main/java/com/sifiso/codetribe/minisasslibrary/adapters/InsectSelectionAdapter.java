@@ -70,19 +70,19 @@ public class InsectSelectionAdapter extends RecyclerView.Adapter<InsectSelection
         final InsectImageDTO insect = mList.get(position);
 
         int rID = mContext.getResources().getIdentifier(insect.getUri(), "drawable", mContext.getPackageName());
-        Log.d("TAG",new Gson().toJson(insect));
+        Log.d("TAG", new Gson().toJson(insect));
         h.INSC_image.setImageResource(rID);
-        h.INSC_image.setOnLongClickListener(new View.OnLongClickListener() {
+        h.INSC_image.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onLongClick(View v) {
-                Log.d("TAG",new Gson().toJson(insect));
+            public void onClick(View v) {
+                Log.d("TAG", new Gson().toJson(insect));
                 listener.onViewMoreImages(insect, position);
-                return false;
             }
         });
-        h.INSC_name.setText(insect.getGroupName());
-        Statics.setRobotoFontLight(mContext,h.INSC_name);
-        h.INSC_box.setText(insect.getGroupName());
+        h.INSC_name.setText(insect.getInsect().getGroupName());
+        Statics.setRobotoFontLight(mContext, h.INSC_name);
+
+        h.INSC_box.setText(insect.getInsect().getGroupName());
         h.INSC_box.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

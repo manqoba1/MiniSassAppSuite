@@ -7,6 +7,7 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 
+import android.graphics.Typeface;
 import android.view.ViewGroup.LayoutParams;
 import android.content.Context;
 import android.content.Intent;
@@ -53,6 +54,8 @@ import com.sifiso.codetribe.minisasslibrary.dto.EvaluationSiteDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.InsectDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.RiverDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.TeamMemberDTO;
+import com.sifiso.codetribe.minisasslibrary.viewsUtil.CircleTransform;
+import com.squareup.picasso.Picasso;
 
 import org.joda.time.DateTime;
 
@@ -101,19 +104,48 @@ public class Util {
     private static int MAX_IMAGE_DIMENSION = 720;
 
     public static void setCustomActionBar(Context ctx,
-                                          ActionBar actionBar, String text, Drawable image) {
+                                          ActionBar actionBar, String text, String team, String image, final ActinBarListener listener) {
         actionBar.setDisplayShowCustomEnabled(true);
 
         LayoutInflater inflator = (LayoutInflater)
                 ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View v = inflator.inflate(R.layout.action_bar_logo, null);
-        TextView txt = (TextView) v.findViewById(R.id.ACTION_BAR_text);
-        ImageView logo = (ImageView) v.findViewById(R.id.ACTION_BAR_logo);
+        final View actionView = inflator.inflate(R.layout.action_bar_logo, null);
+        final TextView txt = (TextView) actionView.findViewById(R.id.ACTION_BAR_text);
+        final TextView subTxt = (TextView) actionView.findViewById(R.id.ACTION_BAR_sub_text);
+        ImageView logo = (ImageView) actionView.findViewById(R.id.ACTION_BAR_logo);
         txt.setText(text);
-        //
-        logo.setImageDrawable(image);
-        actionBar.setCustomView(v);
-        actionBar.setTitle("");
+        subTxt.setText("Team " + team);
+        if (team.equals("") || team.equals(null)) {
+            subTxt.setVisibility(View.GONE);
+        } else {
+            subTxt.setVisibility(View.VISIBLE);
+        }
+        if (image.equals("") || image.equals(null)) {
+            logo.setImageDrawable(ctx.getResources().getDrawable(R.drawable.girl));
+        } else {
+            CircleTransform transform = new CircleTransform();
+            Picasso.with(ctx).load(image).placeholder(ctx.getResources().getDrawable(R.drawable.girl)).transform(transform).into(logo);
+
+        }
+
+        actionView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                flashOnce(txt, 200, new UtilAnimationListener() {
+                    @Override
+                    public void onAnimationEnded() {
+                        listener.onEvokeProfile();
+                    }
+                });
+                flashOnce(subTxt, 200, new UtilAnimationListener() {
+                    @Override
+                    public void onAnimationEnded() {
+
+                    }
+                });
+            }
+        });
+        actionBar.setCustomView(actionView);
     }
 
     public static int getPopupWidth(Activity activity) {
@@ -231,6 +263,7 @@ public class Util {
         customtoast.setDuration(Toast.LENGTH_SHORT);
         customtoast.show();
     }
+
     public static void showPopupWithHeroImage(Context ctx, Activity act,
                                               List<String> list,
                                               View anchorView, String caption, final UtilPopupListener listener) {
@@ -265,9 +298,10 @@ public class Util {
         });
         pop.show();
     }
+
     public static void showPopupWith(Context ctx, Activity act,
-                                              List<TeamMemberDTO> list,
-                                              View anchorView, String caption, final UtilPopupListener listener) {
+                                     List<TeamMemberDTO> list,
+                                     View anchorView, String caption, final UtilPopupListener listener) {
         final ListPopupWindow pop = new ListPopupWindow(act);
         LayoutInflater inf = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View v = inf.inflate(R.layout.hero_image_popup, null);
@@ -1593,5 +1627,9 @@ public class Util {
 
     public interface AddMemberListener {
         public void membersToBeRegistered(TeamMemberDTO tm);
+    }
+
+    public interface ActinBarListener {
+        public void onEvokeProfile();
     }
 }

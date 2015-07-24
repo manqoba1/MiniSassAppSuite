@@ -18,4 +18,7 @@ public interface CreateEvaluationListener {
     public void onCreateEvaluation(RiverDTO river);
 
     public void onDirection(Double latitude, Double longitude);
+
+    public void onPullRefresh();
+
 }

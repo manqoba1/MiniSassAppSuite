@@ -103,8 +103,8 @@ public class AddMemberDialog extends DialogFragment {
                 member.setLastName(rsMemberSurname.getText().toString());
                 member.setPin(rsPin.getText().toString());
                 member.setTeamID(teamMember.getTeam().getTeamID());
-                member.setTeamMemberImage(teamMember.getTeamMemberImage());
-                if (isFlag()) {
+               // member.setTeamMemberImage(teamMember.getTeamMemberImage());
+                if (!isFlag()) {
                     member.setTeamMemberID(teamMember.getTeamMemberID());
                 }
                 listener.membersToBeRegistered(member);
