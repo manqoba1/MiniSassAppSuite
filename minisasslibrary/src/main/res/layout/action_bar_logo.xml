@@ -2,13 +2,14 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:padding="@dimen/mon_padding"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_alignParentLeft="true">
 
     <ImageView
         android:id="@+id/ACTION_BAR_logo"
         android:src="@drawable/xblack_oval_small"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_width="48dp"
+        android:layout_height="48dp" />
 
     <LinearLayout
         android:orientation="vertical"

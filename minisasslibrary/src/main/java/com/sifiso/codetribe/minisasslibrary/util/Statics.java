@@ -11,17 +11,17 @@ import com.sifiso.codetribe.minisasslibrary.R;
 public class Statics {
 
 
-  /*public static final String WEBSOCKET_URL = "ws://69.89.15.29:8080/ms2/";
-   public static final String URL = "http://69.89.15.29:8080/ms2/";
-  public static final String IMAGE_URL = "http://69.89.15.29::8080/";*/
+    /*public static final String WEBSOCKET_URL = "ws://69.89.15.29:8080/ms2/";
+    public static final String URL = "http://69.89.15.29:8080/ms2/";
+    public static final String IMAGE_URL = "http://69.89.15.29::8080/";*/
 
-    public static final String WEBSOCKET_URL = "ws://192.168.1.145:8080/ms2/";
-    public static final String URL = "http://192.168.1.145:8080/ms2/";
-    public static final String IMAGE_URL = "http://192.168.1.145:8080/";
+    /*public static final String WEBSOCKET_URL = "ws://192.168.33.119:8080/ms2/";
+    public static final String URL = "http://192.168.33.119:8080/ms2/";
+    public static final String IMAGE_URL = "http://192.168.33.119:8080/";*/
 
-    /*public static final String WEBSOCKET_URL = "ws://146.64.85.16:8080/ms2/";
-    public static final String URL = "http://146.64.85.16:8080/ms2/";
-    public static final String IMAGE_URL = "http://146.64.85.16:8080/";*/
+    public static final String WEBSOCKET_URL = "ws://146.64.85.53:8080/ms2/";
+    public static final String URL = "http://146.64.85.53:8080/ms2/";
+    public static final String IMAGE_URL = "http://146.64.85.53:8080/";
 
     public static final String CRASH_REPORTS_URL = URL + "crash?";
     public static final String UPLOAD_URL_REQUEST = "uploadUrl?";

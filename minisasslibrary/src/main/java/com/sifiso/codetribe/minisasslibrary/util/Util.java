@@ -120,7 +120,7 @@ public class Util {
         } else {
             subTxt.setVisibility(View.VISIBLE);
         }
-        if (image.equals("") || image.equals(null)) {
+        if (image == null || image.equals("")) {
             logo.setImageDrawable(ctx.getResources().getDrawable(R.drawable.girl));
         } else {
             CircleTransform transform = new CircleTransform();

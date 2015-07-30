@@ -24,16 +24,12 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.gson.Gson;
 import com.sifiso.codetribe.minisasslibrary.R;
-import com.sifiso.codetribe.minisasslibrary.activities.RiverMapActivity;
-import com.sifiso.codetribe.minisasslibrary.dialogs.AddTeamDialog;
+import com.sifiso.codetribe.minisasslibrary.dialogs.AddTeamsDialog;
 import com.sifiso.codetribe.minisasslibrary.dto.GcmDeviceDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.TeamDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.TeamMemberDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.RequestDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.tranfer.ResponseDTO;
-import com.sifiso.codetribe.minisasslibrary.toolbox.WebCheck;
-import com.sifiso.codetribe.minisasslibrary.toolbox.WebCheckResult;
-import com.sifiso.codetribe.minisasslibrary.util.CacheUtil;
 import com.sifiso.codetribe.minisasslibrary.util.DataUtil;
 import com.sifiso.codetribe.minisasslibrary.util.ErrorUtil;
 import com.sifiso.codetribe.minisasslibrary.util.GCMUtil;
@@ -188,7 +184,7 @@ public class SignActivity extends ActionBarActivity {
         return true;
     }
 
-    AddTeamDialog addTeamDialog;
+    AddTeamsDialog addTeamDialog;
 
     public void sendSignIn() {
 
@@ -218,9 +214,9 @@ public class SignActivity extends ActionBarActivity {
                 }
                 // Log.d(LOG,resp.getTeamMember().getEmail());
                 if (resp.getTeamMember().getTeam() == null) {
-                    addTeamDialog = new AddTeamDialog();
+                    addTeamDialog = new AddTeamsDialog();
                     addTeamDialog.setTeamData(resp);
-                    addTeamDialog.setListener(new AddTeamDialog.AddTeamDialogListener() {
+                    addTeamDialog.setListener(new AddTeamsDialog.AddTeamDialogListener() {
                         @Override
                         public void onAddTeamToMember(TeamDTO team) {
                             DataUtil.addTeam(team, new DataUtil.DataUtilInterface() {

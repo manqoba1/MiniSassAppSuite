@@ -247,6 +247,7 @@ public class RiverListFragment extends Fragment implements PageFragment, SwipeRe
         }, 50000);
 
     }
+
     public void refreshListStart() {
         refreshLayout.setRefreshing(true);
         mListener.onPullRefresh();
