@@ -18,9 +18,11 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.android.volley.VolleyError;
 import com.sifiso.codetribe.minisasslibrary.R;
+import com.sifiso.codetribe.minisasslibrary.activities.EvaluationActivity;
 import com.sifiso.codetribe.minisasslibrary.activities.InsectBrowser;
 import com.sifiso.codetribe.minisasslibrary.adapters.EvaluationAdapter;
 import com.sifiso.codetribe.minisasslibrary.dialogs.EditEvaluationDialog;
@@ -54,9 +56,19 @@ public class EvaluationListFragment extends Fragment implements PageFragment {
     private CreateEvaluationListener mListener;
     private LinearLayout FEL_search;
     private ListView FEL_list;
+    private TextView RL_add;
     private ImageView SLT_imgSearch2, SLT_hero;
     private EditText SLT_editSearch;
     private EditEvaluationDialog editEvaluationDialog;
+
+    public static EvaluationListFragment newInstance(ResponseDTO resp, int index) {
+        EvaluationListFragment fragment = new EvaluationListFragment();
+        Bundle args = new Bundle();
+        args.putSerializable("response", resp);
+        args.putInt("index", index);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     public EvaluationListFragment() {
         // Required empty public constructor
@@ -80,22 +92,38 @@ public class EvaluationListFragment extends Fragment implements PageFragment {
         SLT_hero.setImageDrawable(Util.getRandomHeroImage(ctx));
 
 
-        setList();
     }
 
+    public void setEvaluationSiteList(List<EvaluationSiteDTO> evaluationSiteList) {
+        this.evaluationSiteList = evaluationSiteList;
+        List<EvaluationDTO> list = new ArrayList<>();
+        for (EvaluationSiteDTO evalSite : evaluationSiteList) {
+            for (EvaluationDTO eval : evalSite.getEvaluationList()) {
+                list.add(eval);
+            }
+        }
+        evaluationList = list;
+        Log.i(LOG, "++ evaluation has been set");
+        if (v != null) {
+            setList();
+        } else {
+            Log.e(LOG, "$%#$## WTF?");
+        }
+
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // getActivity().setTheme(R.style.EvalListTheme);
+        if (getArguments() != null) {
+            evaluationSiteList = (List<EvaluationSiteDTO>) getArguments().getSerializable("evaluationSite");
 
+        }
     }
 
     View v;
     EvaluationAdapter adapter;
-
     private Context ctx;
-    ResponseDTO response;
     private List<EvaluationDTO> evaluationList;
     Activity activity;
 
@@ -105,27 +133,9 @@ public class EvaluationListFragment extends Fragment implements PageFragment {
 
         v = inflater.inflate(R.layout.fragment_evaluation_list, container, false);
         Bundle b = getArguments();
-        //setHasOptionsMenu(true);
-        //  getActivity().setTheme(R.style.EvalListTheme);
         ctx = getActivity().getApplicationContext();
         activity = getActivity();
-        GPSTracker tracker = new GPSTracker(ctx);
-        if (b != null) {
-            evaluationSiteList = (List<EvaluationSiteDTO>) b.getSerializable("evaluationSite");
-            response = (ResponseDTO) b.getSerializable("response");
-            for (EvaluationSiteDTO evalSite : evaluationSiteList) {
 
-                for (EvaluationDTO eval : evalSite.getEvaluationList()) {
-                    if (evaluationList == null) {
-                        evaluationList = new ArrayList<>();
-                    }
-                    evaluationList.add(eval);
-                }
-            }
-            getActivity().setTitle(evaluationSiteList.get(0).getRiverName() + " Evaluation");
-
-
-        }
         build();
         return v;
     }
@@ -134,17 +144,7 @@ public class EvaluationListFragment extends Fragment implements PageFragment {
         return evaluationSiteList.get(0).getRiverName();
     }
 
-    public void setEvaluation() {
-
-        if (!evaluationList.isEmpty()) {
-            setList();
-        }
-
-    }
-
-
     private void setList() {
-        if (evaluationList == null) evaluationList = new ArrayList<>();
         LayoutInflater inf = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View v = inf.inflate(R.layout.hero_layout, null);
         // FEL_list.addHeaderView(v);
@@ -158,7 +158,6 @@ public class EvaluationListFragment extends Fragment implements PageFragment {
             @Override
             public void onDirectionToSite(EvaluationSiteDTO evaluationSite) {
                 mListener.onDirection(evaluationSite.getLatitude(), evaluationSite.getLongitude());
-                // startDirectionsMap(evaluationSite.getLatitude(), evaluationSite.getLongitude());
             }
 
             @Override
@@ -180,9 +179,7 @@ public class EvaluationListFragment extends Fragment implements PageFragment {
 
             @Override
             public void onViewInsect(List<EvaluationInsectDTO> insectImage) {
-               /* if(insectImage != null){
-                    return;
-                }*/
+
                 Util.showPopupInsectsSelected(ctx, activity, insectImage, SLT_hero, ctx.getResources().getString(R.string.insect_selected), new Util.UtilPopupInsectListener() {
                     @Override
                     public void onInsectSelected(InsectDTO insect) {
@@ -248,19 +245,6 @@ public class EvaluationListFragment extends Fragment implements PageFragment {
     public void animateCounts() {
 
     }
-
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-
 
     private List<EvaluationSiteDTO> evaluationSiteList;
 }

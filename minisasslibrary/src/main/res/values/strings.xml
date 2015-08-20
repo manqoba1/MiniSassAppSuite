@@ -138,4 +138,5 @@
     <string name="title_activity_view_more_images">ViewMoreImages</string>
     <string name="title_activity_just">Map</string>
     <string name="title_activity_visited_sites">VisitedSitesActivity</string>
+    <string name="title_activity_file_import">FileImportActivity</string>
 </resources>

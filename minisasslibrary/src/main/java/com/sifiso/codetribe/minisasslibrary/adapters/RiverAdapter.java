@@ -22,6 +22,7 @@ import com.sifiso.codetribe.minisasslibrary.util.Util;
 import com.sifiso.codetribe.minisasslibrary.viewsUtil.CircleTransform;
 
 import java.util.Date;
+import java.util.Formatter;
 import java.util.List;
 
 /**
@@ -61,7 +62,7 @@ public class RiverAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View v, ViewGroup parent) {
+    public View getView(final int position, View v, ViewGroup parent) {
         final Holder h;
         if (v == null) {
             h = new Holder();
@@ -101,8 +102,9 @@ public class RiverAdapter extends BaseAdapter {
         }
         h.AR_totalStreams.setText("" + dto.getStreamList().size());
         double percentage = total;//   Math.round((perc / dto.getEvaluationsiteList().size()) * 100.00) / 100.00; ;
+
         if (percentage > 0) {
-            h.AR_percOverallEva.setText(percentage + "");
+            h.AR_percOverallEva.setText((Math.round(percentage * 100.00) / 100.00) + "");
         } else {
             h.AR_percOverallEva.setText("0");
         }
@@ -143,7 +145,7 @@ public class RiverAdapter extends BaseAdapter {
                     @Override
                     public void onAnimationEnded() {
                         if (dto.getEvaluationsiteList() != null) {
-                            mListener.onEvaluationRequest(dto.getEvaluationsiteList());
+                            mListener.onEvaluationRequest(dto.getEvaluationsiteList(), position,dto.getRiverName().trim());
                         } else {
                             ToastUtil.toast(mCtx, "No evaluations yet");
                         }
@@ -159,7 +161,7 @@ public class RiverAdapter extends BaseAdapter {
                     @Override
                     public void onAnimationEnded() {
                         if (dto.getEvaluationsiteList() != null) {
-                            mListener.onEvaluationRequest(dto.getEvaluationsiteList());
+                            mListener.onEvaluationRequest(dto.getEvaluationsiteList(), position,dto.getRiverName().trim());
                         } else {
                             ToastUtil.toast(mCtx, "No evaluations yet");
                         }
@@ -196,7 +198,7 @@ public class RiverAdapter extends BaseAdapter {
     public interface RiverAdapterListener {
         public void onMapSiteRequest(List<EvaluationSiteDTO> siteList);
 
-        public void onEvaluationRequest(List<EvaluationSiteDTO> siteList);
+        public void onEvaluationRequest(List<EvaluationSiteDTO> siteList, int position,String riverName);
 
         public void onCreateEvaluation(RiverDTO river);
 

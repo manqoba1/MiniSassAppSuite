@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
     <LinearLayout
         android:id="@+id/fieldsLayout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/fieldsLayout"
         android:background="@color/white"
-        android:padding="5dp"
         android:orientation="vertical"
-    >
+        android:padding="6dp">
 
 
         <LinearLayout
@@ -40,9 +41,9 @@
         <EditText
             android:id="@+id/edtMemberName"
             android:layout_width="match_parent"
-            android:maxLines="1"
             android:layout_height="wrap_content"
-            android:hint="First Name" >
+            android:hint="First Name"
+            android:maxLines="1">
 
         </EditText>
 
@@ -50,9 +51,9 @@
             android:id="@+id/edtMemberLastNAme"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:maxLines="1"
             android:layout_below="@+id/edtMemberName"
-            android:hint="Last Name" />
+            android:hint="Last Name"
+            android:maxLines="1" />
 
         <AutoCompleteTextView
             android:id="@+id/edtMemberEmail"
@@ -60,26 +61,26 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/edtMemberLastNAme"
             android:hint="Email Address"
-            android:maxLines="1"
-            android:inputType="textEmailAddress" />
+            android:inputType="textEmailAddress"
+            android:maxLines="1" />
 
         <EditText
             android:id="@+id/edtMemberPhone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:maxLines="1"
             android:layout_below="@+id/edtMemberEmail"
             android:hint="Cellphone Number"
-            android:inputType="number" />
+            android:inputType="number"
+            android:maxLines="1" />
 
         <EditText
             android:id="@+id/edtPassword"
             android:layout_width="match_parent"
-            android:maxLines="1"
             android:layout_height="wrap_content"
             android:layout_below="@+id/edtMemberEmail"
             android:hint="Pin Code"
-            android:inputType="numberPassword" />
+            android:inputType="numberPassword"
+            android:maxLines="1" />
 
         <ViewStub
             android:id="@+id/vTub"
@@ -89,22 +90,18 @@
 
     </LinearLayout>
 
+
     <LinearLayout
-        android:id="@+id/btnLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/fieldsLayout2"
-        android:background="@color/white"
-        android:orientation="horizontal">
+        android:layout_below="@id/fieldsLayout2"
+        android:elevation="10dp"
+        android:background="@color/White"
+        android:orientation="horizontal"
+        android:padding="10dp">
 
-        <Button
-            android:id="@+id/btnReg"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@color/blue"
-            android:text="REGISTER"
-            android:textColor="@color/white"
-            android:textStyle="bold" />
+
+        <include layout="@layout/btn_red" />
+
     </LinearLayout>
 </RelativeLayout>

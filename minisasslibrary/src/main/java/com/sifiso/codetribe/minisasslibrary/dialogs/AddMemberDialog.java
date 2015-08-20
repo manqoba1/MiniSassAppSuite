@@ -14,8 +14,11 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
+import com.google.gson.Gson;
 import com.sifiso.codetribe.minisasslibrary.R;
 import com.sifiso.codetribe.minisasslibrary.dto.TeamMemberDTO;
+import com.sifiso.codetribe.minisasslibrary.util.Statics;
+import com.sifiso.codetribe.minisasslibrary.util.Util;
 
 /**
  * Created by CodeTribe1 on 2015-07-07.
@@ -53,65 +56,110 @@ public class AddMemberDialog extends DialogFragment {
         return v;
     }
 
+    TeamMemberDTO member;
 
     private void setFields() {
         rsMemberName = (EditText) v.findViewById(R.id.edtMemberName);
         rsMemberSurname = (EditText) v.findViewById(R.id.edtMemberLastNAme);
         rsPin = (EditText) v.findViewById(R.id.edtPassword);
+        rsPin.setVisibility(View.GONE);
         rsMemberEmail = (AutoCompleteTextView) v.findViewById(R.id.edtMemberEmail);
         rsCellphone = (EditText) v.findViewById(R.id.edtMemberPhone);
 
         cbMoreMember = (CheckBox) v.findViewById(R.id.cbMoreMember);
         cbMoreMember.setVisibility(View.GONE);
-        rsRegister = (Button) v.findViewById(R.id.btnReg);
-        rsRegister.setText("Join team " + teamMember.getTeam().getTeamName());
+        rsRegister = (Button) v.findViewById(R.id.btnLogSubmit);
+        rsRegister.setText("Join team " + teamMember.getTeamName());
         getDialog().setTitle("Add Member");
-        if(isFlag()){
+
+        if (isFlag()) {
             rsMemberName.setText(teamMember.getFirstName());
             rsMemberSurname.setText(teamMember.getLastName());
             rsCellphone.setText(teamMember.getCellphone());
             rsMemberEmail.setText(teamMember.getEmail());
             rsMemberEmail.setEnabled(false);
             rsPin.setText(teamMember.getPin());
+            rsPin.setVisibility(View.VISIBLE);
             rsRegister.setText("Submit");
-            getDialog().setTitle("Edit member profile");
+            //member.setPin(rsPin.getText().toString());
+            getDialog().setTitle("Edit Profile");
         }
         rsRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Util.flashOnce(rsRegister, 100, new Util.UtilAnimationListener() {
+                    @Override
+                    public void onAnimationEnded() {
+                        if (rsMemberName.getText().toString().isEmpty()) {
+                            rsMemberName.setError("Enter first name");
+                            // Toast.makeText(ctx, "Enter Last Name", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        if (Statics.isLetterAndNumber(rsMemberName.getText().toString())) {
+                            rsMemberName.setError("First name should be letters only");
+                            // Toast.makeText(ctx, "Enter Last Name", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        if (rsMemberSurname.getText().toString().isEmpty()) {
+                            rsMemberSurname.setError("Enter last name");
+                            // Toast.makeText(ctx, "Enter Last Name", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        if (Statics.isLetterAndNumber(rsMemberSurname.getText().toString())) {
+                            rsMemberSurname.setError("Last name should be letters only ");
+                            // Toast.makeText(ctx, "Enter Last Name", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
 
-                if (rsMemberName.getText().toString().isEmpty()) {
-                    rsMemberName.setError("Enter first name");
-                    // Toast.makeText(ctx, "Enter Last Name", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                if (rsMemberEmail.getText().toString().isEmpty()) {
-                    rsMemberEmail.setError("Enter email address");
-                    //Toast.makeText(ctx, "Enter Email Address", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                if (rsPin.getText().toString().isEmpty()) {
-                    rsPin.setError("Enter pin");
-                    //Toast.makeText(ctx, "Enter Email Address", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                TeamMemberDTO member = new TeamMemberDTO();
-                member.setActiveFlag(0);
-                member.setCellphone(rsCellphone.getText().toString());
-                member.setEmail(rsMemberEmail.getText().toString());
-                member.setFirstName(rsMemberName.getText().toString());
-                member.setLastName(rsMemberSurname.getText().toString());
-                member.setPin(rsPin.getText().toString());
-                member.setTeamID(teamMember.getTeam().getTeamID());
-               // member.setTeamMemberImage(teamMember.getTeamMemberImage());
-                if (!isFlag()) {
-                    member.setTeamMemberID(teamMember.getTeamMemberID());
-                }
-                listener.membersToBeRegistered(member);
-                dismiss();
+
+                        if (!Statics.rfc2822.matcher(rsMemberEmail.getText().toString()).matches()) {
+                            rsMemberEmail.setError("Enter email address");
+                            //Toast.makeText(ctx, "Enter Email Address", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        if (rsCellphone.getText().toString().length() != 10) {
+                            rsCellphone.setError("Phone number must be 10 digits long");
+                            // Toast.makeText(ctx, "Enter Last Name", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        if (rsPin.getText().toString().isEmpty()) {
+                            rsPin.setError("Enter pin");
+                            //Toast.makeText(ctx, "Enter Email Address", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        member = new TeamMemberDTO();
+                        member.setActiveFlag(0);
+                        member.setCellphone(rsCellphone.getText().toString());
+                        member.setEmail(rsMemberEmail.getText().toString());
+                        member.setFirstName(rsMemberName.getText().toString());
+                        member.setLastName(rsMemberSurname.getText().toString());
+
+                        member.setTeamID(teamMember.getTeamID());
+
+                        // member.setTeamMemberImage(teamMember.getTeamMemberImage());
+                        member.setTeamMemberID(teamMember.getTeamMemberID());
+                        if (isFlag()) {
+
+                            member.setTeamMemberImage(teamMember.getTeamMemberImage());
+                            member.setTeamName(teamMember.getTeamName());
+                            if (teamMember.getTmemberList() != null) {
+                                member.setTmemberList(teamMember.getTmemberList());
+                            }
+                            if (teamMember.getTeam() != null) {
+                                member.setTeam(teamMember.getTeam());
+                            }
+                            member.setPin(rsPin.getText().toString());
+                        }
+                        //Util.showToast(ctx, "show");
+                        listener.membersToBeRegistered(member);
+                        // dismiss();
+                    }
+                });
+
             }
         });
     }
+
 
     boolean flag;
 
@@ -124,6 +172,7 @@ public class AddMemberDialog extends DialogFragment {
     }
 
     public void setTeamMember(TeamMemberDTO teamMember) {
+        Log.d(LOG, new Gson().toJson(teamMember));
         this.teamMember = teamMember;
     }
 

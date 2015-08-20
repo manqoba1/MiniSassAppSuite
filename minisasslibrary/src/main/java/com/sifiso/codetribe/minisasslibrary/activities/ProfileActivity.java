@@ -96,8 +96,7 @@ public class ProfileActivity extends ActionBarActivity implements BusyListener, 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         ctx = getApplicationContext();
         getSupportActionBar().setTitle("Profile");
-        teamMember = SharedUtil.getTeamMember(ctx);
-        Log.d(LOG, new Gson().toJson(teamMember));
+
         setFields();
         setRefreshActionButtonState(true);
     }
@@ -157,35 +156,50 @@ public class ProfileActivity extends ActionBarActivity implements BusyListener, 
         buildPages();
     }
 
+    boolean isEdited;
 
     private void updateProfilePicture(final TeamMemberDTO tm) {
-        Log.e(LOG, new Gson().toJson(tm));
+        Log.e(LOG + " Updated", new Gson().toJson(tm));
         RequestDTO w = new RequestDTO();
         w.setRequestType(RequestDTO.UPDATE_PROFILE);
         w.setTeamMember(tm);
         BaseVolley.getRemoteData(Statics.SERVLET_TEST, w, ctx, new BaseVolley.BohaVolleyListener() {
             @Override
             public void onResponseReceived(final ResponseDTO r) {
+                if (!ErrorUtil.checkServerError(ctx, r)) {
+                    return;
+                }
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Log.i(LOG + "Check", new Gson().toJson(r));
-                        SharedUtil.saveTeamMember(ctx, r.getTeamMember());
-                        teamMember = r.getTeamMember();
+                        Log.i(LOG + " Check", new Gson().toJson(r));
+
+                        if (isEdited) {
+                            addMemberDialog.dismiss();
+                            Util.showToast(ctx, r.getMessage());
+                            isEdited = false;
+                        }
+                        SharedUtil.saveTeamMember(ctx, tm);
+                        teamMember = tm;
                         buildPages();
                     }
                 });
             }
 
             @Override
-            public void onVolleyError(VolleyError error) {
-
+            public void onVolleyError(final VolleyError error) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Util.showErrorToast(ctx, "Problem: " + error.getMessage());
+                    }
+                });
             }
         });
     }
 
 
-    private void registerMember(TeamMemberDTO dto) {
+    private void registerMember(final TeamMemberDTO dto) {
         RequestDTO w = new RequestDTO();
         w.setRequestType(RequestDTO.REGISTER_TEAM_MEMBER);
         w.setTeamMember(dto);
@@ -197,10 +211,13 @@ public class ProfileActivity extends ActionBarActivity implements BusyListener, 
                     @Override
                     public void run() {
                         if (!ErrorUtil.checkServerError(ctx, r)) {
-
+                            return;
                         }
-                        SharedUtil.saveTeamMember(ctx, r.getTeamMember());
+                        Util.showToast(ctx, r.getMessage());
+                        addMemberDialog.dismiss();
                         teamMember = r.getTeamMember();
+                        teamMember.getTeam().getTeammemberList().add(0, dto);
+                        SharedUtil.saveTeamMember(ctx, teamMember);
                         buildPages();
                     }
                 });
@@ -209,7 +226,12 @@ public class ProfileActivity extends ActionBarActivity implements BusyListener, 
 
             @Override
             public void onVolleyError(VolleyError error) {
-
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Util.showErrorToast(ctx, dto.getEmail() + " already exists in out database");
+                    }
+                });
             }
         });
     }
@@ -234,6 +256,7 @@ public class ProfileActivity extends ActionBarActivity implements BusyListener, 
             getProfileData();
             return true;
         } else if (id == android.R.id.home) {
+
             finish();
         }
 
@@ -269,15 +292,22 @@ public class ProfileActivity extends ActionBarActivity implements BusyListener, 
         startActivityForResult(intent, PICK_IMAGE);
     }
 
-    private void uploadProfileImageToCDN(final TeamMemberDTO teamMember, File imgUrl) {
+    private void uploadProfileImageToCDN(final TeamMemberDTO tn, File imgUrl) {
         Log.e(LOG, imgUrl.toString());
         CloudinaryUtil.uploadImagesToCDN(ctx, imgUrl, new CloudinaryUtil.CloudinaryUtilListner() {
             @Override
             public void onSuccessUpload(Map uploadResult) {
                 pictureChanged = false;
                 String url = (String) uploadResult.get("url");
-                teamMember.setTeamMemberImage(url);
-                updateProfilePicture(teamMember);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Util.showToast(ctx, "Profile picture uploaded");
+                    }
+                });
+
+                tn.setTeamMemberImage(url);
+                updateProfilePicture(tn);
             }
 
             @Override
@@ -491,11 +521,13 @@ public class ProfileActivity extends ActionBarActivity implements BusyListener, 
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                teamMember = SharedUtil.getTeamMember(ctx);
                 P_name.setText(teamMember.getFirstName() + " " + teamMember.getLastName());
                 P_phone.setText((teamMember.getCellphone().equals("") ? "cell not specified" : teamMember.getCellphone()));
                 P_email.setText(teamMember.getEmail());
-                P_EVN_count.setText(teamMember.getEvaluationCount() + "");
-                P_TNAME.setText("Team " + teamMember.getTeam().getTeamName());
+
+                P_EVN_count.setText((teamMember.getEvaluationCount() == null ? 0 : teamMember.getEvaluationCount()) + "");
+                P_TNAME.setText("Team " + teamMember.getTeamName());
                 if (teamMember.getTeamMemberImage() == null) {
                     AP_PP.setImageDrawable(ctx.getResources().getDrawable(R.drawable.boy));
                 } else {
@@ -559,6 +591,8 @@ public class ProfileActivity extends ActionBarActivity implements BusyListener, 
                         addMemberDialog.setListener(new AddMemberDialog.AddMemberDialogListener() {
                             @Override
                             public void membersToBeRegistered(TeamMemberDTO tm) {
+                                Log.d(LOG, new Gson().toJson(tm));
+                                isEdited = true;
                                 updateProfilePicture(tm);
                             }
                         });
@@ -584,7 +618,7 @@ public class ProfileActivity extends ActionBarActivity implements BusyListener, 
         teamMemberListFragment = new TeamMemberListFragment();
         teamListFragment = new TeamListFragment();
         Bundle data = new Bundle();
-        Log.i(LOG, new Gson().toJson(teamMember.getTeam().getTeammemberList()));
+//        Log.i(LOG, new Gson().toJson(teamMember.getTeam().getTeammemberList()));
         data.putSerializable("teamMemberList", (Serializable) teamMember.getTeam().getTeammemberList());
         data.putSerializable("tTeamList", (Serializable) teamMember.getTmemberList());
 
@@ -649,8 +683,9 @@ public class ProfileActivity extends ActionBarActivity implements BusyListener, 
                         if (!ErrorUtil.checkServerError(ctx, r)) {
                             return;
                         }
-                        SharedUtil.saveTeamMember(ctx, r.getTeamMember());
                         teamMember = r.getTeamMember();
+                        SharedUtil.saveTeamMember(ctx, teamMember);
+
                         buildPages();
                     }
                 });
@@ -658,8 +693,13 @@ public class ProfileActivity extends ActionBarActivity implements BusyListener, 
             }
 
             @Override
-            public void onVolleyError(VolleyError error) {
-                Toast.makeText(ctx, "Problem: " + error.getMessage(), Toast.LENGTH_LONG).show();
+            public void onVolleyError(final VolleyError error) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Util.showErrorToast(ctx, "Problem: " + error.getMessage());
+                    }
+                });
             }
         });
 

@@ -17,7 +17,9 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -35,8 +37,11 @@ import com.sifiso.codetribe.minisasslibrary.util.ErrorUtil;
 import com.sifiso.codetribe.minisasslibrary.util.GCMUtil;
 import com.sifiso.codetribe.minisasslibrary.util.SharedUtil;
 import com.sifiso.codetribe.minisasslibrary.util.Statics;
+import com.sifiso.codetribe.minisasslibrary.util.TimerUtil;
 import com.sifiso.codetribe.minisasslibrary.util.ToastUtil;
+import com.sifiso.codetribe.minisasslibrary.util.Util;
 import com.sifiso.codetribe.minisasslibrary.util.WebSocketUtil;
+import com.sifiso.codetribe.minisasslibrary.viewsUtil.RandomPics;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +54,8 @@ public class SignActivity extends ActionBarActivity {
     String email, townList;
     ProgressBar sign_progress;
     AutoCompleteTextView esEmail;
+    TextView SI_app, SI_welcome;
+    ImageView SI_banner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,17 +101,39 @@ public class SignActivity extends ActionBarActivity {
 
     public void setFields() {
 
-
+        SI_app = (TextView) findViewById(R.id.SI_app);
+        SI_banner = (ImageView) findViewById(R.id.SI_banner);
+        SI_banner.setImageDrawable(Util.getRandomHeroImage(ctx));
+        SI_banner.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Util.flashOnce(SI_banner, 100, new Util.UtilAnimationListener() {
+                    @Override
+                    public void onAnimationEnded() {
+                        SI_banner.setImageDrawable(Util.getRandomHeroImage(ctx));
+                    }
+                });
+            }
+        });
+        SI_app.setText("MiniSASS App Sign in");
+        SI_welcome = (TextView) findViewById(R.id.SI_welcome);
         bsSignin = (Button) findViewById(R.id.btnLogSubmit);
-        esEmail = (AutoCompleteTextView) findViewById(R.id.edtLogEmail);
-        esPin = (EditText) findViewById(R.id.edtLogPassword);
-        sign_progress = (ProgressBar) findViewById(R.id.signProgress);
+        bsSignin.setText("Sign In");
+        esEmail = (AutoCompleteTextView) findViewById(R.id.SI_txtEmail);
+        esPin = (EditText) findViewById(R.id.SI_pin);
+        sign_progress = (ProgressBar) findViewById(R.id.progressBar);
 
 
         bsSignin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendSignIn();
+                Util.flashOnce(bsSignin, 100, new Util.UtilAnimationListener() {
+                    @Override
+                    public void onAnimationEnded() {
+                        sendSignIn();
+                    }
+                });
+
               /*  Intent intentEva = new Intent(SignActivity.this, EvaluationView.class);
                 startActivity(intentEva);
                 finish();*/
@@ -258,7 +287,14 @@ public class SignActivity extends ActionBarActivity {
             }
 
             @Override
-            public void onError(String message) {
+            public void onError(final String message) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.e(LOG, message);
+                        Util.showErrorToast(ctx, "Check your network connectivity:");
+                    }
+                });
 
             }
         });
@@ -298,6 +334,17 @@ public class SignActivity extends ActionBarActivity {
 
     }
 
+    @Override
+    protected void onPause() {
+        TimerUtil.killFlashTimer();
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        TimerUtil.killFlashTimer();
+        super.onDestroy();
+    }
 
     static final String LOG = "SigninActivity";
 

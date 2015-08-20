@@ -26,10 +26,11 @@ public class ViewMoreImages extends ActionBarActivity {
     private ViewMoreImageAdapter adapter;
     private RecyclerView SD_list;
 
-  //  private List<InsectImageListDTO> mImageListDTOs;
+    //  private List<InsectImageListDTO> mImageListDTOs;
     private List<InsectImageDTO> mSites;
     Intent intent;
-private InsectImageDTO insect;
+    private InsectImageDTO insect;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,6 +90,9 @@ private InsectImageDTO insect;
         }
         if (id == R.id.action_grid) {
             SD_list.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+        }
+        if(id == android.R.id.home){
+            finish();
         }
 
         return super.onOptionsItemSelected(item);

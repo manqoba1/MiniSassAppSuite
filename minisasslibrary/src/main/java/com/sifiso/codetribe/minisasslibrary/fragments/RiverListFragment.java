@@ -17,6 +17,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.sifiso.codetribe.minisasslibrary.R;
@@ -45,10 +46,20 @@ public class RiverListFragment extends Fragment implements PageFragment, SwipeRe
     private Context ctx;
     private Activity activity;
     private AutoCompleteTextView SLT_editSearch;
+    private TextView RL_add;
     private ImageView SLT_imgSearch2, SLT_hero;
     private ListView RL_riverList;
     private SwipeRefreshLayout refreshLayout;
+    private int index2;
 
+    public static RiverListFragment newInstance(ResponseDTO resp, int indexList) {
+        RiverListFragment fragment = new RiverListFragment();
+        Bundle args = new Bundle();
+        args.putSerializable("response", resp);
+        args.putInt("index", indexList);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     public RiverListFragment() {
         // Required empty public constructor
@@ -60,6 +71,7 @@ public class RiverListFragment extends Fragment implements PageFragment, SwipeRe
         if (getArguments() != null) {
 
             response = (ResponseDTO) getArguments().getSerializable("response");
+            index2 = savedInstanceState.getInt("index");
         }
     }
 
@@ -75,6 +87,20 @@ public class RiverListFragment extends Fragment implements PageFragment, SwipeRe
         GPSTracker tracker = new GPSTracker(ctx);
         setField();
         return v;
+    }
+
+    public void setResponse(ResponseDTO resp, int index) {
+        this.response = resp;
+        this.index2 = index;
+
+        Log.i(LOG, "++ rivers has been set index : " + index);
+        if (v != null) {
+            setListView();
+            riverToSearch();
+        } else {
+            Log.e(LOG, "$%#$## WTF?");
+        }
+
     }
 
     private void setField() {
@@ -95,8 +121,6 @@ public class RiverListFragment extends Fragment implements PageFragment, SwipeRe
         RL_riverList = (ListView) v.findViewById(R.id.RL_riverList);
         SLT_hero.setImageDrawable(Util.getRandomHeroImage(ctx));
 
-        setListView();
-        riverToSearch();
     }
 
 
@@ -161,7 +185,6 @@ public class RiverListFragment extends Fragment implements PageFragment, SwipeRe
 
     private void setListView() {
 
-        Log.d(LOG, "Mentor " + new Gson().toJson(response.getRiverList()));
         riverAdapter = new RiverAdapter(response.getRiverList(), ctx, new RiverAdapter.RiverAdapterListener() {
             @Override
             public void onDirection(Double latitude, Double longitude) {
@@ -174,9 +197,9 @@ public class RiverListFragment extends Fragment implements PageFragment, SwipeRe
             }
 
             @Override
-            public void onEvaluationRequest(List<EvaluationSiteDTO> siteList) {
+            public void onEvaluationRequest(List<EvaluationSiteDTO> siteList, int position,String riverName) {
 
-                mListener.onRefreshEvaluation(siteList, 1);
+                mListener.onRefreshEvaluation(siteList, position,riverName);
             }
 
             @Override
@@ -192,7 +215,13 @@ public class RiverListFragment extends Fragment implements PageFragment, SwipeRe
         LayoutInflater inf = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View v = inf.inflate(R.layout.hero_layout, null);
         // RL_riverList.addHeaderView(v);
+
         RL_riverList.setAdapter(riverAdapter);
+        RL_riverList.setVerticalScrollbarPosition(index2);
+
+        Log.d(LOG, "Mentor " + index2);
+        RL_riverList.setSelection(index2);
+
         RL_riverList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
@@ -239,13 +268,7 @@ public class RiverListFragment extends Fragment implements PageFragment, SwipeRe
     public void refreshListStop() {
         //do processing to get new data and set your listview's adapter, maybe  reinitialise the loaders you may be using or so
         //when your data has finished loading, cset the refresh state of the view to false
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                refreshLayout.setRefreshing(false);
-            }
-        }, 50000);
-
+        refreshLayout.setRefreshing(false);
     }
 
     public void refreshListStart() {

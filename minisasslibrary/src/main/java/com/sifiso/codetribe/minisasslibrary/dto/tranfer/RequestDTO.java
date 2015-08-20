@@ -39,7 +39,7 @@ public class RequestDTO implements Serializable {
 
 
     public static final int ADD_RIVER = 10,
-            ADD_INSECT = 13,
+            IMPORT_MEMBER_INFO = 13,
             ADD_INSECT_IMAGE = 14,
             ADD_EVALUATION = 15,
             ADD_COMMENT = 16,

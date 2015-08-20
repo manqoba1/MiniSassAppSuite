@@ -10,7 +10,6 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- *
  * @author CodeTribe1
  */
 public class ConditionsDTO implements Serializable {
@@ -18,7 +17,7 @@ public class ConditionsDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Integer conditionsID, categoryID;
-    private String conditionName;
+    private String conditionName, categoryName;
     private double low;
     private double high;
     private List<EvaluationDTO> evaluationList;
@@ -29,6 +28,13 @@ public class ConditionsDTO implements Serializable {
     }
 
 
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
 
     public Integer getCategoryID() {
         return categoryID;

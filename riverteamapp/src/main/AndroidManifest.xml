@@ -6,8 +6,6 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
-
-
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -19,14 +17,14 @@
 
     <uses-permission android:name="com.boha.cmauthor.gcm.permission.C2D_MESSAGE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
     <!--
  The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
          Google Maps Android API v2, but are recommended.
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-     -->
-
+    -->
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -68,16 +66,13 @@
         <activity
             android:name=".MainPagerActivity"
             android:label="@string/app_name"
-            android:screenOrientation="portrait">
-
-        </activity>
+            android:screenOrientation="portrait"></activity>
         <activity
             android:name="com.sifiso.codetribe.minisasslibrary.activities.MapsActivity"
-            android:label="@string/title_activity_minisass_maps"></activity>
+            android:label="@string/title_activity_minisass_maps" />
         <activity
             android:name="com.sifiso.codetribe.minisasslibrary.activities.EvaluationActivity"
-            android:label="@string/title_activity_evaluation"></activity>
-
+            android:label="@string/title_activity_evaluation" />
         <activity
             android:name=".RegisterActivity"
             android:label="@string/title_activity_register"
@@ -85,15 +80,7 @@
         <activity
             android:name=".SignActivity"
             android:label="@string/title_activity_sign"
-            android:windowSoftInputMode="stateHidden" />
-        <activity
-            android:name="com.sifiso.codetribe.minisasslibrary.activities.SplashActivity"
-            android:label="@string/app_name">
-
-        </activity>
-        <activity
-            android:name=".Welcome"
-            android:label="@string/title_activity_welcome">
+            android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -101,8 +88,20 @@
             </intent-filter>
         </activity>
         <activity
+            android:name="com.sifiso.codetribe.minisasslibrary.activities.SplashActivity"
+            android:label="@string/app_name"></activity>
+        <activity
+            android:name=".Welcome"
+            android:label="@string/title_activity_welcome">
+
+        </activity>
+        <activity
             android:name=".MapsActivity"
-            android:label="@string/title_activity_maps"></activity>
+            android:label="@string/title_activity_maps" />
+        <activity
+            android:name=".EvaluationListActivity"
+            android:label="@string/title_activity_evaluation_list"></activity>
+
     </application>
 
 </manifest>

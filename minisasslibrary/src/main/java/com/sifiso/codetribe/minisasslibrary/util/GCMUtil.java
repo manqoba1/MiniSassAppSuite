@@ -2,6 +2,8 @@ package com.sifiso.codetribe.minisasslibrary.util;
 
 /**
  * Created by aubreyM on 2014/10/12.
+ * <p/>
+ * Created by aubreyM on 2014/05/11.
  */
 
 /**
@@ -41,7 +43,7 @@ public class GCMUtil {
 
     }
 
-    public static final String GCM_SENDER_ID = "416263723885";
+    public static final String GCM_SENDER_ID = "884798769581";
 
     static class GCMTask extends AsyncTask<Void, Void, Integer> {
 
@@ -71,7 +73,7 @@ public class GCMUtil {
             if (result > 0) {
                 gcmUtilListener.onGCMError();
                 //ErrorUtil.handleErrors(ctx, result);
-
+                new GCMTask().execute();
                 return;
             }
             gcmUtilListener.onDeviceRegistered(registrationID);

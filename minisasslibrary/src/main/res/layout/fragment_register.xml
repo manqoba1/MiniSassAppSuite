@@ -27,10 +27,11 @@
         <LinearLayout
             android:id="@+id/fieldsLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_below="@+id/fieldsLayout1"
             android:background="@color/white"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="6dp">
 
 
             <TextView
@@ -46,17 +47,16 @@
                 android:id="@+id/edtRegTeamName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:maxLines="1"
-                android:marqueeRepeatLimit="1"
                 android:layout_below="@+id/imgTopLgo"
-                android:hint="Organisation Name">
+                android:hint="Organisation Name"
+                android:marqueeRepeatLimit="1"
+                android:maxLines="1">
 
                 <requestFocus />
             </EditText>
 
             <Spinner
                 android:id="@+id/sp_org_type"
-                style="@style/TextStyleOrangeSmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
@@ -67,7 +67,6 @@
 
             <Spinner
                 android:id="@+id/sp_country"
-                style="@style/TextStyleOrangeSmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"

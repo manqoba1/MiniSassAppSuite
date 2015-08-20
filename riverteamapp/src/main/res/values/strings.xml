@@ -6,8 +6,9 @@
     <string name="title_activity_evaluation">Evaluation</string>
     <string name="title_activity_evaluation_view">EvaluationView</string>
     <string name="title_activity_register">RegisterActivity</string>
-    <string name="title_activity_sign">SignActivity</string>
+    <string name="title_activity_sign">MiniSass</string>
     <string name="title_activity_welcome">MiniSass</string>
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_welcome_screen">WelcomeScreen</string>
+    <string name="title_activity_evaluation_list">EvaluationListActivity</string>
 </resources>

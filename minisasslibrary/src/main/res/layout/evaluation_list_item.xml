@@ -256,6 +256,13 @@
                 android:src="@android:drawable/ic_menu_directions" />
         </LinearLayout>
 
-    </RelativeLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="New Text"
+            android:id="@+id/ELI_envType"
+            android:layout_below="@+id/ELI_date"
+            android:layout_toEndOf="@+id/ELI_txtCount" />
 
+    </RelativeLayout>
 </RelativeLayout>

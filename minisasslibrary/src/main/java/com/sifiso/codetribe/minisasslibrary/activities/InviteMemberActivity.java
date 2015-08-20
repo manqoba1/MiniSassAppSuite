@@ -103,8 +103,8 @@ public class InviteMemberActivity extends ActionBarActivity {
         });
         adapter = new InviteMemberAdapter(ctx, response.getTeamMemberList(), teamMember.getTeam().getTeamID(), new InviteMemberAdapter.InviteMemberAdapterListener() {
             @Override
-            public void onInviteAccepted(TeamMemberDTO teamMember) {
-                sendInvite(teamMember.getTeamMemberID(), teamMember.getTeamID());
+            public void onInviteAccepted(TeamMemberDTO ten) {
+                sendInvite(ten.getTeamMemberID(), teamMember.getTeam().getTeamID());
             }
         });
         MSG_list.setAdapter(adapter);
@@ -118,9 +118,7 @@ public class InviteMemberActivity extends ActionBarActivity {
         BaseVolley.getRemoteData(Statics.SERVLET_ENDPOINT, w, ctx, new BaseVolley.BohaVolleyListener() {
             @Override
             public void onResponseReceived(ResponseDTO r) {
-                if (!ErrorUtil.checkServerError(ctx, r)) {
-                    return;
-                }
+
                 search(searchText);
             }
 

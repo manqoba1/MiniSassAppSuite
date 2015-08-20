@@ -10,11 +10,6 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.view.PagerTitleStrip;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -31,6 +26,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.gson.Gson;
 import com.sifiso.codetribe.minisasslibrary.R;
 import com.sifiso.codetribe.minisasslibrary.activities.EvaluationActivity;
 import com.sifiso.codetribe.minisasslibrary.activities.MapsActivity;
@@ -57,6 +53,7 @@ import com.sifiso.codetribe.minisasslibrary.util.ErrorUtil;
 import com.sifiso.codetribe.minisasslibrary.util.SharedUtil;
 import com.sifiso.codetribe.minisasslibrary.util.Statics;
 import com.sifiso.codetribe.minisasslibrary.util.TimerUtil;
+import com.sifiso.codetribe.minisasslibrary.util.ToastUtil;
 import com.sifiso.codetribe.minisasslibrary.util.Util;
 
 import java.util.ArrayList;
@@ -71,12 +68,7 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
     Context ctx;
     ProgressBar progressBar;
     RiverListFragment riverListFragment;
-    EvaluationListFragment evaluationListFragment;
-    TownListFragment townListFragment;
-    List<PageFragment> pageFragmentList;
-    ViewPager mPager;
     Menu mMenu;
-    PagerAdapter adapter;
     private ResponseDTO response;
     private TextView RL_add;
     TeamMemberDTO teamMember;
@@ -84,8 +76,6 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
     LocationRequest locationRequest;
     Location location;
     boolean mResolvingError;
-    static final long ONE_MINUTE = 1000 * 60;
-    static final long FIVE_MINUTES = 1000 * 60 * 5;
     private static final int REQUEST_RESOLVE_ERROR = 1001;
     // Unique tag for the error dialog fragment
     private static final String DIALOG_ERROR = "dialog_error";
@@ -95,24 +85,44 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ctx = getApplicationContext();
+        riverListFragment = (RiverListFragment) getSupportFragmentManager().findFragmentById(R.id.fragment);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setDisplayShowCustomEnabled(true);
-        teamMember = SharedUtil.getTeamMember(ctx);
-        Util.setCustomActionBar(ctx, getSupportActionBar(), teamMember.getFirstName() + " " + teamMember.getLastName(), teamMember.getTeam().getTeamName(), teamMember.getTeamMemberImage(), new Util.ActinBarListener() {
-            @Override
-            public void onEvokeProfile() {
-                Intent pro = new Intent(MainPagerActivity.this, ProfileActivity.class);
-                startActivity(pro);
-            }
-        });
-        setField();
 
+       /* runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Util.setCustomActionBar(ctx, getSupportActionBar(), teamMember.getFirstName() + " " + teamMember.getLastName(), teamMember.getTeamName(), teamMember.getTeamMemberImage(), new Util.ActinBarListener() {
+                    @Override
+                    public void onEvokeProfile() {
+                        Intent pro = new Intent(MainPagerActivity.this, ProfileActivity.class);
+                        startActivity(pro);
+                    }
+                });
+            }
+        });*/
+
+
+        setField();
+        if (savedInstanceState != null) {
+            response = (ResponseDTO) savedInstanceState.getSerializable("response");
+            evaluationSiteList = (List<EvaluationSiteDTO>) savedInstanceState.getSerializable("evaluationSite");
+            index = savedInstanceState.getInt("index");
+            if (response != null) {
+                buildPages();
+            } else {
+                getCachedRiverData();
+            }
+
+        }
 
     }
 
+    int index;
+
     private void setField() {
-        mPager = (ViewPager) findViewById(R.id.SITE_pager);
         RL_add = (TextView) findViewById(R.id.RL_add);
+
         RL_add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -132,106 +142,29 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
                 .addApi(LocationServices.API)
                 .build();
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        // mPager.setOffscreenPageLimit(NUM_ITEMS - 1);
 
-        PagerTitleStrip strip = (PagerTitleStrip) findViewById(R.id.pager_title_strip);
-        strip.setVisibility(View.GONE);
     }
 
-    private ServiceConnection mConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service) {
-            Log.w(LOG, "## RequestSyncService ServiceConnection: onServiceConnected");
-            RequestSyncService.LocalBinder binder = (RequestSyncService.LocalBinder) service;
-            mService = binder.getService();
-            mBound = true;
-            WebCheckResult wcr = WebCheck.checkNetworkAvailability(ctx, true);
-            if (wcr.isWifiConnected()) {
-                mService.startSyncCachedRequests(new RequestSyncService.RequestSyncListener() {
-                    @Override
-                    public void onTasksSynced(int goodResponses, int badResponses) {
-                        Log.w(LOG, "@@ cached requests done, good: " + goodResponses + " bad: " + badResponses);
-                        // getRiversAroundMe();
-                    }
-
-                    @Override
-                    public void onError(String message) {
-
-                    }
-                });
-
-               /* Util.pretendFlash(progressBar, 1000, 2, new Util.UtilAnimationListener() {
-                    @Override
-                    public void onAnimationEnded() {
-
-                    }
-                });*/
-            }
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            Log.w(LOG, "## RequestSyncService onServiceDisconnected");
-            mBound = false;
-        }
-    };
-    boolean mBound;
-    RequestSyncService mService;
-
     @Override
-    protected void onStop() {
-        Log.d(LOG,
-                "#################### onStop");
-
-
-        if (mBound) {
-            unbindService(mConnection);
-            mBound = false;
-        }
-        Log.w(LOG, "############## onStop stopping google service clients");
-        try {
-            mGoogleApiClient.disconnect();
-        } catch (Exception e) {
-            Log.e(LOG, "Failed to Stop something", e);
-        }
-
-        super.onStop();
-    }
-
-
-    static final int STATUS_CODE = 220;
-
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        outState.putSerializable("response", response);
-        super.onSaveInstanceState(outState);
+    protected void onSaveInstanceState(Bundle data) {
+        data.putSerializable("response", response);
+        data.putSerializable("evaluationSite", (java.io.Serializable) evaluationSiteList);
+        data.putInt("index", index);
+        super.onSaveInstanceState(data);
     }
 
     private void buildPages() {
 //        calculateDistances();
-        pageFragmentList = new ArrayList<PageFragment>();
-        riverListFragment = new RiverListFragment();
-        Bundle data = new Bundle();
-        data.putSerializable("response", response);
-        data.putSerializable("evaluationSite", (java.io.Serializable) evaluationSite);
-
-        riverListFragment.setArguments(data);
-
-
-        pageFragmentList.add(riverListFragment);
-        // pageFragmentList.add(evaluationListFragment);
-
-        initializeAdapter();
-
+        if (riverListFragment != null) {
+            riverListFragment.setResponse(response, index);
+        }
 
     }
 
 
     @Override
     protected void onStart() {
+        teamMember = SharedUtil.getTeamMember(ctx);
         Log.e(LOG, "################ onStart .... connect API and location clients ");
         if (!mResolvingError) {  // more about this later
             mGoogleApiClient.connect();
@@ -242,82 +175,24 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
         Log.d(LOG,
                 "#################### onStart");
+        setActionBar();
         super.onStart();
     }
 
-    private void initializeAdapter() {
-        try {
-            adapter = new PagerAdapter(getSupportFragmentManager());
-            mPager.setAdapter(adapter);
-            mPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-                @Override
-                public void onPageSelected(int arg0) {
-                    PageFragment pf = pageFragmentList.get(arg0);
-                    if (pf instanceof EvaluationListFragment) {
-                        if (pf.equals(townListFragment)) {
-                            pageFragmentList.remove(evaluationListFragment);
-                            adapter.notifyDataSetChanged();
-                        }
-                        if (pf.equals(riverListFragment)) {
-                            pageFragmentList.remove(riverListFragment);
-                            adapter.notifyDataSetChanged();
-                        }
-
-                        Util.setCustomActionBar(ctx, getSupportActionBar(), evaluationListFragment.getRiverName(), "", teamMember.getTeamMemberImage(), new Util.ActinBarListener() {
-                            @Override
-                            public void onEvokeProfile() {
-                                Intent pro = new Intent(MainPagerActivity.this, ProfileActivity.class);
-                                startActivity(pro);
-                            }
-                        });
-                        isBack = false;
-                    } else if (pf instanceof RiverListFragment) {
-                        Util.setCustomActionBar(ctx, getSupportActionBar(), teamMember.getFirstName() + " " + teamMember.getLastName(), teamMember.getTeam().getTeamName(), teamMember.getTeamMemberImage(), new Util.ActinBarListener() {
-                            @Override
-                            public void onEvokeProfile() {
-                                Intent pro = new Intent(MainPagerActivity.this, ProfileActivity.class);
-                                startActivity(pro);
-                            }
-                        });
-                        if (pf.equals(evaluationListFragment)) {
-                            pageFragmentList.remove(evaluationListFragment);
-                            adapter.notifyDataSetChanged();
-                        }
-                        if (pf.equals(townListFragment)) {
-                            pageFragmentList.remove(townListFragment);
-                            adapter.notifyDataSetChanged();
-                        }
-                        isBack = false;
-                    } else if (pf instanceof TownListFragment) {
-                        if (pf.equals(evaluationListFragment)) {
-                            pageFragmentList.remove(riverListFragment);
-                            adapter.notifyDataSetChanged();
-                        }
-                        if (pf.equals(evaluationListFragment)) {
-                            pageFragmentList.remove(evaluationListFragment);
-                            adapter.notifyDataSetChanged();
-                        }
-
-                        getSupportActionBar().setTitle(townListFragment.getTownName() + " Towns");
-                        isBack = false;
+    private void setActionBar() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Util.setCustomActionBar(ctx, getSupportActionBar(), teamMember.getFirstName() + " " + teamMember.getLastName(), teamMember.getTeamName(), teamMember.getTeamMemberImage(), new Util.ActinBarListener() {
+                    @Override
+                    public void onEvokeProfile() {
+                        Intent pro = new Intent(MainPagerActivity.this, ProfileActivity.class);
+                        startActivity(pro);
                     }
+                });
+            }
+        });
 
-                }
-
-                @Override
-                public void onPageScrolled(int arg0, float arg1, int arg2) {
-
-                }
-
-                @Override
-                public void onPageScrollStateChanged(int arg0) {
-                }
-            });
-            //ZoomOutPageTransformerImpl z = new ZoomOutPageTransformerImpl();
-            // mPager.setPageTransformer(true, z);
-        } catch (Exception e) {
-            Log.e(LOG, "-- Some shit happened, probably IllegalState of some kind ...");
-        }
     }
 
     @Override
@@ -325,9 +200,12 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         mMenu = menu;
-        //TimerUtil.killFlashTimer();
-        // getLocalData();
-        getCachedRiverData();
+
+        if (response == null) {
+            getCachedRiverData();
+        } else {
+            progressBar.setVisibility(View.GONE);
+        }
         // startActivity(new Intent(MainPagerActivity.this, SplashActivity.class));
 
         return true;
@@ -377,36 +255,31 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
     }
 
 
-    private List<EvaluationSiteDTO> evaluationSite;
+    private List<EvaluationSiteDTO> evaluationSiteList;
 
     @Override
-    public void onRefreshEvaluation(List<EvaluationSiteDTO> siteList, int index) {
+    public void onRefreshEvaluation(List<EvaluationSiteDTO> siteList, int index, String riverName) {
         Log.d(LOG, "onclick" + siteList.toString());
         if (siteList.size() == 0) {
+            Util.showToast(ctx, "Unfortunately there are no evaluations made yet on this river : " + riverName);
             return;
         }
-        if (pageFragmentList.size() > 1) {
-            pageFragmentList.remove(pageFragmentList.size() - 1);
-            adapter.notifyDataSetChanged();
-        }
-        Bundle b = new Bundle();
+        this.index = index;
+        evaluationSiteList = siteList;
+        Intent intent = new Intent(MainPagerActivity.this, EvaluationListActivity.class);
+        intent.putExtra("evaluationSite", (java.io.Serializable) siteList);
+        intent.putExtra("response", response);
+        startActivity(intent);
 
-        b.putSerializable("evaluationSite", (java.io.Serializable) siteList);
-        b.putSerializable("response", response);
-        evaluationListFragment = new EvaluationListFragment();
-        evaluationListFragment.setArguments(b);
-        currentView = 1;
-        pageFragmentList.add(evaluationListFragment);
-        initializeAdapter();
-        adapter.notifyDataSetChanged();
-        mPager.setCurrentItem(currentView);
-        // mPager.
-        //  evaluationListFragment.setEvaluation(siteList);
     }
 
 
     @Override
     public void onRefreshMap(RiverDTO river, int result) {
+        if (river.getEvaluationsiteList().size() == 0) {
+            Util.showToast(ctx, "Unfortunately there are no evaluations to display on : " + river.getRiverName() + " river");
+            return;
+        }
         Intent intent = new Intent(MainPagerActivity.this, MapsActivity.class);
         intent.putExtra("river", river);
         intent.putExtra("displayType", result);
@@ -426,7 +299,13 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
 
     @Override
     public void onDirection(Double latitude, Double longitude) {
-        startDirectionsMap(latitude, longitude);
+        Log.i(LOG, "startDirectionsMap ..........");
+        String url = "http://maps.google.com/maps?saddr="
+                + location.getLatitude() + "," + location.getLongitude()
+                + "&daddr=" + latitude + "," + longitude + "&mode=driving";
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
+        startActivity(intent);
     }
 
     @Override
@@ -434,21 +313,13 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
         getCachedRiverData();
     }
 
-
-    private void startDirectionsMap(double lat, double lng) {
-        Log.i(LOG, "startDirectionsMap ..........");
-        String url = "http://maps.google.com/maps?saddr="
-                + location.getLatitude() + "," + location.getLongitude()
-                + "&daddr=" + lat + "," + lng + "&mode=driving";
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-        intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
+    @Override
+    public void onNewEvaluation() {
+        Intent intent = new Intent(MainPagerActivity.this, EvaluationActivity.class);
         startActivity(intent);
     }
 
     static final int CREATE_EVALUATION = 108;
-    static final int RIVER_VIEW = 13;
-    private int currentView;
-
 
     boolean mRequestingLocationUpdates;
 
@@ -503,15 +374,19 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
                     + location.getLongitude() + " acc: "
                     + location.getAccuracy());
         }
+
         locationRequest = LocationRequest.create();
         locationRequest.setInterval(3000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationRequest.setFastestInterval(2000);
-
+        if (location == null) {
+            startLocationUpdates();
+            return;
+        }
         if (location.getAccuracy() > ACCURACY_LIMIT) {
             startLocationUpdates();
         } else {
-            getCachedRiverData();
+            // getCachedRiverData();
             // getRiversAroundMe();
         }
     }
@@ -553,45 +428,6 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
         dialogFragment.show(getFragmentManager(), "errordialog");
     }
 
-    private class PagerAdapter extends FragmentStatePagerAdapter implements PageFragment {
-
-        public PagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public Fragment getItem(int i) {
-
-            return (Fragment) pageFragmentList.get(i);
-        }
-
-        @Override
-        public int getCount() {
-            return pageFragmentList.size();
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            String title = "Title";
-
-            switch (position) {
-                case 0:
-
-                    break;
-
-
-                default:
-                    break;
-            }
-            return title;
-        }
-
-        @Override
-        public void animateCounts() {
-
-        }
-    }
-
 
     boolean isBusy;
 
@@ -617,10 +453,10 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        //Log.d(LOG, new Gson().toJson(respond.getRiverList().get(0)));
-
+                        Log.d(LOG, new Gson().toJson(respond));
+                        progressBar.setVisibility(View.GONE);
                         response = respond;
-                        if (response != null) {
+                        if (respond != null) {
 
                             buildPages();
                         }
@@ -644,6 +480,7 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        progressBar.setVisibility(View.GONE);
                         if (w.isWifiConnected() || w.isMobileConnected()) {
                             getRiversAroundMe();
                         }
@@ -680,12 +517,13 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
         w.setRadius(5);
         isBusy = true;
         //riverListFragment.refreshListStart();
+        progressBar.setVisibility(View.VISIBLE);
         BaseVolley.getRemoteData(Statics.SERVLET_ENDPOINT, w, ctx, new BaseVolley.BohaVolleyListener() {
             @Override
             public void onResponseReceived(ResponseDTO r) {
                 isBusy = false;
 
-//              progressBar.setVisibility(View.GONE);
+                progressBar.setVisibility(View.GONE);
                 Log.e(LOG, "## getStarterData responded...statusCode: " + r.getStatusCode());
                 if (!ErrorUtil.checkServerError(ctx, r)) {
                     return;
@@ -704,7 +542,9 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
                         // getData();
                         response = r;
                         buildPages();
-                        riverListFragment.refreshListStop();
+                        if (riverListFragment != null) {
+                            riverListFragment.refreshListStop();
+                        }
                         getData();
                     }
 
@@ -719,6 +559,7 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
             public void onVolleyError(VolleyError error) {
                 isBusy = false;
                 //riverListFragment.refreshListStop();
+                progressBar.setVisibility(View.GONE);
                 Toast.makeText(ctx, "Problem: " + error.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
@@ -773,19 +614,6 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
 
     }
 
-
-    boolean isBack = false;
-
-    @Override
-    public void onBackPressed() {
-        currentView = 0;
-        mPager.setCurrentItem(currentView, true);
-        if (isBack) {
-            super.onBackPressed();
-        }
-        isBack = true;
-    }
-
     private void calculateDistances() {
         if (location != null) {
             List<RiverPointDTO> riverPoints = new ArrayList<>();
@@ -812,5 +640,67 @@ public class MainPagerActivity extends ActionBarActivity implements LocationList
             }
             Collections.sort(response.getRiverList());
         }
+    }
+
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            Log.w(LOG, "## RequestSyncService ServiceConnection: onServiceConnected");
+            RequestSyncService.LocalBinder binder = (RequestSyncService.LocalBinder) service;
+            mService = binder.getService();
+            mBound = true;
+            WebCheckResult wcr = WebCheck.checkNetworkAvailability(ctx, true);
+            if (wcr.isWifiConnected()) {
+                mService.startSyncCachedRequests(new RequestSyncService.RequestSyncListener() {
+                    @Override
+                    public void onTasksSynced(int goodResponses, int badResponses) {
+                        Log.w(LOG, "@@ cached requests done, good: " + goodResponses + " bad: " + badResponses);
+                         getRiversAroundMe();
+                    }
+
+                    @Override
+                    public void onError(String message) {
+
+                    }
+                });
+
+               /* Util.pretendFlash(progressBar, 1000, 2, new Util.UtilAnimationListener() {
+                    @Override
+                    public void onAnimationEnded() {
+
+                    }
+                });*/
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            Log.w(LOG, "## RequestSyncService onServiceDisconnected");
+            mBound = false;
+        }
+    };
+    boolean mBound;
+    RequestSyncService mService;
+
+    @Override
+    protected void onStop() {
+        Log.d(LOG,
+                "#################### onStop");
+
+
+        if (mBound) {
+            unbindService(mConnection);
+            mBound = false;
+        }
+        Log.w(LOG, "############## onStop stopping google service clients");
+        try {
+            mGoogleApiClient.disconnect();
+        } catch (Exception e) {
+            Log.e(LOG, "Failed to Stop something", e);
+        }
+
+        super.onStop();
     }
 }

@@ -22,6 +22,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -71,6 +72,7 @@ public class RegisterFragment extends Fragment implements PageFragment {
     ListView lsMember;
     LinearLayout llMember;
     TextView textView13;
+    ImageView imgTopLgo;
     private RegisterFragmentListener mListener;
 
 
@@ -104,7 +106,6 @@ public class RegisterFragment extends Fragment implements PageFragment {
         v = inflater.inflate(R.layout.fragment_register, container, false);
         activity = getActivity();
         ctx = getActivity().getApplicationContext();
-        response = (ResponseDTO) getArguments().getSerializable("response");
         setFields();
         getEmail();
 
@@ -112,6 +113,8 @@ public class RegisterFragment extends Fragment implements PageFragment {
     }
 
     List<String> countrySpinner, orgTypeSpinner;
+    ArrayAdapter<String> countryAdapter;
+    ArrayAdapter<String> orgtypeAdapter;
 
     private void setSpinners() {
         if (countrySpinner == null && orgTypeSpinner == null) {
@@ -126,8 +129,8 @@ public class RegisterFragment extends Fragment implements PageFragment {
         for (OrganisationtypeDTO c : response.getOrganisationtypeList()) {
             orgTypeSpinner.add(c.getOrganisationName());
         }
-        ArrayAdapter<String> countryAdapter = new ArrayAdapter<String>(ctx, R.layout.xxsimple_spinner_dropdown_item, countrySpinner);
-        ArrayAdapter<String> orgtypeAdapter = new ArrayAdapter<String>(ctx, R.layout.xxsimple_spinner_dropdown_item, orgTypeSpinner);
+        countryAdapter = new ArrayAdapter<String>(ctx, R.layout.xxsimple_spinner_dropdown_item, countrySpinner);
+        orgtypeAdapter = new ArrayAdapter<String>(ctx, R.layout.xxsimple_spinner_dropdown_item, orgTypeSpinner);
         sp_org_type.setAdapter(orgtypeAdapter);
         sp_org_type.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -172,7 +175,9 @@ public class RegisterFragment extends Fragment implements PageFragment {
     MemberToBeAddedAdapter memberToBeAddedAdapter;
 
     public void setFields() {
-        rsRegister = (Button) v.findViewById(R.id.btnReg);
+        imgTopLgo = (ImageView) v.findViewById(R.id.imgTopLgo);
+        imgTopLgo.setImageDrawable(Util.getRandomHeroImage(ctx));
+        rsRegister = (Button) v.findViewById(R.id.btnLogSubmit);
         textView13 = (TextView) v.findViewById(R.id.textView13);
         llMember = (LinearLayout) v.findViewById(R.id.llMember);
         rsTeamName = (EditText) v.findViewById(R.id.edtRegTeamName);
@@ -205,15 +210,81 @@ public class RegisterFragment extends Fragment implements PageFragment {
                 }
             }
         });
+        rsRegister.setText("Sign Up");
         rsRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Util.flashOnce(rsRegister, 200, new Util.UtilAnimationListener() {
+                    @Override
+                    public void onAnimationEnded() {
 
-                sendRegistration();
+                        if (rsTeamName.getText().toString().isEmpty()) {
+                            //Toast.makeText(ctx, "Enter Team Name", Toast.LENGTH_SHORT).show();
+                            rsTeamName.setError("Enter team name");
+                            return;
+                        }
+                        if (Statics.isSpecial(rsTeamName.getText().toString())) {
+                            rsTeamName.setError("Team name should be letters and numbers only");
+                            // Toast.makeText(ctx, "Enter Last Name", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        if (countryID == null) {
+                            Util.showErrorToast(ctx, "Choose a country");
+                            //Toast.makeText(ctx, "Select Town", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        if (orgaTypeID == null) {
+                            Util.showErrorToast(ctx, "Choose a Organisation type");
+                            //Toast.makeText(ctx, "Select Town", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        if (rsMemberName.getText().toString().isEmpty()) {
+                            rsMemberName.setError("Enter first name");
+                            // Toast.makeText(ctx, "Enter Last Name", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        if (Statics.isLetterAndNumber(rsMemberName.getText().toString())) {
+                            rsMemberName.setError("First name should be letters only");
+                            // Toast.makeText(ctx, "Enter Last Name", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        if (rsMemberSurname.getText().toString().isEmpty()) {
+                            rsMemberSurname.setError("Enter last name");
+                            // Toast.makeText(ctx, "Enter Last Name", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        if (Statics.isLetterAndNumber(rsMemberSurname.getText().toString())) {
+                            rsMemberSurname.setError("Last name should be letters only ");
+                            // Toast.makeText(ctx, "Enter Last Name", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+
+                        if (!Statics.rfc2822.matcher(rsMemberEmail.getText().toString()).matches()) {
+                            rsMemberEmail.setError("Incorrect email address format");
+                            //Toast.makeText(ctx, "Enter Email Address", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        if (rsCellphone.getText().toString().length() != 10) {
+                            rsCellphone.setError("Phone number must be 10 digits long");
+                            // Toast.makeText(ctx, "Enter Last Name", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        if (rsPin.getText().toString().isEmpty()) {
+                            rsPin.setError("Enter pin");
+                            //Toast.makeText(ctx, "Enter Email Address", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        sendRegistration();
+                    }
+                });
+
 
             }
         });
-        setSpinners();
+
+
     }
 
     private void disableWhenMoreIsChecked() {
@@ -233,38 +304,6 @@ public class RegisterFragment extends Fragment implements PageFragment {
 
     public void sendRegistration() {
 
-        if (rsTeamName.getText().toString().isEmpty()) {
-            //Toast.makeText(ctx, "Enter Team Name", Toast.LENGTH_SHORT).show();
-            rsTeamName.setError("Enter team name");
-            return;
-        }
-
-        if (countryID == null) {
-            Util.showErrorToast(ctx, "Choose a country");
-            //Toast.makeText(ctx, "Select Town", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        if (orgaTypeID == null) {
-            Util.showErrorToast(ctx, "Choose a Organisation type");
-            //Toast.makeText(ctx, "Select Town", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if (rsMemberName.getText().toString().isEmpty()) {
-            rsMemberName.setError("Enter last name");
-            // Toast.makeText(ctx, "Enter Last Name", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if (rsMemberEmail.getText().toString().isEmpty()) {
-            rsMemberEmail.setError("Enter email address");
-            //Toast.makeText(ctx, "Enter Email Address", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if (rsPin.getText().toString().isEmpty()) {
-            rsPin.setError("Enter password");
-            //Toast.makeText(ctx, "Enter Email Address", Toast.LENGTH_SHORT).show();
-            return;
-        }
 
         TeamMemberDTO t = new TeamMemberDTO();
         t.setEmail(rsMemberEmail.getText().toString());
@@ -296,6 +335,7 @@ public class RegisterFragment extends Fragment implements PageFragment {
         registerRequest(memberToBeRegistered);
 
     }
+
 
     private void clearMemberInput() {
         ToastUtil.toast(ctx, "Next member please.");
@@ -361,6 +401,17 @@ public class RegisterFragment extends Fragment implements PageFragment {
 
     Menu menu;
     MenuInflater inflater;
+
+    public void setResponse(ResponseDTO response) {
+        this.response = response;
+        Log.i(LOG, "++ evaluation has been set");
+        if (v != null) {
+            setSpinners();
+        } else {
+            Log.e(LOG, "$%#$## WTF?");
+        }
+
+    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {

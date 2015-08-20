@@ -7,6 +7,8 @@ import android.widget.TextView;
 
 import com.sifiso.codetribe.minisasslibrary.R;
 
+import java.util.regex.Pattern;
+
 
 public class Statics {
 
@@ -19,9 +21,9 @@ public class Statics {
     public static final String URL = "http://192.168.33.119:8080/ms2/";
     public static final String IMAGE_URL = "http://192.168.33.119:8080/";*/
 
-    public static final String WEBSOCKET_URL = "ws://146.64.85.53:8080/ms2/";
-    public static final String URL = "http://146.64.85.53:8080/ms2/";
-    public static final String IMAGE_URL = "http://146.64.85.53:8080/";
+    public static final String WEBSOCKET_URL = "ws://146.64.85.22:8080/ms2/";
+    public static final String URL = "http://146.64.85.22:8080/ms2/";
+    public static final String IMAGE_URL = "http://146.64.85.22:8080/";
 
     public static final String CRASH_REPORTS_URL = URL + "crash?";
     public static final String UPLOAD_URL_REQUEST = "uploadUrl?";
@@ -78,4 +80,23 @@ public class Statics {
         txt.setTypeface(font);
     }
 
+    public static boolean isAlpha(String name) {
+        return name.matches("[a-zA-Z]+");
+    }
+    public static boolean isSpecial(String name) {
+        return name.matches("[!#$%&'*+/=?^_`{|}~-]+");
+    }
+
+    public static boolean isLetterAndNumber(String l) {
+        String n = ".*[0-9].*";
+        String a = ".*[A-Z].*";
+        String s = ".*[0-9!#$%&'*+/=?^_`{|}~-].*";
+
+        return l.matches(s) ;
+
+    }
+
+    public static final Pattern rfc2822 = Pattern.compile(
+            "^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$"
+    );
 }

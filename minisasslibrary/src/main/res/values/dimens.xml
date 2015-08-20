@@ -86,5 +86,5 @@
     <dimen name="img_folder">32sp</dimen>
     <dimen name="pp_image_width">190dp</dimen>
     <dimen name="pp_image_height">150dp</dimen>
-
+    <dimen name="touch_raise">16dp</dimen>
 </resources>

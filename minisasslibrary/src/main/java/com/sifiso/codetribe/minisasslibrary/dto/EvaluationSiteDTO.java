@@ -27,6 +27,11 @@ public class EvaluationSiteDTO implements Serializable, Comparable<EvaluationSit
     private CategoryDTO category;
     private StreamDTO stream;
 
+    private String siteName;
+    private Integer gID;
+    private String description;
+    private String riverName2;
+
     @Override
     public int compareTo(EvaluationSiteDTO another) {
         if (this.distanceFromMe < another.distanceFromMe) {
@@ -36,6 +41,38 @@ public class EvaluationSiteDTO implements Serializable, Comparable<EvaluationSit
             return 1;
         }
         return 0;
+    }
+
+    public String getSiteName() {
+        return siteName;
+    }
+
+    public void setSiteName(String siteName) {
+        this.siteName = siteName;
+    }
+
+    public Integer getgID() {
+        return gID;
+    }
+
+    public void setgID(Integer gID) {
+        this.gID = gID;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getRiverName2() {
+        return riverName2;
+    }
+
+    public void setRiverName2(String riverName2) {
+        this.riverName2 = riverName2;
     }
 
     public StreamDTO getStream() {

@@ -25,6 +25,8 @@ public class InsectBrowser extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_insect_browser);
         webView = (WebView) findViewById(R.id.browser);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         if (savedInstanceState != null) {
             insect = (InsectDTO) savedInstanceState.getSerializable("insect");
         } else {
@@ -85,6 +87,7 @@ public class InsectBrowser extends ActionBarActivity {
             //     progressBar.setVisibility(View.GONE);
         }
     }
+
     private class MyWebViewClient extends WebViewClient {
 
         @Override
@@ -96,7 +99,7 @@ public class InsectBrowser extends ActionBarActivity {
             end = System.currentTimeMillis();
            /* Toast.makeText(getApplicationContext(), "Page: " + currentTitle +
                     " - loaded in " + (end - start) / 1000 + " seconds", Toast.LENGTH_SHORT).show();*/
-            Log.e("SA", "--onPageFinished -- elapsed loading time: " + (end-start)/1000 + " seconds");
+            Log.e("SA", "--onPageFinished -- elapsed loading time: " + (end - start) / 1000 + " seconds");
             super.onPageFinished(web, url);
         }
 
@@ -106,6 +109,7 @@ public class InsectBrowser extends ActionBarActivity {
             Log.i("SA", "--onReceivedError code: " + errorCode + " "
                     + description + " - failing: " + failingURL);
         }
+
         @Override
         public void onPageStarted(WebView web, String url, Bitmap favIcon) {
             Log.e("SA", "--onPageStarted url: " + url);
@@ -113,8 +117,10 @@ public class InsectBrowser extends ActionBarActivity {
             setRefreshActionButtonState(true);*/
         }
     }
+
     long start, end;
     String currentTitle, currentURL;
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -134,6 +140,9 @@ public class InsectBrowser extends ActionBarActivity {
             return true;
         }
 
+        if (id == android.R.id.home) {
+            finish();
+        }
         return super.onOptionsItemSelected(item);
     }
 

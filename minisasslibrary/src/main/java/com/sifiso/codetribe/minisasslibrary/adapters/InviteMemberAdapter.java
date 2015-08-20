@@ -100,17 +100,23 @@ public class InviteMemberAdapter extends BaseAdapter {
         } else {
             viewHolderItem.txtMember.setVisibility(View.GONE);
             viewHolderItem.btnYes.setVisibility(View.VISIBLE);
-            viewHolderItem.btnNo.setVisibility(View.VISIBLE);
+            viewHolderItem.btnNo.setVisibility(View.GONE);
         }
         for (TmemberDTO mt : tm.getTmemberList()) {
-            if (mt.getTeamID() == teamID) {
+            if (mt.getTeamID() == teamID && mt.getAcceptInvite() == 1) {
                 viewHolderItem.txtMember.setVisibility(View.VISIBLE);
                 viewHolderItem.btnYes.setVisibility(View.GONE);
                 viewHolderItem.btnNo.setVisibility(View.GONE);
-            } else {
+            } else if(mt.getTeamID() == teamID && mt.getAcceptInvite() == 0){
+                viewHolderItem.txtMember.setVisibility(View.VISIBLE);
+                viewHolderItem.txtMember.setText("Padding request");
+                viewHolderItem.txtMember.setTextColor(mCtx.getResources().getColor(R.color.blue_300));
+                viewHolderItem.btnYes.setVisibility(View.GONE);
+                viewHolderItem.btnNo.setVisibility(View.GONE);
+            }else{
                 viewHolderItem.txtMember.setVisibility(View.GONE);
                 viewHolderItem.btnYes.setVisibility(View.VISIBLE);
-                viewHolderItem.btnNo.setVisibility(View.VISIBLE);
+                viewHolderItem.btnNo.setVisibility(View.GONE);
             }
         }
         Statics.setRobotoFontBold(mCtx, viewHolderItem.txtName);

@@ -29,6 +29,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.gson.Gson;
 import com.sifiso.codetribe.minisasslibrary.dto.GcmDeviceDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.TeamDTO;
 import com.sifiso.codetribe.minisasslibrary.dto.TeamMemberDTO;
@@ -51,84 +52,36 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class RegisterActivity extends ActionBarActivity implements SearchTownFragment.SearchTownFragmentListener, RegisterFragment.RegisterFragmentListener {
+public class RegisterActivity extends ActionBarActivity implements RegisterFragment.RegisterFragmentListener {
 
     Context ctx;
     Activity activity;
-    List<PageFragment> pageFragmentList;
+
     RegisterFragment registerFragment;
-    SearchTownFragment searchTownFragment;
-    ViewPager mPager;
+
     Menu mMenu;
-    PagerAdapter adapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("Team member");
         activity = this;
         ctx = getApplicationContext();
         countryCode = "ZA";
-        mPager = (ViewPager) findViewById(R.id.SITE_pager);
-
-
-        PagerTitleStrip strip = (PagerTitleStrip) findViewById(R.id.pager_title_strip);
-        strip.setVisibility(View.GONE);
+        registerFragment = (RegisterFragment) getSupportFragmentManager().findFragmentById(R.id.fragment);
         // buildPages();
     }
 
     private void buildPages() {
-
-        pageFragmentList = new ArrayList<PageFragment>();
-        registerFragment = new RegisterFragment();
-        Bundle data = new Bundle();
-        data.putSerializable("response", response);
-
-        registerFragment.setArguments(data);
-        searchTownFragment = new SearchTownFragment();
-        searchTownFragment.setArguments(data);
-
-
-        pageFragmentList.add(registerFragment);
-        // pageFragmentList.add(searchTownFragment);
-        initializeAdapter();
-
-    }
-
-    private void initializeAdapter() {
-        try {
-            adapter = new PagerAdapter(getSupportFragmentManager());
-            mPager.setAdapter(adapter);
-            mPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-                @Override
-                public void onPageSelected(int arg0) {
-                    // currentViewPager = arg0;
-                    PageFragment pf = pageFragmentList.get(arg0);
-                    if (pf instanceof RegisterFragment) {
-                        isBack = false;
-                        getSupportActionBar().setTitle("Sign up member");
-                        pageFragmentList.remove(searchTownFragment);
-                        adapter.notifyDataSetChanged();
-                    } else if (pf instanceof SearchTownFragment) {
-                        isBack = false;
-                        getSupportActionBar().setTitle("Search town");
-                    }
-
-                }
-
-                @Override
-                public void onPageScrolled(int arg0, float arg1, int arg2) {
-
-                }
-
-                @Override
-                public void onPageScrollStateChanged(int arg0) {
-                }
-            });
-        } catch (Exception e) {
-            Log.e(LOG, "-- Some shit happened, probably IllegalState of some kind ...");
+        if (registerFragment != null) {
+            registerFragment.setResponse(response);
         }
     }
+
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -144,18 +97,18 @@ public class RegisterActivity extends ActionBarActivity implements SearchTownFra
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-
         getMenuInflater().inflate(R.menu.menu_register, menu);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Team member");
-       // getCachedData();
+        final WebCheckResult w = WebCheck.checkNetworkAvailability(ctx);
+        if(w.isMobileConnected() || w.isWifiConnected()) {
+            getRegistrationData();
+        }else{
+            Util.showErrorToast(ctx,"No connection");
+        }
         return true;
     }
 
     @Override
     protected void onStart() {
-        getCachedData();
         super.onStart();
     }
 
@@ -199,34 +152,6 @@ public class RegisterActivity extends ActionBarActivity implements SearchTownFra
     static final String LOG = "RegistrationActivity";
     ResponseDTO response;
 
-    private void getCachedData() {
-        final WebCheckResult wcr = WebCheck.checkNetworkAvailability(ctx);
-
-        CacheUtil.getCachedRegisterData(getApplicationContext(), CacheUtil.CACHE_REGISTER_DATA, new CacheUtil.CacheUtilListener() {
-
-            @Override
-            public void onFileDataDeserialized(ResponseDTO r) {
-                Log.d(LOG, r.getTownList().toString() + "");
-
-                response = r;
-                buildPages();
-                if (wcr.isWifiConnected()) {
-                    getRegistrationData();
-                }
-            }
-
-            @Override
-            public void onDataCached(ResponseDTO r) {
-                buildPages();
-            }
-
-            @Override
-            public void onError() {
-
-            }
-        });
-
-    }
 
     String countryCode;
 
@@ -239,27 +164,17 @@ public class RegisterActivity extends ActionBarActivity implements SearchTownFra
             WebSocketUtil.sendRequest(ctx, Statics.MINI_SASS_ENDPOINT, req, new WebSocketUtil.WebSocketListener() {
                 @Override
                 public void onMessage(final ResponseDTO r) {
-
                     Log.e(LOG, "## getStarterData responded...statusCode: " + r.getStatusCode());
-                    if (!ErrorUtil.checkServerError(ctx, r)) {
-                        return;
-                    }
-                    CacheUtil.cacheRegisterData(ctx, r, CacheUtil.CACHE_REGISTER_DATA, new CacheUtil.CacheUtilListener() {
+                    runOnUiThread(new Runnable() {
                         @Override
-                        public void onFileDataDeserialized(final ResponseDTO resp) {
+                        public void run() {
+                            if (!ErrorUtil.checkServerError(ctx, r)) {
+                                return;
+                            }
 
-
-                        }
-
-                        @Override
-                        public void onDataCached(ResponseDTO r) {
+                            Log.e(LOG, new Gson().toJson(r));
                             response = r;
                             buildPages();
-                        }
-
-                        @Override
-                        public void onError() {
-
                         }
                     });
 
@@ -288,75 +203,23 @@ public class RegisterActivity extends ActionBarActivity implements SearchTownFra
         finish();
     }
 
-    private int currentViewPager;
-
     @Override
     public void onTownRequest() {
-        currentViewPager = 1;
-        pageFragmentList.add(searchTownFragment);
-        adapter.notifyDataSetChanged();
-        mPager.setCurrentItem(currentViewPager, true);
+
     }
 
-    @Override
-    public void onTownSelected(TownDTO town) {
+    private int currentViewPager;
 
-        pageFragmentList.remove(searchTownFragment);
-        adapter.notifyDataSetChanged();
-        currentViewPager = 0;
-        isBack = true;
-        mPager.setCurrentItem(currentViewPager, true);
-    }
 
     boolean isBack = false;
 
     @Override
     public void onBackPressed() {
-        currentViewPager = 0;
-        mPager.setCurrentItem(currentViewPager, true);
+
         if (isBack) {
             super.onBackPressed();
         }
         isBack = true;
-    }
-
-    private class PagerAdapter extends FragmentStatePagerAdapter implements PageFragment {
-
-        public PagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public Fragment getItem(int i) {
-
-            return (Fragment) pageFragmentList.get(i);
-        }
-
-        @Override
-        public int getCount() {
-            return pageFragmentList.size();
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            String title = "Title";
-
-            switch (position) {
-                case 0:
-
-                    break;
-
-
-                default:
-                    break;
-            }
-            return title;
-        }
-
-        @Override
-        public void animateCounts() {
-
-        }
     }
 
 }

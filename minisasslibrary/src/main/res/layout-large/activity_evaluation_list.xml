@@ -1,17 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    tools:context="com.sifiso.codetribe.riverteamapp.MainPagerActivity">
+    tools:context="com.sifiso.codetribe.riverteamapp.EvaluationListActivity">
 
     <fragment
         android:id="@+id/fragment"
-        android:name="com.sifiso.codetribe.minisasslibrary.fragments.RiverListFragment"
+        android:name="com.sifiso.codetribe.minisasslibrary.fragments.EvaluationListFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:layout="@layout/river_list" />
+        tools:layout="@layout/fragment_evaluation_list" />
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -19,7 +17,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:padding="@dimen/mon_wide"
-        android:visibility="visible" />
+        android:visibility="gone" />
 
 
     <TextView
@@ -29,10 +27,9 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="135dp"
-        android:layout_marginRight="24dp"
+        android:layout_marginRight="44dp"
+        android:layout_marginTop="230dp"
         android:elevation="10dp"
         android:text="+"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 </RelativeLayout>
-

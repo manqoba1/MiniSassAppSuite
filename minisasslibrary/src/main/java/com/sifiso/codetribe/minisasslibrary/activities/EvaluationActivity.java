@@ -174,47 +174,60 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
         AE_down_up.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mShowMore) {
-                    mShowMore = false;
-                    result2.setVisibility(View.VISIBLE);
-                    // AE_down_up.setCompoundDrawables(ctx.getResources().getDrawable(android.R.drawable.arrow_down_float), null, null, null);
-                    AE_down_up.setCompoundDrawablesWithIntrinsicBounds(0, 0, android.R.drawable.arrow_down_float, 0);
-                } else {
-                    mShowMore = true;
-                    result2.setVisibility(View.GONE);
-                    AE_down_up.setCompoundDrawablesWithIntrinsicBounds(0, 0, android.R.drawable.arrow_up_float, 0);
-                }
+                Util.flashOnce(AE_down_up, 100, new Util.UtilAnimationListener() {
+                    @Override
+                    public void onAnimationEnded() {
+                        if (mShowMore) {
+                            mShowMore = false;
+                            result2.setVisibility(View.VISIBLE);
+                            // AE_down_up.setCompoundDrawables(ctx.getResources().getDrawable(android.R.drawable.arrow_down_float), null, null, null);
+                            AE_down_up.setCompoundDrawablesWithIntrinsicBounds(0, 0, android.R.drawable.arrow_down_float, 0);
+                        } else {
+                            mShowMore = true;
+                            result2.setVisibility(View.GONE);
+                            AE_down_up.setCompoundDrawablesWithIntrinsicBounds(0, 0, android.R.drawable.arrow_up_float, 0);
+                        }
+                    }
+                });
+
             }
         });
         AE_find_near_sites = (Button) findViewById(R.id.AE_find_near_sites);
         AE_find_near_sites.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (riverID == null) {
-                    Toast.makeText(ctx, "Please choose the river first", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                getEvaluationsByRiver();
+                Util.flashOnce(AE_find_near_sites, 100, new Util.UtilAnimationListener() {
+                    @Override
+                    public void onAnimationEnded() {
+                        if (riverID == null) {
+                            Toast.makeText(ctx, "Please choose the river first", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        getEvaluationsByRiver();
+                    }
+                });
+
             }
         });
         viewStub = (ViewStub) findViewById(R.id.viewStub);
         codeStatus = getIntent().getIntExtra("statusCode", 0);
         if (codeStatus == CREATE_EVALUATION) {
-            fieldPicker();
+            //fieldPicker();
             river = (RiverDTO) getIntent().getSerializableExtra("riverCreate");
             response = (ResponseDTO) getIntent().getSerializableExtra("response");
             WT_sp_river.setText(river.getRiverName());
             WT_sp_riverConnected.setText(river.getRiverName());
             setStreamSpinner(river.getStreamList());
-            Util.expand(WT_sp_stream, 200, new Util.UtilAnimationListener() {
+            Util.expand(WT_sp_stream, 2000, new Util.UtilAnimationListener() {
                 @Override
                 public void onAnimationEnded() {
                     WT_sp_stream.setVisibility(View.VISIBLE);
                 }
             });
             riverID = river.getRiverID();
+            Log.e(LOG, CREATE_EVALUATION + " River ID : " + riverID);
 
-            buildUI();
+            //buildUI();
         }
         //buildUI();
     }
@@ -305,8 +318,9 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_evaluation, menu);
+        mMenu = menu;
         WebCheckResult wr = WebCheck.checkNetworkAvailability(ctx);
-
+        fieldPicker();
         if (codeStatus != CREATE_EVALUATION) {
             getCachedRiverData();
         }
@@ -329,8 +343,16 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
         if (id == android.R.id.home) {
             finish();
             stopLocationUpdates();
-
         }
+        if (id == R.id.action_refresh) {
+            WebCheckResult wr = WebCheck.checkNetworkAvailability(ctx);
+            if (wr.isMobileConnected() || wr.isWifiConnected()) {
+                getRiversAroundMe();
+            } else {
+                Util.showErrorToast(ctx, "Check your network connectivity");
+            }
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -371,16 +393,17 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
             case INSECT_DATA:
                 Log.w(LOG, "### insects ui has returned with data?");
                 if (resultCode == INSECT_DATA) {
+                    if ((List<InsectImageDTO>) data.getSerializableExtra("selectedInsects") != null) {
 
-                    insectImageList = (List<InsectImageDTO>) data.getSerializableExtra("overallInsect");
-
-                    scoreUpdater((List<InsectImageDTO>) data.getSerializableExtra("selectedInsects"));
-                    List<InsectImageDTO> list = (List<InsectImageDTO>) data.getSerializableExtra("selectedInsects");
-                    //Log.w(LOG, "### insect ui has returned with data?" + list.size());
-                    isInsectsPickerBack = true;
-                    isBusy = true;
-                    result3.setVisibility(View.VISIBLE);
-                    teamMember = SharedUtil.getTeamMember(ctx);
+                        insectImageList = (List<InsectImageDTO>) data.getSerializableExtra("overallInsect");
+                        scoreUpdater((List<InsectImageDTO>) data.getSerializableExtra("selectedInsects"));
+                        List<InsectImageDTO> list = (List<InsectImageDTO>) data.getSerializableExtra("selectedInsects");
+                        //Log.w(LOG, "### insect ui has returned with data?" + list.size());
+                        isInsectsPickerBack = true;
+                        isBusy = true;
+                        result3.setVisibility(View.VISIBLE);
+                        teamMember = SharedUtil.getTeamMember(ctx);
+                    }
                 }
                 break;
         }
@@ -453,46 +476,57 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
         WT_sp_category.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                hideKeyboard();
-                Util.showPopupCategoryBasicWithHeroImage(ctx, EvaluationActivity.this, response.getCategoryList(), WT_sp_category, "", new Util.UtilPopupListener() {
+                Util.flashOnce(WT_sp_category, 100, new Util.UtilAnimationListener() {
                     @Override
-                    public void onItemSelected(int index) {
-                        indexCat = index;
-                        WT_sp_category.setText(response.getCategoryList().get(indexCat).getCategoryName());
-                        categoryID = response.getCategoryList().get(indexCat).getCategoryId();
-                        catType = (response.getCategoryList().get(indexCat).getCategoryName());
-                        evaluationSite.setCategoryID(categoryID);
-                        Log.e(LOG, categoryID + "");
+                    public void onAnimationEnded() {
+                        hideKeyboard();
+                        Util.showPopupCategoryBasicWithHeroImage(ctx, EvaluationActivity.this, response.getCategoryList(), WT_sp_category, "", new Util.UtilPopupListener() {
+                            @Override
+                            public void onItemSelected(int index) {
+                                indexCat = index;
+                                WT_sp_category.setText(response.getCategoryList().get(indexCat).getCategoryName());
+                                categoryID = response.getCategoryList().get(indexCat).getCategoryId();
+                                catType = (response.getCategoryList().get(indexCat).getCategoryName());
+                                evaluationSite.setCategoryID(categoryID);
+                                Log.e(LOG, categoryID + "");
+                            }
+                        });
                     }
                 });
+
             }
         });
         Log.d(LOG, "river size " + response.getRiverList().size());
         WT_sp_riverConnected.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
-                Util.showPopupRiverWithHeroImage(ctx, EvaluationActivity.this, response.getRiverList(), WT_sp_river, "", new Util.UtilPopupListener() {
+                Util.flashOnce(WT_sp_riverConnected, 100, new Util.UtilAnimationListener() {
                     @Override
-                    public void onItemSelected(int position) {
-                        // WT_sp_river.setTextColor(getResources().getColor(R.color.gray));
-                        indexRiv = position;
-                        WT_sp_riverConnected.setText(response.getRiverList().get(position).getRiverName());
-                        riverID = response.getRiverList().get(position).getRiverID();
-
-                        evaluationSite.setRiverID(riverID);
-
-                        setStreamSpinner(response.getRiverList().get(position).getStreamList());
-                        Util.expand(WT_sp_stream, 200, new Util.UtilAnimationListener() {
+                    public void onAnimationEnded() {
+                        Util.showPopupRiverWithHeroImage(ctx, EvaluationActivity.this, response.getRiverList(), WT_sp_river, "", new Util.UtilPopupListener() {
                             @Override
-                            public void onAnimationEnded() {
-                                WT_sp_stream.setVisibility(View.VISIBLE);
+                            public void onItemSelected(int position) {
+                                // WT_sp_river.setTextColor(getResources().getColor(R.color.gray));
+                                indexRiv = position;
+                                WT_sp_riverConnected.setText(response.getRiverList().get(position).getRiverName());
+                                riverID = response.getRiverList().get(position).getRiverID();
+
+                                evaluationSite.setRiverID(riverID);
+
+                                setStreamSpinner(response.getRiverList().get(position).getStreamList());
+                                Util.expand(WT_sp_stream, 200, new Util.UtilAnimationListener() {
+                                    @Override
+                                    public void onAnimationEnded() {
+                                        WT_sp_stream.setVisibility(View.VISIBLE);
+                                    }
+                                });
+
                             }
                         });
-
                     }
                 });
+
+
             }
         });
         setAutoTextData();
@@ -562,32 +596,40 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
         AE_create.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (riverID == null) {
-                    ToastUtil.toast(ctx, "Please select river");
-                    return;
-                }
-                if (categoryID == null) {
-                    ToastUtil.toast(ctx, "Please select category");
-                    return;
-                }
+                Util.flashOnce(AE_create, 100, new Util.UtilAnimationListener() {
+                    @Override
+                    public void onAnimationEnded() {
+                        if (riverID == null) {
+                            ToastUtil.toast(ctx, "Please select river");
+                            return;
+                        }
+                        if (categoryID == null) {
+                            ToastUtil.toast(ctx, "Please select category");
+                            return;
+                        }
 
-                if (evaluationSite == null && accuracy == null) {
-                    ToastUtil.toast(ctx, "Evaluation site not defined");
-                    GPS_layout4.setVisibility(View.VISIBLE);
-                    startLocationUpdates();
-                    return;
-                }
-                if (selectedInsects == null) {
-                    //selectedInsects = new ArrayList<>();
-                    ToastUtil.toast(ctx, "Select insect group found, to score evaluation (Hint: Select insect group)");
-                    return;
-                }
-                if (conditionID == null) {
-                    ToastUtil.toast(ctx, "Condition not specified, Please select insect group found");
-                    return;
-                }
+                        if (evaluationSite == null && accuracy == null) {
+                            ToastUtil.toast(ctx, "Evaluation site not defined");
+                            GPS_layout4.setVisibility(View.VISIBLE);
+                            startLocationUpdates();
+                            return;
+                        }
+                        if (selectedInsects == null) {
+                            //selectedInsects = new ArrayList<>();
+                            ToastUtil.toast(ctx, "Select insect group found, to score evaluation (Hint: Select insect group)");
+                            return;
+                        }
+                        if (conditionID == null) {
+                            ToastUtil.toast(ctx, "Condition not specified, Please select insect group found");
+                            return;
+                        }
 
-                localSaveRequests();
+                        AE_create.setEnabled(false);
+                        localSaveRequests();
+
+                    }
+                });
+
             }
         });
 
@@ -650,15 +692,25 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
                 TV_average_score.setText("0.0");
                 TV_avg_score.setText("0.0");
                 IMG_score_icon.setImageDrawable(getResources().getDrawable(R.drawable.gray_crap));
-                WT_sp_river.setText("What is the current river are you at?");
-                WT_sp_category.setText("What environment are you at? Rocky or Sandy?");
-                EDT_comment.setText("");
+                WT_sp_river.setText(null);
+                //WT_sp_river.setHint("What is the current river are you at?");
+                WT_sp_category.setText(null);
+                // WT_sp_category.setHint("What environment are you at? Rocky or Sandy?");
+                EDT_comment.setText(null);
+                WT_sp_stream.setText(null);
+                WT_sp_stream.setVisibility(View.GONE);
+                WT_sp_riverConnected.setText(null);
+                //WT_sp_riverConnected.setHint("What is the current river are you at?");
                 AE_pin_point.setVisibility(View.GONE);
-                evaluationSite = null;
+                result3.setVisibility(View.GONE);
+
+                evaluationSite = new EvaluationSiteDTO();
+                evaluationDTO = new EvaluationDTO();
 
                 TV_score_status.setText("not specified");
                 TV_score_status.setTextColor(getResources().getColor(R.color.gray));
                 IMG_score_icon.setColorFilter(getResources().getColor(R.color.gray), PorterDuff.Mode.MULTIPLY);
+                TV_total_score.setTextColor(getResources().getColor(R.color.gray));
                 WE_score.setText("0.0");
                 WO_score.setText("0.0");
                 WC_score.setText("0.0");
@@ -667,11 +719,10 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
                 categoryID = null;
                 riverID = null;
                 conditionID = null;
-                GPS_layout4.setVisibility(View.GONE);
-
-
+                AE_create.setEnabled(true);
             }
         });
+
 
     }
 
@@ -835,7 +886,8 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
 
 
     private void sendRequest(final RequestDTO request) {
-        BaseVolley.getRemoteData(Statics.SERVLET_ENDPOINT, request, ctx, new BaseVolley.BohaVolleyListener() {
+        setRefreshActionButtonState(true);
+        BaseVolley.getRemoteData(Statics.SERVLET_TEST, request, ctx, new BaseVolley.BohaVolleyListener() {
             @Override
             public void onResponseReceived(ResponseDTO response) {
                 if (response.getStatusCode() > 0) {
@@ -845,6 +897,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
                         @Override
                         public void run() {
                             // cleanForm();
+                            setRefreshActionButtonState(false);
                             showImageDialog();
                         }
                     });
@@ -853,6 +906,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
 
             @Override
             public void onVolleyError(VolleyError error) {
+
                 addRequestToCache(request);
             }
         });
@@ -885,13 +939,14 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
     }
 
     private void addRequestToCache(RequestDTO request) {
+        setRefreshActionButtonState(true);
         RequestCacheUtil.addRequest(ctx, request, new CacheUtil.CacheRequestListener() {
             @Override
             public void onDataCached() {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-
+                        setRefreshActionButtonState(false);
                         showImageDialog();
                     }
                 });
@@ -906,7 +961,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
 
             @Override
             public void onError() {
-
+                setRefreshActionButtonState(false);
             }
         });
     }
@@ -945,7 +1000,8 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
         evaluationDTO.setConditionsID(conditionID);
         evaluationDTO.setTeamMemberID(teamMember.getTeamMemberID());
         evaluationSite.setDateRegistered(new Date().getTime());
-
+        evaluationSite.setCategoryID(categoryID);
+        evaluationSite.setRiverID(riverID);
         evaluationDTO.setEvaluationSite(evaluationSite);
 
 
@@ -1063,6 +1119,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
                                     // intent.putExtra("takenImages", )
                                     // startActivityForResult(intent, CAPTURE_IMAGE);
                                     cleanForm();
+
                                     dialog.cancel();
                                 }
                             })
@@ -1158,11 +1215,11 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
 
     private void getRiversAroundMe() {
         if (location == null) {
-            Toast.makeText(ctx, "Busy...getting rivers ...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ctx, "Invalid Location ...", Toast.LENGTH_SHORT).show();
             return;
         }
         if (isBusy) {
-            Toast.makeText(ctx, "Busy...getting rivers ...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ctx, "Rivers Loaded ...", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -1173,12 +1230,14 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
         w.setLongitude(location.getLongitude());
         w.setRadius(5);
         isBusy = true;
-        Util.showToast(ctx, "Loading new data");
+        //Util.showToast(ctx, "Loading new data");
+        setRefreshActionButtonState(true);
         BaseVolley.getRemoteData(Statics.SERVLET_ENDPOINT, w, ctx, new BaseVolley.BohaVolleyListener() {
             @Override
             public void onResponseReceived(ResponseDTO r) {
                 isBusy = false;
 //                progressBar.setVisibility(View.GONE);
+                setRefreshActionButtonState(false);
                 if (r.getStatusCode() > 0) {
                     Toast.makeText(ctx, r.getMessage(), Toast.LENGTH_LONG).show();
                     return;
@@ -1193,6 +1252,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
             @Override
             public void onVolleyError(VolleyError error) {
                 isBusy = false;
+                setRefreshActionButtonState(false);
                 //Toast.makeText(ctx, "Problem: " + error.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
@@ -1275,7 +1335,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
 
     private void getEvaluationsByRiver() {
         if (isBusy2) {
-            Toast.makeText(ctx, "Busy...getting rivers ...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ctx, "Evaluations Loaded ...", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -1401,7 +1461,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
     private void fieldPicker() {
         w = WebCheck.checkNetworkAvailability(ctx);
         if (w.isWifiConnected() || w.isMobileConnected()) {
-            Util.showToast(ctx, "System detected network connectivity and is going to load only the nearest rivers");
+            // Util.showToast(ctx, "System detected network connectivity and is going to load only the nearest rivers");
             Util.collapse(WT_sp_river, 200, new Util.UtilAnimationListener() {
                 @Override
                 public void onAnimationEnded() {
@@ -1415,8 +1475,10 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
                 }
             });
 
-
-            getRiversAroundMe();
+            if (!isBusy) {
+                getRiversAroundMe();
+            }
+            return;
         } else {
             Util.collapse(WT_sp_riverConnected, 200, new Util.UtilAnimationListener() {
                 @Override
@@ -1430,7 +1492,7 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
                     WT_sp_river.setVisibility(View.VISIBLE);
                 }
             });
-
+            buildUI();
         }
     }
 
@@ -1442,9 +1504,6 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
 
                 response = new ResponseDTO();
                 response = respond;
-                buildUI();
-
-                fieldPicker();
             }
 
             @Override
@@ -1457,7 +1516,6 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        fieldPicker();
                     }
                 });
 
@@ -1510,5 +1568,18 @@ public class EvaluationActivity extends ActionBarActivity implements LocationLis
         }
         hideKeyboard();
         return index;
+    }
+
+    public void setRefreshActionButtonState(final boolean refreshing) {
+        if (mMenu != null) {
+            final MenuItem refreshItem = mMenu.findItem(R.id.action_refresh);
+            if (refreshItem != null) {
+                if (refreshing) {
+                    refreshItem.setActionView(R.layout.action_bar_progess);
+                } else {
+                    refreshItem.setActionView(null);
+                }
+            }
+        }
     }
 }

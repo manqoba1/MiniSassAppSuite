@@ -12,6 +12,7 @@ import android.util.Log;
 import com.google.android.gcm.GCMBaseIntentService;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.gson.Gson;
+import com.sifiso.codetribe.minisasslibrary.activities.ProfileActivity;
 
 public class GcmIntentService extends GCMBaseIntentService {
     public static final int NOTIFICATION_ID = 1;
@@ -78,15 +79,15 @@ public class GcmIntentService extends GCMBaseIntentService {
         String message = msgIntent.getExtras().getString("message");
 
 
-        Intent wpaIntent = new Intent(this, MainPagerActivity.class);
+        Intent wpaIntent = new Intent(this, ProfileActivity.class);
 
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
                 wpaIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
-                this).setSmallIcon(R.drawable.reply32)
-                .setContentTitle("Confirmation")
-                .setStyle(new NotificationCompat.BigTextStyle().bigText("GCM Confirmation"))
+                this).setSmallIcon(R.drawable.blue_crap)
+                .setContentTitle("Invitation request")
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
                 .setContentText(message);
 
         mBuilder.setContentIntent(contentIntent);

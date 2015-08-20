@@ -52,7 +52,7 @@ public class EvaluationAdapter extends BaseAdapter {
     }
 
     class Holder {
-        TextView ELI_txtCount, ELI_team, ELI_date, ELI_wc, ELI_pH, ELI_wt, ELI_oxygen, ELI_score, ELI_condition, ELI_remarks;
+        TextView ELI_txtCount, ELI_team, ELI_date, ELI_wc, ELI_pH, ELI_wt, ELI_oxygen, ELI_score, ELI_condition, ELI_remarks, ELI_envType;
         ImageView ELI_condition_image, ELI_contribute, ELI_edit, ELI_directions;
 
         RelativeLayout AR_traineeLayout;
@@ -73,6 +73,7 @@ public class EvaluationAdapter extends BaseAdapter {
             h.AR_traineeLayout2 = (RelativeLayout) v.findViewById(R.id.AR_traineeLayout2);
             h.AR_traineeLayout = (RelativeLayout) v.findViewById(R.id.AR_traineeLayout);
             h.ELI_condition = (TextView) v.findViewById(R.id.ELI_condition);
+            h.ELI_envType = (TextView) v.findViewById(R.id.ELI_envType);
             h.ELI_date = (TextView) v.findViewById(R.id.ELI_date);
             h.ELI_oxygen = (TextView) v.findViewById(R.id.ELI_oxygen);
             h.ELI_pH = (TextView) v.findViewById(R.id.ELI_pH);
@@ -100,6 +101,12 @@ public class EvaluationAdapter extends BaseAdapter {
         h.ELI_wc.setText(evaluation.getWaterClarity() + "");
         h.ELI_wt.setText(evaluation.getWaterTemperature() + "");
         h.ELI_pH.setText(evaluation.getpH() + "");
+        h.ELI_envType.setText(evaluation.getConditions().getCategoryName());
+        if(evaluation.getConditions().getCategoryID()==8) {
+            h.ELI_envType.setTextColor(mCtx.getResources().getColor(R.color.yellow_dark));
+        }else{
+            h.ELI_envType.setTextColor(mCtx.getResources().getColor(R.color.Peru));
+        }
         if (evaluation.getRemarks() == null) {
             h.ELI_remarks.setVisibility(View.GONE);
         } else {
